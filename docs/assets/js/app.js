@@ -10,7 +10,7 @@
     if (!spec) return;
     const sec = document.createElement('section');
     sec.id = id;
-    sec.className = id === 'journey' ? 'hero' : 'story';
+    sec.className = id === 'journey' ? 'hero' : 'section';
     main.append(sec);
     try { spec.render(sec, D); } catch (e) { sec.innerHTML = `<div class="wrap"><p>This section could not be drawn: ${e.message}</p></div>`; console.error(e); }
     if (spec.nav) nav.append(R.h(`<a href="#${id}">${spec.nav}</a>`));

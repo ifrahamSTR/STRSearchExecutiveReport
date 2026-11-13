@@ -40,10 +40,14 @@
     const rec = { node, build, inst: null };
     R.charts.push(rec);
     const draw = () => {
+      if (!node.offsetWidth) return;                       // hidden (collapsed details): drawn when opened
       if (!rec.inst) rec.inst = echarts.init(node, null, { renderer: 'svg' });
       rec.inst.setOption(build(R.tokens()), true);
+      rec.inst.resize();
     };
     rec.draw = draw;
+    const det = node.closest('details');
+    if (det) det.addEventListener('toggle', () => { if (det.open) draw(); });
     draw();
     return rec;
   };
