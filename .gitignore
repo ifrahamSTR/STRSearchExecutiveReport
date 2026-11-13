@@ -1,0 +1,27 @@
+# Raw business data and credentials must never be committed.
+*.xlsx
+*.xls
+*.xlsm
+*.csv
+!docs/data/*.csv
+*.zip
+*.pdf
+*.docx
+*.mp4
+*.pkl
+*.parquet
+*auth*.json
+*credential*
+*secret*
+*.pem
+*.key
+.env
+.env.*
+# Local build cache / tooling
+.cache/
+__pycache__/
+*.pyc
+.venv/
+node_modules/
+.DS_Store
+qa_output/

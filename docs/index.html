@@ -1,0 +1,39 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <title>STRSearch Executive Performance Report</title>
+  <meta name="claude:viewport-fit-sides" content="cover">
+  <meta name="description" content="How quickly STRSearch clients reach Under Contract and CLOSED, how many get there, and whether acquisition output is keeping pace with new clients.">
+  <meta name="robots" content="noindex, nofollow">
+  <link rel="icon" href="assets/img/strsearch-logo.webp">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Space+Grotesk:wght@500;600&display=swap">
+  <link rel="stylesheet" href="assets/css/report.css">
+  <script>try { var t = localStorage.getItem('exr-theme'); if (t) document.documentElement.setAttribute('data-theme', t); } catch (e) {}</script>
+</head>
+<body>
+  <a class="visually-hidden" href="#main">Skip to content</a>
+  <header class="top">
+    <div class="wrap">
+      <a class="brand" href="#journey" aria-label="Back to the summary"><img src="assets/img/strsearch-logo.webp" alt="STR Search" width="90" height="26"><span>Executive Performance Report</span></a>
+      <nav class="nav" id="nav" aria-label="Sections"><a href="#journey">Summary</a></nav>
+      <button class="theme-btn" id="themeBtn" type="button" aria-label="Switch light or dark mode"><svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M16.5 12.2A7 7 0 017.8 3.5a7 7 0 108.7 8.7z"/></svg></button>
+    </div>
+  </header>
+  <main id="main"></main>
+  <footer class="foot"><div class="wrap"><span>STRSearch · Executive Performance Report · aggregates from Jira and Pipedrive</span><span id="foot-asof"></span></div></footer>
+
+  <script src="assets/vendor/echarts-5.5.0.min.js"></script>
+  <script src="data/report-data.js"></script>
+  <script src="assets/js/core.js"></script>
+  <script src="assets/js/stories/journey.js"></script>
+  <script src="assets/js/stories/speed.js"></script>
+  <script src="assets/js/stories/progression.js"></script>
+  <script src="assets/js/stories/throughput.js"></script>
+  <script src="assets/js/stories/notes.js"></script>
+  <script src="assets/js/app.js"></script>
+</body>
+</html>
