@@ -62,6 +62,14 @@ def checks(ctx: C.Ctx, data: dict) -> list[dict]:
     chk("Active clients with UC / CLOSED recorded", (oc["attainment"]["uc"], oc["attainment"]["closed"]), (ex["q2"]["active_uc"], ex["q2"]["active_closed"]))
     q3 = {r["month"]: r for r in ex["q3"]}
     chk("Monthly rows that differ from the Explorer", sum(1 for r in pc["monthly"] if (r["new"], r["uc"], r["closed"]) != (q3[r["month"]]["new_signed_start"], q3[r["month"]]["uc"], q3[r["month"]]["closed"])), 0)
+    chk("Jira intake: signed + pre-sale + declined = the Explorer's new Jira issues (all statuses), months that differ",
+        sum(1 for r in pc["intake"]["monthly"] if r["signed"] + r["presale"] + r["declined"] != q3[r["month"]]["new_all_created"]), 0)
+    ca = pc["intake"]["classes_all"]
+    chk("Jira intake classes cover every issue: signed = signed-up list, pre-sale + declined = records outside it",
+        (ca["signed"], ca["presale"] + ca["declined"]), (ex["jira"]["signed"], ex["jira"]["unmapped"]))
+    chk("Same-cohort view: start months whose size differs from the Explorer's signed starts",
+        sum(1 for c in pc["cohort"]["rows"] if c["n"] != q3[c["month"]]["new_signed_start"]), 0)
+    chk("Keeping pace: no published share rests on 1-4 clients", small_cells(pc), 0)
     chk("Pre-sale Jira statuses = records outside the signed-up lists", sum(jn["presale"]["statuses"].values()), ex["jira"]["unmapped"])
     chk("Fast/slow: the four speed groups add up to clients with 75+ days on the clock", sum(g["n"] for g in dr["composition"]["groups"]), dr["bases"]["d75"]["eligible"])
     chk("Fast/slow: matched clients never exceed eligible clients", all(dr["bases"][b]["matched"] <= dr["bases"][b]["eligible"] for b in ("d30", "d75")), True)
@@ -73,6 +81,11 @@ def checks(ctx: C.Ctx, data: dict) -> list[dict]:
     # statements the presentation makes in words (warn only: on a refresh the page text follows the data)
     chk("Largest 15-day bin is 15-29 days", (sp["hist"]["largest"]["from"], sp["hist"]["largest"]["to"]), (15, 29), hard=False)
     chk("About 71% of recorded UC within 60 days", round(sp["hist"]["within60"]["share"] * 100), 71, hard=False)
+    w, co = pc["windows"], pc["cohort"]
+    chk("Keeping pace: Jira intake and acquisition starts both rose after late May (five-month averages)",
+        w["intake"]["after"] > w["intake"]["before"] and w["starts"]["after"] > w["starts"]["before"], True, hard=False)
+    chk("Keeping pace: 'still about N in 10' - starters before and after late May reach UC within 90 days at the same rounded rate",
+        co["pooled_before"] is not None and round(co["pooled_before"] * 10) == round(co["pooled_after"] * 10), True, hard=False)
     of = [r["within30"]["share"] for r in dr["offers"]["rows"]]
     chk("Capital: no threshold beats chance (family-wise p > 0.05 on both outcomes)", min(dr["capital"]["family_p"].values()) > 0.05, True, hard=False)
     chk("Offer experience: share within 30 days rises 0 -> 1-2 -> 3+ offers", None not in of and of == sorted(of), True, hard=False)

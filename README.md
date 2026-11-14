@@ -11,7 +11,7 @@ A visually led leadership presentation that shows how STRSearch turns paying cli
 |---|---|---|---|
 | 1 · The Client Journey | Route map: Pipedrive Won (buys STRSearch) vs Jira CLOSED (buys a property); sales-first route before 27 May 2026 vs the New Client Experience (New Clients → Confidence Call → Won or Services Declined), where the clocks overlap | `pipeline/chapters/journey.py` | `docs/assets/js/chapters/journey.js` |
 | 2 · Where are our clients today? | 850 signed-up → Active / Inactive → current stage; recorded milestone attainment (72% / 67%) | `outcomes.py` | `outcomes.js` |
-| 3 · Are we keeping pace? | Monthly new clients vs Under Contract and CLOSED events | `pace.py` | `pace.js` |
+| 3 · Are we keeping pace? | What enters Jira: new issues by month created, by where each stands today (signed client / still in pre-sale onboarding / Services Declined), since Jira began opening before the sale on 27 May 2026 → signed clients starting acquisition vs Under Contract and CLOSED events, with the share of each 2026 start month under contract within 90 days | `pace.py` | `pace.js` |
 | 4 · How long does acquisition actually take? | Recorded durations → distribution of days to UC → clients still waiting → Kaplan–Meier (77 / 127 days) | `speed.py` | `speed.js` |
 | 5 · What distinguishes fast and slow clients? | Who moves quickly (four speed groups) → capital: no threshold from $250K to $500K → offer experience (16% vs 36% under contract within 30 days) → deals seen before committing (8 / 13 / 20) → what STRSearch might take from it | `drivers.py` | `drivers.js` |
 
@@ -20,6 +20,7 @@ Use the ← and → keys to step through the scenes while presenting.
 ## Data
 - Every figure comes from the [Business Data Explorer](https://github.com/ifrahamSTR/STRSearchBusinessDataExplorer-Public). This repo imports its pipeline (`definitions.py`, `build.py`, `metrics.py`) and uses its headline metrics directly.
 - The chapter modules only reshape those figures for the visuals (bin counts, curve points). There is no new analysis and no imputed dates.
+- Chapter 3 uses the Explorer's monthly counts (new Jira issues by created date, signed clients by client start, first Under Contract / CLOSED dates), its onboarding-first funnel classes and its same-cohort view (Under Contract within 90 days). Each build checks that the three intake classes add up to the Explorer's monthly totals and that cohort sizes match its monthly signed starts.
 - Chapter 5 also reads the onboarding form (`Onboarding STR Search (Responses).xlsx`, sheet *Form Responses 2*) and matches it to Jira by hashed client e-mail (preferred or secondary answer vs Jira client and additional e-mails).
   - The column headed "Person ID" (AH) actually holds Pipedrive **deal** ids. Each build checks this against the e-mail matches, and the column is used only as a deal-id fallback.
   - An answer counts only if it was given before the client's first Under Contract date.

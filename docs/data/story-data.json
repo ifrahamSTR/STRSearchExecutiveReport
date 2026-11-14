@@ -279,7 +279,383 @@
    }
   ],
   "change_month": "2026-06",
-  "change_date": "2026-05-27"
+  "change_date": "2026-05-27",
+  "intake": {
+   "monthly": [
+    {
+     "month": "2025-01",
+     "label": "Jan 2025",
+     "signed": 11,
+     "presale": 0,
+     "declined": 0,
+     "partial": false,
+     "total": 11
+    },
+    {
+     "month": "2025-02",
+     "label": "Feb 2025",
+     "signed": 6,
+     "presale": 0,
+     "declined": 0,
+     "partial": false,
+     "total": 6
+    },
+    {
+     "month": "2025-03",
+     "label": "Mar 2025",
+     "signed": 13,
+     "presale": 0,
+     "declined": 0,
+     "partial": false,
+     "total": 13
+    },
+    {
+     "month": "2025-04",
+     "label": "Apr 2025",
+     "signed": 9,
+     "presale": 0,
+     "declined": 0,
+     "partial": false,
+     "total": 9
+    },
+    {
+     "month": "2025-05",
+     "label": "May 2025",
+     "signed": 14,
+     "presale": 0,
+     "declined": 0,
+     "partial": false,
+     "total": 14
+    },
+    {
+     "month": "2025-06",
+     "label": "Jun 2025",
+     "signed": 16,
+     "presale": 0,
+     "declined": 0,
+     "partial": false,
+     "total": 16
+    },
+    {
+     "month": "2025-07",
+     "label": "Jul 2025",
+     "signed": 26,
+     "presale": 0,
+     "declined": 0,
+     "partial": false,
+     "total": 26
+    },
+    {
+     "month": "2025-08",
+     "label": "Aug 2025",
+     "signed": 34,
+     "presale": 0,
+     "declined": 0,
+     "partial": false,
+     "total": 34
+    },
+    {
+     "month": "2025-09",
+     "label": "Sep 2025",
+     "signed": 38,
+     "presale": 0,
+     "declined": 0,
+     "partial": false,
+     "total": 38
+    },
+    {
+     "month": "2025-10",
+     "label": "Oct 2025",
+     "signed": 35,
+     "presale": 0,
+     "declined": 0,
+     "partial": false,
+     "total": 35
+    },
+    {
+     "month": "2025-11",
+     "label": "Nov 2025",
+     "signed": 17,
+     "presale": 0,
+     "declined": 0,
+     "partial": false,
+     "total": 17
+    },
+    {
+     "month": "2025-12",
+     "label": "Dec 2025",
+     "signed": 24,
+     "presale": 1,
+     "declined": 0,
+     "partial": false,
+     "total": 25
+    },
+    {
+     "month": "2026-01",
+     "label": "Jan 2026",
+     "signed": 34,
+     "presale": 2,
+     "declined": 0,
+     "partial": false,
+     "total": 36
+    },
+    {
+     "month": "2026-02",
+     "label": "Feb 2026",
+     "signed": 18,
+     "presale": 2,
+     "declined": 2,
+     "partial": false,
+     "total": 22
+    },
+    {
+     "month": "2026-03",
+     "label": "Mar 2026",
+     "signed": 35,
+     "presale": 0,
+     "declined": 0,
+     "partial": false,
+     "total": 35
+    },
+    {
+     "month": "2026-04",
+     "label": "Apr 2026",
+     "signed": 31,
+     "presale": 0,
+     "declined": 0,
+     "partial": false,
+     "total": 31
+    },
+    {
+     "month": "2026-05",
+     "label": "May 2026",
+     "signed": 32,
+     "presale": 4,
+     "declined": 6,
+     "partial": false,
+     "total": 42
+    },
+    {
+     "month": "2026-06",
+     "label": "Jun 2026",
+     "signed": 75,
+     "presale": 25,
+     "declined": 65,
+     "partial": false,
+     "total": 165
+    },
+    {
+     "month": "2026-07",
+     "label": "Jul 2026",
+     "signed": 86,
+     "presale": 43,
+     "declined": 67,
+     "partial": false,
+     "total": 196
+    },
+    {
+     "month": "2026-08",
+     "label": "Aug 2026",
+     "signed": 86,
+     "presale": 63,
+     "declined": 115,
+     "partial": false,
+     "total": 264
+    },
+    {
+     "month": "2026-09",
+     "label": "Sep 2026",
+     "signed": 68,
+     "presale": 64,
+     "declined": 101,
+     "partial": false,
+     "total": 233
+    },
+    {
+     "month": "2026-10",
+     "label": "Oct 2026",
+     "signed": 47,
+     "presale": 79,
+     "declined": 38,
+     "partial": false,
+     "total": 164
+    },
+    {
+     "month": "2026-11",
+     "label": "Nov 2026",
+     "signed": 7,
+     "presale": 29,
+     "declined": 0,
+     "partial": true,
+     "total": 36
+    }
+   ],
+   "since_change": {
+    "from": "2026-05-27",
+    "total": 1074,
+    "signed": 375,
+    "presale": 307,
+    "declined": 392
+   },
+   "classes_all": {
+    "signed": 850,
+    "presale": 312,
+    "declined": 394
+   },
+   "early_prospects": 7
+  },
+  "windows": {
+   "before": [
+    "2025-12",
+    "2026-01",
+    "2026-02",
+    "2026-03",
+    "2026-04"
+   ],
+   "after": [
+    "2026-06",
+    "2026-07",
+    "2026-08",
+    "2026-09",
+    "2026-10"
+   ],
+   "intake": {
+    "before": 29.8,
+    "after": 204.4
+   },
+   "starts": {
+    "before": 26.8,
+    "after": 73.4
+   },
+   "uc": {
+    "before": 17.6,
+    "after": 46.6
+   },
+   "closed": {
+    "before": 18.0,
+    "after": 38.0
+   }
+  },
+  "cohort": {
+   "days": 90,
+   "from": "2026-01",
+   "rows": [
+    {
+     "month": "2026-01",
+     "n": 31,
+     "k": 17,
+     "share": 0.5484,
+     "mature": true,
+     "closed_no_uc": 0
+    },
+    {
+     "month": "2026-02",
+     "n": 23,
+     "k": 11,
+     "share": 0.4783,
+     "mature": true,
+     "closed_no_uc": 1
+    },
+    {
+     "month": "2026-03",
+     "n": 32,
+     "k": 17,
+     "share": 0.5312,
+     "mature": true,
+     "closed_no_uc": 3
+    },
+    {
+     "month": "2026-04",
+     "n": 28,
+     "k": 18,
+     "share": 0.6429,
+     "mature": true,
+     "closed_no_uc": 1
+    },
+    {
+     "month": "2026-05",
+     "n": 34,
+     "k": 21,
+     "share": 0.6176,
+     "mature": true,
+     "closed_no_uc": 2
+    },
+    {
+     "month": "2026-06",
+     "n": 65,
+     "k": 38,
+     "share": 0.5846,
+     "mature": true,
+     "closed_no_uc": 2
+    },
+    {
+     "month": "2026-07",
+     "n": 92,
+     "k": 57,
+     "share": 0.6196,
+     "mature": true,
+     "closed_no_uc": 0
+    },
+    {
+     "month": "2026-08",
+     "n": 82,
+     "k": null,
+     "share": null,
+     "mature": false,
+     "closed_no_uc": 0
+    },
+    {
+     "month": "2026-09",
+     "n": 76,
+     "k": null,
+     "share": null,
+     "mature": false,
+     "closed_no_uc": 0
+    },
+    {
+     "month": "2026-10",
+     "n": 52,
+     "k": null,
+     "share": null,
+     "mature": false,
+     "closed_no_uc": 0
+    },
+    {
+     "month": "2026-11",
+     "n": 9,
+     "k": null,
+     "share": null,
+     "mature": false,
+     "closed_no_uc": 0
+    }
+   ],
+   "pooled_before": 0.5526,
+   "pooled_after": 0.6051,
+   "no_uc_date": {
+    "y2025": {
+     "n": 238,
+     "k": 48
+    },
+    "shown": {
+     "n": 305,
+     "k": 9
+    }
+   },
+   "presale_pending": {
+    "2026-06": 24,
+    "2026-07": 37
+   }
+  },
+  "sales": {
+   "before": {
+    "won": 161,
+    "starts": 134
+   },
+   "after": {
+    "won": 362,
+    "starts": 367
+   }
+  }
  },
  "speed": {
   "observed": {
@@ -1854,7 +2230,7 @@
    "jira": "2026-11-11 16:46",
    "pipedrive": "2026-11-12 17:21"
   },
-  "built_at": "2026-11-14 10:24",
+  "built_at": "2026-11-15 03:54",
   "chapters": [
    "journey",
    "outcomes",
@@ -1958,6 +2334,40 @@
    "hard": true
   },
   {
+   "check": "Jira intake: signed + pre-sale + declined = the Explorer's new Jira issues (all statuses), months that differ",
+   "page": 0,
+   "explorer": 0,
+   "ok": true,
+   "hard": true
+  },
+  {
+   "check": "Jira intake classes cover every issue: signed = signed-up list, pre-sale + declined = records outside it",
+   "page": [
+    850,
+    706
+   ],
+   "explorer": [
+    850,
+    706
+   ],
+   "ok": true,
+   "hard": true
+  },
+  {
+   "check": "Same-cohort view: start months whose size differs from the Explorer's signed starts",
+   "page": 0,
+   "explorer": 0,
+   "ok": true,
+   "hard": true
+  },
+  {
+   "check": "Keeping pace: no published share rests on 1-4 clients",
+   "page": 0,
+   "explorer": 0,
+   "ok": true,
+   "hard": true
+  },
+  {
    "check": "Pre-sale Jira statuses = records outside the signed-up lists",
    "page": 706,
    "explorer": 706,
@@ -2016,6 +2426,20 @@
    "check": "About 71% of recorded UC within 60 days",
    "page": 71,
    "explorer": 71,
+   "ok": true,
+   "hard": false
+  },
+  {
+   "check": "Keeping pace: Jira intake and acquisition starts both rose after late May (five-month averages)",
+   "page": true,
+   "explorer": true,
+   "ok": true,
+   "hard": false
+  },
+  {
+   "check": "Keeping pace: 'still about N in 10' - starters before and after late May reach UC within 90 days at the same rounded rate",
+   "page": true,
+   "explorer": true,
    "ok": true,
    "hard": false
   },

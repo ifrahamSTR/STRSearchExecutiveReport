@@ -3,6 +3,7 @@
    A slim journey rail on the left tracks the four chapters. Arrow keys step between scenes.
    Colour carries meaning everywhere: plum = sales clock, deep green = acquisition clock,
    amber = still searching, blue = Under Contract, green = CLOSED, grey = inactive / context.
+   Chapter 3 intake: signed client = acquisition green, still in pre-sale onboarding = hatched plum (sales side, undecided), Services Declined = grey (--decl).
    Chapter 5 speed groups use one blue ramp (strong = within 30 days, pale = 75+ days) plus hatched amber for still searching.
    Milestone palette validated with the dataviz validator (light on #ffffff, dark on #131c19). */
 
@@ -16,7 +17,7 @@
   --uc: #2a78d6; --uc-2: #b7d1f2;
   --closed: #0f8a6f; --closed-2: #a5d8c8;
   --wait: #d98a2b; --wait-2: #f2cf9e;
-  --hold: #8c9a95; --hold-2: #c9d2ce;
+  --hold: #8c9a95; --hold-2: #c9d2ce; --decl: #c9d2ce;
   --sp-fast: #1f5fb8; --sp-mid: #5b97e3; --sp-slow: #86b1ea;
   --grid: #e8eeeb; --axis: #c7d2cd; --label: #66786f;
   --focus: #2a78d6;
@@ -38,7 +39,7 @@
     --uc: #3987e5; --uc-2: #23426a;
     --closed: #1b9a7c; --closed-2: #1a4f41;
     --wait: #c98500; --wait-2: #5a4212;
-    --hold: #7f8d88; --hold-2: #36423e;
+    --hold: #7f8d88; --hold-2: #36423e; --decl: #7f8d88;
     --sp-fast: #8bbaf5; --sp-mid: #4a8be0; --sp-slow: #24518f;
     --grid: #1f2a26; --axis: #34423d; --label: #8b9b95;
     --focus: #5596ea;
@@ -55,7 +56,7 @@
   --uc: #3987e5; --uc-2: #23426a;
   --closed: #1b9a7c; --closed-2: #1a4f41;
   --wait: #c98500; --wait-2: #5a4212;
-  --hold: #7f8d88; --hold-2: #36423e;
+  --hold: #7f8d88; --hold-2: #36423e; --decl: #7f8d88;
   --sp-fast: #8bbaf5; --sp-mid: #4a8be0; --sp-slow: #24518f;
   --grid: #1f2a26; --axis: #34423d; --label: #8b9b95;
   --focus: #5596ea;
@@ -267,3 +268,23 @@ footer.foot .stage { display: flex; flex-wrap: wrap; gap: 6px 18px; justify-cont
 .learn li::before { content: counter(learn, decimal-leading-zero); font: 600 13px/1 var(--f-mono); color: var(--acq); }
 .learn b { font: 650 clamp(20px, 1.9vw, 24px)/1.2 var(--f-display); letter-spacing: -.01em; color: var(--ink); text-wrap: balance; }
 .learn span { font-size: 15px; line-height: 1.5; color: var(--ink-2); }
+
+/* ---------- chapter 3: Jira intake tally + taller throughput chart */
+.chart.h-xxl { height: 500px; }
+.legend.legend-top { margin: 0 0 4px; }
+@media (max-width: 640px) { .chart.h-xxl { height: 470px; } }
+.in-signed { background: var(--acq); }
+.in-presale { background: repeating-linear-gradient(135deg, var(--sales) 0 2px, var(--sales-2) 2px 4px); }
+.in-declined { background: var(--decl); }
+.tally { margin-top: 14px; padding-top: 16px; border-top: 1px solid var(--line); }
+.tally-h { font: 500 14px/1.4 var(--f-body); color: var(--ink-2); }
+.tally-h b { color: var(--ink); font-weight: 700; }
+.tally-bar { display: flex; gap: 3px; height: 14px; margin-top: 10px; }
+.tally-bar i { display: block; min-width: 4px; border-radius: 3px; }
+.tally-keys { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 12px 28px; margin-top: 14px; }
+.tk { display: grid; grid-template-columns: auto minmax(0, 1fr); column-gap: 12px; align-items: baseline; min-width: 0; }
+.tk-v { grid-row: span 2; min-width: 1.9em; font: 700 clamp(24px, 2.4vw, 30px)/1 var(--f-display); letter-spacing: -.02em; color: var(--ink); }
+.tk-t { font: 600 14.5px/1.3 var(--f-body); color: var(--ink); }
+.tk-t i { display: inline-block; width: 10px; height: 10px; border-radius: 2px; margin-right: 7px; vertical-align: 0; }
+.tk-s { font: 500 12.5px/1.35 var(--f-body); color: var(--muted); }
+@media (max-width: 760px) { .tally-keys { grid-template-columns: 1fr; gap: 10px; } }

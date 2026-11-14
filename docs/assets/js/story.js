@@ -21,10 +21,10 @@
   const css = n => getComputedStyle(document.documentElement).getPropertyValue(n).trim();
   S.tok = () => ({
     ink: css('--ink'), ink2: css('--ink-2'), muted: css('--muted'), surface: css('--surface'), line: css('--line'),
-    grid: css('--grid'), axis: css('--axis'), label: css('--label'), sales: css('--sales'), acq: css('--acq'),
+    grid: css('--grid'), axis: css('--axis'), label: css('--label'), sales: css('--sales'), sales2: css('--sales-2'), acq: css('--acq'),
     uc: css('--uc'), uc2: css('--uc-2'), closed: css('--closed'), closed2: css('--closed-2'),
     wait: css('--wait'), wait2: css('--wait-2'), hold: css('--hold'), hold2: css('--hold-2'),
-    sp1: css('--sp-fast'), sp2: css('--sp-mid'), sp3: css('--sp-slow'),
+    sp1: css('--sp-fast'), sp2: css('--sp-mid'), sp3: css('--sp-slow'), decl: css('--decl'),
   });
 
   /* charts: ECharts (SVG renderer), redrawn on theme change, resized with their container */

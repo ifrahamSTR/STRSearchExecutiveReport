@@ -26,13 +26,24 @@ Live page: https://ifrahamstr.github.io/STRSearchExecutiveReport/
 - **850 signed-up clients:**
   - **644 Active:** 119 still searching, 66 under contract or inspection, 236 CLOSED, 223 post-close.
   - **206 Inactive:** 109 paused, 92 refunded, 5 additional service.
-- Active includes clients who have already closed.
+- **Active client (STRSearch definition):** a signed-up client whose current Jira status is not Inactive. Active statuses: Searching (Client Start, 2/4/6/8 Weeks), Under Contract (Under Contract, Passed Inspection), CLOSED, Post-close (Photography Shared, Listed, Content Pulled). Inactive: Paused, Refunded, Additional Service. New Clients, Onboarding Completed and Services Declined are prospects, outside the signed-up population.
+- Active does not mean actively searching: clients who have bought a property stay Active. The classification uses current status only, not historical activity.
 - **Recorded milestones among the 644 Active clients:** **72%** have recorded Under Contract (464) and **67%** have recorded CLOSED (429). These describe historical attainment, not a lifetime conversion rate.
 
 ## Chapter 3: are we keeping pace?
-- Monthly from January 2025: new signed-up clients (by month of client start) vs Under Contract and CLOSED events (by month recorded). See `pace.monthly`.
+Two views of monthly input vs output, January 2025 to November 2026 (November partial). See `pace`.
+1. **What enters Jira** (`pace.intake`): every Jira issue by the month it was created, all statuses, split by where it stands **today** with the Explorer's onboarding-first funnel classes: signed client (status in the signed-up list), still in pre-sale onboarding (New Clients, Onboarding Completed), Services Declined.
+   - Since the New Client Experience (27 May 2026), Jira opens at onboarding, before the sale. Before it, Jira opened at the sale.
+   - New issues per month: about 30 before vs about 200 after (29.8 vs 204.4; averages of the five full months either side, Dec 2025–Apr 2026 vs Jun–Oct 2026).
+   - Of the 1,074 issues opened since 27 May: 375 are signed clients today, 307 still in pre-sale onboarding, 392 Services Declined. These are current statuses, not conversions completed in the month the issue opened.
+2. **Clients in, contracts out** (`pace.monthly`, the Explorer's Q3 table): signed clients by the month their acquisition clock started vs first Under Contract and first CLOSED events in the month they happened.
+   - Starts: 26.8 → 73.4 a month; Under Contract events 17.6 → 46.6; CLOSED events 18.0 → 38.0 (same five-month windows).
+   - Starts are currently signed clients grouped by clock start, not purchases in that month. For reference, Pipedrive Won (service sales): 362 in Jun–Oct 2026 vs 367 starts.
+   - Monthly events often belong to clients who started earlier. Never divide monthly Under Contract by monthly starts or intake: that is not a conversion rate.
+   - **Same-cohort view** (`pace.cohort`, the Explorer's Q3 cohort chart): share of each start month's signed clients under contract within 90 days, shown once every client has had 90 days. 2026-01 55%, 2026-02 48%, 2026-03 53%, 2026-04 64%, 2026-05 62%, 2026-06 58%, 2026-07 62%. Pooled: 55% for Jan–Apr 2026 starters vs 61% for Jun–Jul 2026.
+   - 2025 start months are not shown: 48 of 238 clients who started in 2025 have a CLOSED date but no recorded Under Contract date, which would understate them. Shares shown are a slight floor (9 of 305 affected).
 - The late-May 2026 changes (Complete offer, Confidence Call) coincided with growth; their separate effects have not been established.
-- This is not same-cohort conversion.
+- No historical backlog is reconstructed from today's statuses.
 
 ## Chapter 4: how long does acquisition actually take?
 1. **Recorded durations:** median 36 / average 53.8 days to Under Contract (499 clients); median 77 / average 96.3 days to CLOSED (432 clients).
