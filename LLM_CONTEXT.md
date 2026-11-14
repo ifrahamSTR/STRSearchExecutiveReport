@@ -44,16 +44,48 @@ Live page: https://ifrahamstr.github.io/STRSearchExecutiveReport/
    - **Limitation:** 61 clients with a recorded CLOSED date but no recorded Under Contract date count as not reaching Under Contract, so 77 is likely on the high side.
 
 ## Chapter 5: what distinguishes fast and slow clients?
-- **Groups,** by recorded days to first Under Contract: fast ≤30, middle 31–74, slow ≥75. Clients still searching are a separate group.
-- **Who is compared:** only clients with 75+ days on the clock (started by 28 Aug 2026).
-- **Onboarding answers** (current form, since 20 Apr 2026; matched for 204 of 491 eligible clients, mostly recent):
-  - Has submitted 3+ offers: fast 65%, slow 56%.
-  - Owns an Airbnb: fast 18%, slow 22%.
-  - All-in out-of-pocket capital of $300K+: fast 26%, slow 30%.
-  - Capital under $200K: fast 30%, slow 30%.
-  - **No difference is statistically clear** (Fisher's exact test, all p ≥ 0.48).
-  - Capital (column M) is total all-in out-of-pocket capital, not the purchase budget.
-- **Deals sent** (Jira *Total Deals Sent*): median 8 for fast clients, 13 middle, 20 slow, 15 for those still searching. Longer searches accumulate more deals, so this describes the search rather than explains it.
+- **Speed groups** (recorded days to first Under Contract):
+  - Fast: within 30 days. Middle: 31–74 days. Slow: 75+ days.
+  - Still searching (no contract yet) is kept separate from completed slow purchases.
+- **Who moves quickly** (all 491 clients with 75+ days on the clock, started by 28 Aug 2026):
+
+  | Group | Share | Median days to Under Contract |
+  |---|---|---|
+  | Within 30 days | 36% | 18 |
+  | 31–74 days | 34% | 48 |
+  | 75+ days | 20% | 106 |
+  | Still searching | 9% | — |
+
+  30% had no contract before day 75.
+- **Fair comparisons:** each share uses only clients who have had time to reach that milestone.
+  - "Within 30 days": clients with 30+ days on the clock (571; 285 with onboarding answers).
+  - "Before day 75": clients with 75+ days on the clock (491; 206 with answers).
+  - The slow / still-searching split depends on time on the clock, so comparisons use "before day 75".
+- **Onboarding matching:**
+  - Current form, since 20 Apr 2026, matched by client e-mail.
+  - 206 of the 241 eligible clients who started in the form's window are matched (85%).
+  - The form column headed "Person ID" (AH) holds Pipedrive **deal** ids: 599 agreements with the e-mail match, against 0 when read as Jira's person id (`PD_Contact_ID`).
+  - Every answer used precedes the client's first Under Contract date; typically it is given 5 days before client start.
+  - Matched clients started 24 Apr – 12 Oct 2026; 87% after the late-May changes.
+- **Capital** (column M, total all-in out-of-pocket capital, not purchase budget; each range read at its upper end):
+  - No cut-off from $250K to $500K separates fast from slow clients.
+  - Within 30 days: 28–33% at or above each cut-off vs 29–32% below. Before day 75: 68–72% vs 69–70%. Median days to contract ≈ 40 on both sides.
+  - The best cut-off is no better than chance once all six are considered together (p = 0.92 / 0.99). Differences beyond ±19 points are ruled out.
+  - $200K+ would include everyone (the lowest option is $150K–$200K). $500K+ is the top option, so nothing higher can be tested.
+- **Other answers tested** (adjusted for start period; Holm correction across 14 tests):
+  - No clear difference for liquidity, strict budget, named specific markets, turnkey / light renovation, or Airbnb ownership.
+  - Named specific markets: no contract before day 75 for 40% vs 27% (p = 0.13), within chance.
+  - Lower capital (≤$250K) combined with any other constraint: no added effect.
+- **Offer experience** (column AA), share under contract within 30 days:
+  - 16% with no offers, 26% with 1–2, 36% with 3+. Before day 75 every group is ≈ 70%.
+  - Odds ×1.67 per step (95% 1.10–2.54): p = 0.015 before correction, 0.21 after. Same direction in each start month since May.
+  - A lead worth watching, not a proven driver.
+- **Deals seen** (Jira *Total Deals Sent*), median before committing:
+  - 8 within 30 days (median 18 days to contract), 13 in 31–74 days, 20 in 75+ days.
+  - The count appears to stop at Under Contract: for all 23 clients with both dates, the last deal was sent on or before the contract date, and totals don't grow with time since contract.
+  - Per 30 days of search: 13.8 / 8.6 / 5.3. No dated record of each deal exists, so pace and length of search can't be separated.
+  - Missing for most still-searching clients (14 of 46).
+- **Sample size:** with about 200 matched clients, only gaps of ~17 points or more are reliably detectable. "No clear difference" means no large gap, not identical behaviour. Associations, not causes.
 
 ## Files
 - `docs/data/story-data.json`: all figures, keyed by chapter: `journey`, `outcomes`, `pace`, `speed`, `drivers`, plus `meta` and `checks`.

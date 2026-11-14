@@ -1231,130 +1231,621 @@
  "drivers": {
   "form_from": "2026-04-20",
   "min_days": 75,
+  "fast_days": 30,
   "eligible_through": "2026-08-28",
-  "groups": [
-   {
-    "key": "fast",
-    "label": "Under Contract within 30 days",
-    "eligible": 178,
-    "matched": 66
+  "fast_base_through": "2026-10-12",
+  "composition": {
+   "n": 491,
+   "groups": [
+    {
+     "key": "fast",
+     "label": "Under Contract within 30 days",
+     "n": 178,
+     "median_days": 18.0,
+     "median_elapsed": null
+    },
+    {
+     "key": "middle",
+     "label": "31\u201374 days",
+     "n": 168,
+     "median_days": 48.0,
+     "median_elapsed": null
+    },
+    {
+     "key": "slow",
+     "label": "75 days or longer",
+     "n": 99,
+     "median_days": 106.0,
+     "median_elapsed": null
+    },
+    {
+     "key": "searching",
+     "label": "Still searching, no contract yet",
+     "n": 46,
+     "median_days": null,
+     "median_elapsed": 106.5
+    }
+   ]
+  },
+  "bases": {
+   "d30": {
+    "eligible": 571,
+    "matched": 285,
+    "share": 0.3053
    },
-   {
-    "key": "middle",
-    "label": "31\u201374 days",
-    "eligible": 168,
-    "matched": 75
-   },
-   {
-    "key": "slow",
-    "label": "75 days or longer",
-    "eligible": 99,
-    "matched": 27
-   },
-   {
-    "key": "searching",
-    "label": "Still searching, no contract yet",
-    "eligible": 46,
-    "matched": 36
+   "d75": {
+    "eligible": 491,
+    "matched": 206,
+    "share": 0.6942,
+    "in_form_window": 241,
+    "matched_in_window": 206
    }
-  ],
-  "rows": [
+  },
+  "matching": {
+   "identifier": {
+    "deal": {
+     "agree": 599,
+     "conflict": 5
+    },
+    "person": {
+     "agree": 0,
+     "conflict": 25
+    }
+   },
+   "via_deal_only": 1,
+   "rejected_conflicts": 2,
+   "only_after_uc": 0,
+   "answer_lag_days": {
+    "median": -5.0,
+    "max": 4.0
+   },
+   "signed_matched": 401,
+   "answers_after_uc_used": 0
+  },
+  "capital": {
+   "rows": [
+    {
+     "t": 250,
+     "d30": {
+      "at": {
+       "n": 196,
+       "k": 61,
+       "share": 0.3112
+      },
+      "below": {
+       "n": 89,
+       "k": 26,
+       "share": 0.2921
+      },
+      "diff_ci": [
+       -0.099,
+       0.127
+      ]
+     },
+     "d75": {
+      "at": {
+       "n": 143,
+       "k": 99,
+       "share": 0.6923
+      },
+      "below": {
+       "n": 63,
+       "k": 44,
+       "share": 0.6984
+      },
+      "diff_ci": [
+       -0.133,
+       0.134
+      ]
+     },
+     "median_days": {
+      "at": 39.5,
+      "below": 40.5
+     }
+    },
+    {
+     "t": 300,
+     "d30": {
+      "at": {
+       "n": 141,
+       "k": 41,
+       "share": 0.2908
+      },
+      "below": {
+       "n": 144,
+       "k": 46,
+       "share": 0.3194
+      },
+      "diff_ci": [
+       -0.134,
+       0.078
+      ]
+     },
+     "d75": {
+      "at": {
+       "n": 102,
+       "k": 70,
+       "share": 0.6863
+      },
+      "below": {
+       "n": 104,
+       "k": 73,
+       "share": 0.7019
+      },
+      "diff_ci": [
+       -0.14,
+       0.109
+      ]
+     },
+     "median_days": {
+      "at": 42.0,
+      "below": 39.5
+     }
+    },
+    {
+     "t": 350,
+     "d30": {
+      "at": {
+       "n": 87,
+       "k": 24,
+       "share": 0.2759
+      },
+      "below": {
+       "n": 198,
+       "k": 63,
+       "share": 0.3182
+      },
+      "diff_ci": [
+       -0.149,
+       0.076
+      ]
+     },
+     "d75": {
+      "at": {
+       "n": 63,
+       "k": 43,
+       "share": 0.6825
+      },
+      "below": {
+       "n": 143,
+       "k": 100,
+       "share": 0.6993
+      },
+      "diff_ci": [
+       -0.157,
+       0.112
+      ]
+     },
+     "median_days": {
+      "at": 42.0,
+      "below": 40.0
+     }
+    },
+    {
+     "t": 400,
+     "d30": {
+      "at": {
+       "n": 68,
+       "k": 19,
+       "share": 0.2794
+      },
+      "below": {
+       "n": 217,
+       "k": 68,
+       "share": 0.3134
+      },
+      "diff_ci": [
+       -0.147,
+       0.096
+      ]
+     },
+     "d75": {
+      "at": {
+       "n": 53,
+       "k": 38,
+       "share": 0.717
+      },
+      "below": {
+       "n": 153,
+       "k": 105,
+       "share": 0.6863
+      },
+      "diff_ci": [
+       -0.118,
+       0.16
+      ]
+     },
+     "median_days": {
+      "at": 42.0,
+      "below": 39.5
+     }
+    },
+    {
+     "t": 450,
+     "d30": {
+      "at": {
+       "n": 50,
+       "k": 16,
+       "share": 0.32
+      },
+      "below": {
+       "n": 235,
+       "k": 71,
+       "share": 0.3021
+      },
+      "diff_ci": [
+       -0.11,
+       0.167
+      ]
+     },
+     "d75": {
+      "at": {
+       "n": 41,
+       "k": 29,
+       "share": 0.7073
+      },
+      "below": {
+       "n": 165,
+       "k": 114,
+       "share": 0.6909
+      },
+      "diff_ci": [
+       -0.149,
+       0.155
+      ]
+     },
+     "median_days": {
+      "at": 40.5,
+      "below": 40.0
+     }
+    },
+    {
+     "t": 500,
+     "d30": {
+      "at": {
+       "n": 42,
+       "k": 14,
+       "share": 0.3333
+      },
+      "below": {
+       "n": 243,
+       "k": 73,
+       "share": 0.3004
+      },
+      "diff_ci": [
+       -0.104,
+       0.193
+      ]
+     },
+     "d75": {
+      "at": {
+       "n": 35,
+       "k": 25,
+       "share": 0.7143
+      },
+      "below": {
+       "n": 171,
+       "k": 118,
+       "share": 0.6901
+      },
+      "diff_ci": [
+       -0.153,
+       0.167
+      ]
+     },
+     "median_days": {
+      "at": 39.0,
+      "below": 40.0
+     }
+    }
+   ],
+   "everyone_from": 200,
+   "top_option": 500,
+   "family_p": {
+    "d30": 0.923,
+    "d75": 0.986
+   },
+   "rho_days": -0.022,
+   "widest_gap_ci": 0.19,
+   "ambiguous_400plus": 0
+  },
+  "offers": {
+   "rows": [
+    {
+     "key": "0",
+     "label": "No offers yet",
+     "within30": {
+      "n": 32,
+      "k": 5,
+      "share": 0.1562
+     },
+     "within75": {
+      "n": 27,
+      "k": 19,
+      "share": 0.7037
+     },
+     "median_days": 48.5
+    },
+    {
+     "key": "1-2",
+     "label": "1\u20132 offers",
+     "within30": {
+      "n": 85,
+      "k": 22,
+      "share": 0.2588
+     },
+     "within75": {
+      "n": 65,
+      "k": 46,
+      "share": 0.7077
+     },
+     "median_days": 40.0
+    },
+    {
+     "key": "3+",
+     "label": "3+ offers",
+     "within30": {
+      "n": 168,
+      "k": 60,
+      "share": 0.3571
+     },
+     "within75": {
+      "n": 114,
+      "k": 78,
+      "share": 0.6842
+     },
+     "median_days": 35.0
+    }
+   ],
+   "trend": {
+    "or": 1.67,
+    "lo": 1.1,
+    "hi": 2.54,
+    "p": 0.0152,
+    "p_holm": 0.213
+   },
+   "adjusted_all": {
+    "or": 1.78,
+    "lo": 1.15,
+    "hi": 2.75,
+    "p": 0.0099
+   },
+   "gap_3plus_vs_0": [
+    0.026,
+    0.316
+   ],
+   "monthly": [
+    {
+     "month": "2026-05",
+     "more_experienced_faster": true
+    },
+    {
+     "month": "2026-06",
+     "more_experienced_faster": true
+    },
+    {
+     "month": "2026-07",
+     "more_experienced_faster": true
+    },
+    {
+     "month": "2026-08",
+     "more_experienced_faster": true
+    }
+   ]
+  },
+  "markets": {
+   "specific": {
+    "n": 55,
+    "k": 22,
+    "share": 0.4
+   },
+   "open": {
+    "n": 151,
+    "k": 41,
+    "share": 0.2715
+   }
+  },
+  "tested": [
    {
-    "key": "offers3",
-    "label": "Has submitted 3+ real-estate offers",
-    "shares": {
-     "fast": 0.6515,
-     "middle": 0.4667,
-     "slow": 0.5556,
-     "searching": 0.5833
+    "key": "capital",
+    "label": "All-in capital (per $100K)",
+    "within30": {
+     "or": 0.94,
+     "lo": 0.73,
+     "hi": 1.2,
+     "p": 0.6022,
+     "p_holm": 1.0
     },
-    "n": {
-     "fast": 66,
-     "middle": 75,
-     "slow": 27,
-     "searching": 36
+    "within75": {
+     "or": 0.98,
+     "lo": 0.74,
+     "hi": 1.3,
+     "p": 0.8805,
+     "p_holm": 1.0
+    }
+   },
+   {
+    "key": "liquidity",
+    "label": "Capital partly tied up (not liquid)",
+    "within30": {
+     "or": 0.65,
+     "lo": 0.33,
+     "hi": 1.28,
+     "p": 0.2163,
+     "p_holm": 1.0
     },
-    "p_fast_slow": 0.48
+    "within75": {
+     "or": 0.6,
+     "lo": 0.3,
+     "hi": 1.23,
+     "p": 0.1618,
+     "p_holm": 1.0
+    }
+   },
+   {
+    "key": "budget",
+    "label": "Strict budget",
+    "within30": {
+     "or": 1.35,
+     "lo": 0.63,
+     "hi": 2.93,
+     "p": 0.4421,
+     "p_holm": 1.0
+    },
+    "within75": {
+     "or": 1.1,
+     "lo": 0.43,
+     "hi": 2.81,
+     "p": 0.8503,
+     "p_holm": 1.0
+    }
+   },
+   {
+    "key": "markets",
+    "label": "Named specific markets",
+    "within30": {
+     "or": 0.94,
+     "lo": 0.53,
+     "hi": 1.66,
+     "p": 0.8215,
+     "p_holm": 1.0
+    },
+    "within75": {
+     "or": 0.6,
+     "lo": 0.31,
+     "hi": 1.16,
+     "p": 0.1281,
+     "p_holm": 1.0
+    }
+   },
+   {
+    "key": "property",
+    "label": "Turnkey or light renovation only",
+    "within30": {
+     "or": 0.78,
+     "lo": 0.39,
+     "hi": 1.54,
+     "p": 0.4704,
+     "p_holm": 1.0
+    },
+    "within75": {
+     "or": 1.14,
+     "lo": 0.5,
+     "hi": 2.58,
+     "p": 0.7543,
+     "p_holm": 1.0
+    }
+   },
+   {
+    "key": "offers",
+    "label": "Real-estate offers submitted (0 / 1\u20132 / 3+)",
+    "within30": {
+     "or": 1.67,
+     "lo": 1.1,
+     "hi": 2.54,
+     "p": 0.0152,
+     "p_holm": 0.213
+    },
+    "within75": {
+     "or": 0.94,
+     "lo": 0.61,
+     "hi": 1.44,
+     "p": 0.7798,
+     "p_holm": 1.0
+    }
    },
    {
     "key": "airbnb",
-    "label": "Already owns at least one Airbnb",
-    "shares": {
-     "fast": 0.1818,
-     "middle": 0.16,
-     "slow": 0.2222,
-     "searching": 0.1944
+    "label": "Already owns an Airbnb",
+    "within30": {
+     "or": 1.13,
+     "lo": 0.59,
+     "hi": 2.15,
+     "p": 0.7134,
+     "p_holm": 1.0
     },
-    "n": {
-     "fast": 66,
-     "middle": 75,
-     "slow": 27,
-     "searching": 36
-    },
-    "p_fast_slow": 0.773
-   },
-   {
-    "key": "cap300",
-    "label": "Capital (all-in, out of pocket) of $300K+",
-    "shares": {
-     "fast": 0.2576,
-     "middle": 0.3333,
-     "slow": 0.2963,
-     "searching": 0.3333
-    },
-    "n": {
-     "fast": 66,
-     "middle": 75,
-     "slow": 27,
-     "searching": 36
-    },
-    "p_fast_slow": 0.798
-   },
-   {
-    "key": "cap200",
-    "label": "Capital (all-in, out of pocket) under $200K",
-    "shares": {
-     "fast": 0.303,
-     "middle": 0.32,
-     "slow": 0.2963,
-     "searching": 0.3056
-    },
-    "n": {
-     "fast": 66,
-     "middle": 75,
-     "slow": 27,
-     "searching": 36
-    },
-    "p_fast_slow": 1.0
+    "within75": {
+     "or": 0.78,
+     "lo": 0.36,
+     "hi": 1.66,
+     "p": 0.5119,
+     "p_holm": 1.0
+    }
    }
   ],
-  "deals": {
-   "fast": {
-    "n": 171,
-    "p25": 6.0,
-    "median": 8.0,
-    "p75": 10.5
+  "interactions": [
+   {
+    "key": "budget",
+    "label": "Strict budget",
+    "within30": 0.5001,
+    "within75": 0.8892
    },
-   "middle": {
-    "n": 160,
-    "p25": 11.0,
-    "median": 13.0,
-    "p75": 17.0
+   {
+    "key": "liquidity",
+    "label": "Capital partly tied up (not liquid)",
+    "within30": 0.1098,
+    "within75": 0.2188
    },
-   "slow": {
-    "n": 90,
-    "p25": 16.0,
-    "median": 20.0,
-    "p75": 29.0
+   {
+    "key": "markets",
+    "label": "Named specific markets",
+    "within30": 0.8511,
+    "within75": 0.9737
    },
-   "searching": {
-    "n": 14,
-    "p25": 7.5,
-    "median": 15.0,
-    "p75": 29.75
+   {
+    "key": "property",
+    "label": "Turnkey or light renovation only",
+    "within30": 0.6585,
+    "within75": 0.3927
    }
+  ],
+  "detectable_gap": 0.17,
+  "matched_cohort": {
+   "from": "2026-04-24",
+   "to": "2026-10-12",
+   "since_new_experience": 0.874
   },
-  "signed_matched": 399
+  "deals": {
+   "groups": {
+    "fast": {
+     "n": 171,
+     "p25": 6.0,
+     "median": 8.0,
+     "p75": 10.5,
+     "per_30_days": 13.8,
+     "median_days": 18.0
+    },
+    "middle": {
+     "n": 160,
+     "p25": 11.0,
+     "median": 13.0,
+     "p75": 17.0,
+     "per_30_days": 8.6,
+     "median_days": 48.0
+    },
+    "slow": {
+     "n": 90,
+     "p25": 16.0,
+     "median": 20.0,
+     "p75": 29.0,
+     "per_30_days": 5.3,
+     "median_days": 105.0
+    }
+   },
+   "searching_with_count": [
+    14,
+    46
+   ],
+   "last_sent": {
+    "n": 23,
+    "on_or_before_uc": 23
+   },
+   "since_uc_rho": {
+    "fast": -0.42,
+    "middle": -0.37,
+    "slow": -0.07
+   }
+  }
  },
  "meta": {
   "title": "The Client Journey",
@@ -1363,7 +1854,7 @@
    "jira": "2026-11-11 16:46",
    "pipedrive": "2026-11-12 17:21"
   },
-  "built_at": "2026-11-14 09:45",
+  "built_at": "2026-11-14 10:24",
   "chapters": [
    "journey",
    "outcomes",
@@ -1474,16 +1965,37 @@
    "hard": true
   },
   {
-   "check": "Fast/slow groups: matched clients never exceed eligible clients",
+   "check": "Fast/slow: the four speed groups add up to clients with 75+ days on the clock",
+   "page": 491,
+   "explorer": 491,
+   "ok": true,
+   "hard": true
+  },
+  {
+   "check": "Fast/slow: matched clients never exceed eligible clients",
    "page": true,
    "explorer": true,
    "ok": true,
    "hard": true
   },
   {
-   "check": "Fast/slow groups: no reported share rests on fewer than 5 clients",
+   "check": "Onboarding column AH behaves as a Pipedrive deal id, not a person id (>=95% agreement with e-mail matches)",
    "page": true,
    "explorer": true,
+   "ok": true,
+   "hard": true
+  },
+  {
+   "check": "Onboarding answers used all precede the client's first Under Contract date",
+   "page": 0,
+   "explorer": 0,
+   "ok": true,
+   "hard": true
+  },
+  {
+   "check": "Fast/slow: no published share rests on 1-4 clients",
+   "page": 0,
+   "explorer": 0,
    "ok": true,
    "hard": true
   },
@@ -1504,6 +2016,27 @@
    "check": "About 71% of recorded UC within 60 days",
    "page": 71,
    "explorer": 71,
+   "ok": true,
+   "hard": false
+  },
+  {
+   "check": "Capital: no threshold beats chance (family-wise p > 0.05 on both outcomes)",
+   "page": true,
+   "explorer": true,
+   "ok": true,
+   "hard": false
+  },
+  {
+   "check": "Offer experience: share within 30 days rises 0 -> 1-2 -> 3+ offers",
+   "page": true,
+   "explorer": true,
+   "ok": true,
+   "hard": false
+  },
+  {
+   "check": "Deals seen: slow > middle > fast (medians)",
+   "page": true,
+   "explorer": true,
    "ok": true,
    "hard": false
   }

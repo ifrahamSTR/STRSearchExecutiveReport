@@ -24,6 +24,7 @@
     grid: css('--grid'), axis: css('--axis'), label: css('--label'), sales: css('--sales'), acq: css('--acq'),
     uc: css('--uc'), uc2: css('--uc-2'), closed: css('--closed'), closed2: css('--closed-2'),
     wait: css('--wait'), wait2: css('--wait-2'), hold: css('--hold'), hold2: css('--hold-2'),
+    sp1: css('--sp-fast'), sp2: css('--sp-mid'), sp3: css('--sp-slow'),
   });
 
   /* charts: ECharts (SVG renderer), redrawn on theme change, resized with their container */

@@ -3,6 +3,7 @@
    A slim journey rail on the left tracks the four chapters. Arrow keys step between scenes.
    Colour carries meaning everywhere: plum = sales clock, deep green = acquisition clock,
    amber = still searching, blue = Under Contract, green = CLOSED, grey = inactive / context.
+   Chapter 5 speed groups use one blue ramp (strong = within 30 days, pale = 75+ days) plus hatched amber for still searching.
    Milestone palette validated with the dataviz validator (light on #ffffff, dark on #131c19). */
 
 :root {
@@ -16,6 +17,7 @@
   --closed: #0f8a6f; --closed-2: #a5d8c8;
   --wait: #d98a2b; --wait-2: #f2cf9e;
   --hold: #8c9a95; --hold-2: #c9d2ce;
+  --sp-fast: #1f5fb8; --sp-mid: #5b97e3; --sp-slow: #86b1ea;
   --grid: #e8eeeb; --axis: #c7d2cd; --label: #66786f;
   --focus: #2a78d6;
   --shadow: 0 1px 2px rgba(10, 40, 34, .04), 0 10px 30px rgba(10, 40, 34, .06);
@@ -37,6 +39,7 @@
     --closed: #1b9a7c; --closed-2: #1a4f41;
     --wait: #c98500; --wait-2: #5a4212;
     --hold: #7f8d88; --hold-2: #36423e;
+    --sp-fast: #8bbaf5; --sp-mid: #4a8be0; --sp-slow: #24518f;
     --grid: #1f2a26; --axis: #34423d; --label: #8b9b95;
     --focus: #5596ea;
     --shadow: 0 1px 2px rgba(0, 0, 0, .35), 0 10px 30px rgba(0, 0, 0, .25);
@@ -53,6 +56,7 @@
   --closed: #1b9a7c; --closed-2: #1a4f41;
   --wait: #c98500; --wait-2: #5a4212;
   --hold: #7f8d88; --hold-2: #36423e;
+  --sp-fast: #8bbaf5; --sp-mid: #4a8be0; --sp-slow: #24518f;
   --grid: #1f2a26; --axis: #34423d; --label: #8b9b95;
   --focus: #5596ea;
   --shadow: 0 1px 2px rgba(0, 0, 0, .35), 0 10px 30px rgba(0, 0, 0, .25);
@@ -228,8 +232,38 @@ footer.foot .stage { display: flex; flex-wrap: wrap; gap: 6px 18px; justify-cont
 .jlab.a { font-weight: 700; fill: var(--acq); }
 .legend i.pill { width: 22px; height: 12px; border-radius: 6px; }
 .legend b.flag { color: var(--acq); font-size: 14px; }
-.legend i.diamond { width: 11px; height: 11px; border-radius: 1px; background: var(--ink-2); transform: rotate(45deg); }
-.legend .muted { color: var(--muted); }
 .chart.h-s2 { height: 250px; }
 
 .duo > .board + .board { margin-top: 0; }
+
+/* ---------- chapter 5: fast and slow clients */
+.mix { position: relative; padding-top: 34px; }
+.mix-bar { display: flex; gap: 3px; height: 48px; }
+.mix-bar i { display: block; min-width: 4px; border-radius: 4px; }
+.mix-bar i:first-child { border-radius: 12px 4px 4px 12px; }
+.mix-bar i:last-child { border-radius: 4px 12px 12px 4px; }
+.sp-fast { background: var(--sp-fast); }
+.sp-middle { background: var(--sp-mid); }
+.sp-slow { background: var(--sp-slow); }
+.sp-searching { background: repeating-linear-gradient(135deg, var(--wait) 0 5px, var(--wait-2) 5px 9px); }
+.mix-brace { position: absolute; top: 16px; height: 12px; border: 1.5px solid var(--ink-2); border-bottom: 0; border-radius: 6px 6px 0 0; }
+.mix-brace span { position: absolute; right: -2px; bottom: 16px; font: 600 12.5px/1 var(--f-mono); color: var(--ink-2); white-space: nowrap; }
+.mix-keys { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 22px 28px; margin-top: 26px; }
+@media (max-width: 760px) { .mix-keys { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+.mk { display: grid; gap: 6px; align-content: start; min-width: 0; }
+.mk::before { content: ""; height: 5px; border-radius: 3px; margin-bottom: 6px; }
+.mk.fast::before { background: var(--sp-fast); }
+.mk.middle::before { background: var(--sp-mid); }
+.mk.slow::before { background: var(--sp-slow); }
+.mk.searching::before { background: repeating-linear-gradient(135deg, var(--wait) 0 5px, var(--wait-2) 5px 9px); }
+.mk-v { font: 700 clamp(32px, 3.4vw, 44px)/1 var(--f-display); letter-spacing: -.02em; color: var(--ink); }
+.mk-t { font: 600 15px/1.3 var(--f-body); color: var(--ink); }
+.mk-s { font: 500 13px/1.4 var(--f-body); color: var(--muted); }
+.chart.h-d { height: 300px; }
+.legend i.hollow { border-radius: 50%; background: none !important; border: 3px solid var(--ink-2); }
+.learn { list-style: none; margin: 0; padding: 0; display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 32px; counter-reset: learn; }
+@media (max-width: 860px) { .learn { grid-template-columns: 1fr; gap: 22px; } }
+.learn li { counter-increment: learn; display: grid; gap: 10px; align-content: start; min-width: 0; }
+.learn li::before { content: counter(learn, decimal-leading-zero); font: 600 13px/1 var(--f-mono); color: var(--acq); }
+.learn b { font: 650 clamp(20px, 1.9vw, 24px)/1.2 var(--f-display); letter-spacing: -.01em; color: var(--ink); text-wrap: balance; }
+.learn span { font-size: 15px; line-height: 1.5; color: var(--ink-2); }
