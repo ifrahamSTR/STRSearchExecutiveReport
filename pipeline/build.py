@@ -1,14 +1,15 @@
 #!/usr/bin/env python3
-"""Build the STRSearch Executive Performance Report dataset.
+"""Build the data for "The Client Journey" presentation.
 
     python pipeline/build.py [--explorer <path to STRSearch-Business-Data-Explorer>] [--reports <Reporting Tables>] [--cache]
 
-Records and business definitions come from the Business Data Explorer pipeline (imported, not
-copied). Each story module returns aggregates only; nothing at client level is written.
-Output: docs/data/report-data.js (window.REPORT_DATA = {...}).
+All figures come from the Business Data Explorer's validated pipeline (imported, not copied).
+Chapter modules reshape them for the visuals; nothing is re-analysed or imputed. Every build
+checks the output against the Explorer's own headline metrics and stops on any mismatch.
+Output: docs/data/story-data.js (window.STORY_DATA) and docs/data/story-data.json (aggregates only).
 
-Adding a story: write pipeline/stories/<name>.py with build(ctx) -> dict, add it to STORIES,
-then add docs/assets/js/stories/<name>.js and list it in docs/index.html.
+Adding a chapter: write pipeline/chapters/<name>.py with build(ctx) -> dict, add it to CHAPTERS,
+then add docs/assets/js/chapters/<name>.js and one <script> tag in docs/index.html.
 """
 from __future__ import annotations
 
@@ -21,42 +22,35 @@ from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 import core as C  # noqa: E402
-from stories import journey, progression, speed, throughput  # noqa: E402
+from chapters import clocks, outcomes, pace, speed  # noqa: E402
 
-STORIES = {"journey": journey, "speed": speed, "progression": progression, "throughput": throughput}
-OUT = C.ROOT / "docs" / "data" / "report-data.js"
+CHAPTERS = {"clocks": clocks, "speed": speed, "outcomes": outcomes, "pace": pace}
+OUT = C.ROOT / "docs" / "data" / "story-data.js"
 
 
 def checks(ctx: C.Ctx, data: dict) -> list[dict]:
-    """Consistency checks: the report must agree with the Explorer's validated metrics."""
-    ex = ctx.M.expected(ctx.deals, ctx.jira, ctx.asof)
-    sp, pr, th = data["speed"], data["progression"], data["throughput"]
+    ex, sp, oc, pc = ctx.expected, data["speed"], data["outcomes"], data["pace"]
     out = []
 
-    def chk(name, got, want):
-        out.append({"check": name, "report": got, "explorer": want, "ok": got == want})
+    def chk(name, got, want, hard=True):
+        out.append({"check": name, "page": got, "explorer": want, "ok": got == want, "hard": hard})
 
-    chk("Signed-up clients", pr["classes"]["signed"], ex["jira"]["signed"])
-    chk("Active clients", pr["classes"]["active"], ex["jira"]["active"])
-    chk("Inactive clients", pr["classes"]["inactive"], ex["jira"]["inactive"])
-    chk("Days to UC: n", sp["observed"]["uc"]["n"], ex["q1"]["uc"]["n"])
-    chk("Days to UC: mean", sp["observed"]["uc"]["mean"], ex["q1"]["uc"]["mean"])
-    chk("Days to UC: median", sp["observed"]["uc"]["median"], ex["q1"]["uc"]["median"])
-    chk("Days to CLOSED: mean", sp["observed"]["closed"]["mean"], ex["q1"]["closed"]["mean"])
-    chk("Days to CLOSED: median", sp["observed"]["closed"]["median"], ex["q1"]["closed"]["median"])
-    chk("Estimated median to UC, as previously reported", sp["estimate"]["uc"]["prior"]["median"], ex["q1"]["km_uc_signed"])
-    chk("Estimated median to CLOSED, as previously reported", sp["estimate"]["closed"]["prior"]["median"], ex["q1"]["km_closed_signed"])
-    chk("Active clients with a UC date", pr["attainment"]["active"]["uc_logged"], ex["q2"]["active_uc"])
-    chk("Active clients with a CLOSED date", pr["attainment"]["active"]["closed_logged"], ex["q2"]["active_closed"])
+    chk("Days to UC: median / mean / n", (sp["observed"]["uc"]["median"], sp["observed"]["uc"]["mean"], sp["observed"]["uc"]["n"]),
+        (ex["q1"]["uc"]["median"], ex["q1"]["uc"]["mean"], ex["q1"]["uc"]["n"]))
+    chk("Days to CLOSED: median / mean / n", (sp["observed"]["closed"]["median"], sp["observed"]["closed"]["mean"], sp["observed"]["closed"]["n"]),
+        (ex["q1"]["closed"]["median"], ex["q1"]["closed"]["mean"], ex["q1"]["closed"]["n"]))
+    chk("Kaplan-Meier curve crosses 50% (UC)", sp["estimate"]["uc"]["check"], ex["q1"]["km_uc_signed"])
+    chk("Kaplan-Meier curve crosses 50% (CLOSED)", sp["estimate"]["closed"]["check"], ex["q1"]["km_closed_signed"])
+    chk("Histogram bins + overflow = UC n", sum(sp["hist"]["counts"]) + sp["hist"]["overflow"], ex["q1"]["uc"]["n"])
+    chk("Active status groups add up to Active", sum(g["n"] for g in oc["active_groups"]), ex["jira"]["active"])
+    chk("Inactive statuses add up to Inactive", sum(i["n"] for i in oc["inactive_statuses"]), ex["jira"]["inactive"])
+    chk("Active + Inactive = signed-up", oc["active"] + oc["inactive"], ex["jira"]["signed"])
+    chk("Active clients with UC / CLOSED recorded", (oc["attainment"]["uc"], oc["attainment"]["closed"]), (ex["q2"]["active_uc"], ex["q2"]["active_closed"]))
     q3 = {r["month"]: r for r in ex["q3"]}
-    mism = sum(1 for r in th["monthly"] if r["month"] in q3 and (r["new"], r["uc"], r["closed"]) != (q3[r["month"]]["new_signed_start"], q3[r["month"]]["uc"], q3[r["month"]]["closed"]))
-    chk("Monthly new / UC / CLOSED: months that differ", mism, 0)
-    stage_total = sum(s["n"] for s in pr["stages"])
-    chk("Stages add up to signed-up clients", stage_total, pr["classes"]["signed"])
-    d = sp["distribution"]["uc"]
-    chk("Histogram bins + overflow = UC n", sum(b["n"] for b in d["bins7"]) + d["overflow"], d["n"])
-    u = sp["unfinished"]
-    chk("Open searches now = clients searching, never under contract", th["open_searches"]["now"], u["n_never_uc"])
+    chk("Monthly rows that differ from the Explorer", sum(1 for r in pc["monthly"] if (r["new"], r["uc"], r["closed"]) != (q3[r["month"]]["new_signed_start"], q3[r["month"]]["uc"], q3[r["month"]]["closed"])), 0)
+    # statements the presentation makes in words (warn only: on a refresh the page text follows the data)
+    chk("Largest 15-day bin is 15-29 days", (sp["hist"]["largest"]["from"], sp["hist"]["largest"]["to"]), (15, 29), hard=False)
+    chk("About 71% of recorded UC within 60 days", round(sp["hist"]["within60"]["share"] * 100), 71, hard=False)
     return out
 
 
@@ -69,28 +63,24 @@ def main() -> None:
     args = ap.parse_args()
     t0 = time.time()
     ctx = C.load(args.explorer, args.reports, args.cache)
-    data = {k: mod.build(ctx) for k, mod in STORIES.items()}
+    data = {k: mod.build(ctx) for k, mod in CHAPTERS.items()}
     snap = {m["key"]: m["snapshot"] for m in ctx.meta}
     data["meta"] = {
-        "title": "STRSearch Executive Performance Report",
-        "asof": ctx.asof.strftime("%Y-%m-%d"),
+        "title": "The Client Journey", "asof": ctx.asof.strftime("%Y-%m-%d"),
         "snapshots": {"jira": snap["jira"], "pipedrive": snap["deals"]},
-        "built_at": datetime.now().strftime("%Y-%m-%d %H:%M"),
-        "process_change": C.PROCESS_CHANGE, "post_change_first_month": C.POST_CHANGE_FIRST_MONTH,
-        "reliable_from": C.RELIABLE_FROM, "start_rule": ctx.D.EFFECTIVE_START_RULE,
-        "stories": list(STORIES),
+        "built_at": datetime.now().strftime("%Y-%m-%d %H:%M"), "chapters": list(CHAPTERS),
+        "source": "https://ifrahamstr.github.io/STRSearchBusinessDataExplorer-Public/",
     }
     data["checks"] = checks(ctx, data)
-    bad = [c for c in data["checks"] if not c["ok"]]
-    js = "/* Generated by pipeline/build.py. Aggregates only. Do not edit by hand. */\nwindow.REPORT_DATA = " + json.dumps(data, separators=(",", ":"), default=str) + ";\n"
+    js = "/* Generated by pipeline/build.py from the Business Data Explorer. Aggregates only. */\nwindow.STORY_DATA = " + json.dumps(data, separators=(",", ":"), default=str) + ";\n"
     args.out.parent.mkdir(parents=True, exist_ok=True)
     args.out.write_text(js, encoding="utf-8")
-    # plain JSON copy for other tools and AI assistants
     args.out.with_suffix(".json").write_text(json.dumps(data, indent=1, default=str), encoding="utf-8")
+    bad = [c for c in data["checks"] if not c["ok"]]
     print(f"Wrote {args.out.name} ({len(js) / 1e3:.0f} KB) in {time.time() - t0:.1f}s; checks: {len(data['checks']) - len(bad)}/{len(data['checks'])} ok")
     for c in bad:
-        print(f"  CHECK FAILED: {c['check']}: report {c['report']} vs explorer {c['explorer']}")
-    if bad:
+        print(f"  {'CHECK FAILED' if c['hard'] else 'NOTE'}: {c['check']}: page {c['page']} vs explorer/brief {c['explorer']}")
+    if any(c["hard"] for c in bad):
         sys.exit(1)
 
 
