@@ -37,6 +37,35 @@
     });
   }
 
+  /* 4.4 the same journey bars as 4.1, extended from the recorded median to the Kaplan-Meier median */
+  function extended(node, rows) {
+    S.chart(node, t => {
+      const col = { uc: [t.uc, t.uc2], closed: [t.closed, t.closed2] };
+      return Object.assign(S.base(t), {
+        tooltip: { show: false },
+        grid: { left: 150, right: 28, top: 34, bottom: 40 },
+        xAxis: S.dayAxis(t, 150, { name: 'days from client start' }),
+        yAxis: { type: 'category', data: rows.map(r => r.name), inverse: true, show: false },
+        series: [{
+          type: 'custom', encode: { x: [1, 2], y: 0 }, data: rows.map((r, i) => [i, r.obs, r.km]),
+          renderItem: (p, api) => {
+            const i = api.value(0), r = rows[i], c = col[r.k], h = 26;
+            const [x0, y] = api.coord([0, i]), xo = api.coord([r.obs, i])[0], xk = api.coord([r.km, i])[0], xe = api.coord([150, i])[0];
+            return { type: 'group', children: [
+              { type: 'rect', shape: { x: x0, y: y - h / 2, width: xe - x0, height: h, r: h / 2 }, style: { fill: t.grid } },
+              { type: 'rect', shape: { x: x0, y: y - h / 2, width: xk - x0, height: h, r: h / 2 }, style: { fill: c[1], stroke: c[0], lineWidth: 1.5, lineDash: [5, 4] } },
+              { type: 'rect', shape: { x: x0, y: y - h / 2, width: xo - x0, height: h, r: h / 2 }, style: { fill: c[0] } },
+              { type: 'text', style: { x: xo, y: y + h / 2 + 8, text: `recorded ${r.obs}`, textAlign: 'center', textVerticalAlign: 'top', font: `500 12.5px ${BODY}`, fill: t.ink2 } },
+              { type: 'text', style: { x: xk, y: y - h / 2 - 6, text: String(r.km), textAlign: 'right', textVerticalAlign: 'bottom', font: `700 34px ${DISPLAY}`, fill: t.ink } },
+              { type: 'text', style: { x: xk + 6, y: y - h / 2 - 10, text: 'days, all clients', textAlign: 'left', textVerticalAlign: 'bottom', font: `500 13px ${BODY}`, fill: t.ink2 } },
+              { type: 'text', style: { x: x0 - 18, y, text: r.name, textAlign: 'right', textVerticalAlign: 'middle', font: `650 17px ${DISPLAY}`, fill: t.ink } },
+            ] };
+          },
+        }],
+      });
+    });
+  }
+
   /* 2.2 distribution of recorded days to Under Contract (the Explorer's 15-day bins) */
   function histogram(node, h) {
     const W = h.width, cap = h.cap;
@@ -111,7 +140,7 @@
             markLine: { symbol: ['none', 'arrow'], symbolSize: 11, silent: true, lineStyle: { color: t.ink2, width: 2, type: 'solid' }, label: { show: false }, data: [[{ coord: [obsMed + 3, 0.5] }, { coord: [kmMed - 5, 0.5] }]] },
             markPoint: { silent: true, symbol: 'circle', data: [
               { coord: [obsMed, 0.5], symbolSize: 14, itemStyle: { color: t.surface, borderColor: color, borderWidth: 3 }, label: { show: true, position: 'left', distance: 8, formatter: String(obsMed), color: t.ink2, fontWeight: 700, fontSize: 15 } },
-              { coord: [kmMed, 0.5], symbolSize: 16, itemStyle: { color, borderColor: t.surface, borderWidth: 2 }, label: { show: true, position: 'right', distance: 8, formatter: String(kmMed), color: t.ink, fontWeight: 800, fontSize: 17 } },
+              { coord: [kmMed, 0.5], symbolSize: 16, itemStyle: { color, borderColor: t.surface, borderWidth: 2 }, label: { show: true, position: 'bottom', distance: 10, formatter: String(kmMed), color: t.ink, fontWeight: 800, fontSize: 17 } },
             ] } },
         ],
       });
@@ -119,12 +148,12 @@
   }
 
   S.chapter('speed', {
-    n: 2, title: 'How long does it actually take?',
+    n: 4, title: 'How long does acquisition actually take?',
     render(main, D, ch) {
       const sp = D.speed, ob = sp.observed, h = sp.hist, L = sp.lanes, est = sp.estimate;
 
       // 2.1
-      let body = S.scene(main, { ch, step: 1, of: 4, label: 'What has already happened', title: `Recorded journeys: ${ob.uc.median} days to Under Contract, ${ob.closed.median} to CLOSED` });
+      let body = S.scene(main, { ch, step: 1, of: 4, label: 'What has happened', title: `Recorded journeys: ${ob.uc.median} days to Under Contract, ${ob.closed.median} to CLOSED` });
       body.innerHTML = `<div class="board"><div class="chart h-m" id="rulerChart" role="img" aria-label="Median ${ob.uc.median} and average ${S.d1(ob.uc.mean)} days to Under Contract; median ${ob.closed.median} and average ${S.d1(ob.closed.mean)} days to CLOSED."></div></div>
         <p class="cap">Clients with a recorded milestone · clock starts at the onboarding call.</p>`;
       ruler(S.$('#rulerChart', body), ob);
@@ -141,27 +170,29 @@
       histogram(S.$('#histChart', body), h);
 
       // 2.3
-      body = S.scene(main, { ch, step: 3, of: 4, label: 'Not every journey is finished', title: `${S.int(sp.running)} journeys are still running` });
+      body = S.scene(main, { ch, step: 3, of: 4, label: 'Who is still waiting', title: `${S.int(sp.running)} paid clients have not bought a property yet` });
       body.innerHTML = `<div class="board">
           <div class="lane"><div class="lane-head"><span class="v num">${S.int(L.searching.n)}</span><span class="t"><i style="background:var(--wait)"></i>Still searching</span><span class="s">${S.int(L.searching.past_ref)} have already waited longer than ${L.searching.ref} days</span></div>
             <div class="chart h-s" id="laneSearch" role="img" aria-label="${L.searching.n} clients still searching, by days so far."></div></div>
-          <div class="lane"><div class="lane-head"><span class="v num">${S.int(L.under_contract.n)}</span><span class="t"><i style="background:var(--uc)"></i>Under contract, not yet closed</span><span class="s">${S.int(L.under_contract.past_ref)} have already waited longer than ${L.under_contract.ref} days</span></div>
+          <div class="lane"><div class="lane-head"><span class="v num">${S.int(L.under_contract.n)}</span><span class="t"><i style="background:var(--uc)"></i>Under contract, not yet closed</span><span class="s">${S.int(L.under_contract.past_ref)} already past ${L.under_contract.ref} days · recorded contracts close a median ${sp.uc_to_close.median} days after Under Contract</span></div>
             <div class="chart h-s" id="laneUC" role="img" aria-label="${L.under_contract.n} clients under contract, by days so far."></div></div>
         </div>
-        <p class="cap">One dot per client · their time is not in the recorded medians.</p>`;
+        <p class="cap">One dot per client · acquisitions still to come, and time the recorded medians cannot see.</p>`;
       lane(S.$('#laneSearch', body), L.searching, 'wait', `recorded median to Under Contract · ${L.searching.ref}`, false);
       lane(S.$('#laneUC', body), L.under_contract, 'uc', `recorded median to CLOSED · ${L.under_contract.ref}`, true);
 
       // 2.4
-      body = S.scene(main, { ch, step: 4, of: 4, label: 'Counting unfinished journeys', title: `Including unfinished journeys: ${est.uc.median} days to Under Contract, ${est.closed.median} to CLOSED` });
-      body.innerHTML = `<div class="duo">
+      body = S.scene(main, { ch, step: 4, of: 4, label: 'What it means for the timeline', title: `Counting everyone still waiting: ${est.uc.median} days to Under Contract, ${est.closed.median} to CLOSED` });
+      body.innerHTML = `<div class="board" style="margin-bottom:16px"><div class="chart h-s" id="extChart" role="img" aria-label="Recorded medians ${ob.uc.median} and ${ob.closed.median} days extend to ${est.uc.median} and ${est.closed.median} days when unfinished journeys are counted."></div></div>
+        <div class="duo">
           <div class="board"><div class="fig arrow"><span class="v num"><span class="from">${ob.uc.median}</span><span class="ar">→</span><span class="to">${est.uc.median}</span><small>days</small></span><span class="l"><i style="background:var(--uc)"></i>Under Contract</span></div>
-            <div class="chart h-m" id="kmUC" role="img" aria-label="Under Contract: recorded median ${ob.uc.median} days, Kaplan–Meier median ${est.uc.median} days."></div></div>
+            <div class="chart h-s2" id="kmUC" role="img" aria-label="Under Contract: recorded median ${ob.uc.median} days, Kaplan–Meier median ${est.uc.median} days."></div></div>
           <div class="board"><div class="fig arrow"><span class="v num"><span class="from">${ob.closed.median}</span><span class="ar">→</span><span class="to">${est.closed.median}</span><small>days</small></span><span class="l"><i style="background:var(--closed)"></i>CLOSED</span></div>
-            <div class="chart h-m" id="kmCL" role="img" aria-label="CLOSED: recorded median ${ob.closed.median} days, Kaplan–Meier median ${est.closed.median} days."></div></div>
+            <div class="chart h-s2" id="kmCL" role="img" aria-label="CLOSED: recorded median ${ob.closed.median} days, Kaplan–Meier median ${est.closed.median} days."></div></div>
         </div>
         <div class="legend" style="margin-top:12px"><span><i class="dash" style="color:var(--ink-2)"></i>Recorded journeys only</span><span><i class="line" style="background:var(--ink-2)"></i>All ${S.int(est.n)} signed-up clients, unfinished journeys included (Kaplan–Meier)</span></div>
         <p class="cap">Share of clients who have reached the milestone, by day · the median is where each curve crosses half.</p>`;
+      extended(S.$('#extChart', body), [{ k: 'uc', name: 'Under Contract', obs: ob.uc.median, km: est.uc.median }, { k: 'closed', name: 'CLOSED', obs: ob.closed.median, km: est.closed.median }]);
       kmPanel(S.$('#kmUC', body), est.uc.curve, est.recorded_curve.uc, ob.uc.median, est.uc.median, 'uc');
       kmPanel(S.$('#kmCL', body), est.closed.curve, est.recorded_curve.closed, ob.closed.median, est.closed.median, 'closed');
     },

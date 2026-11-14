@@ -54,7 +54,7 @@
   }
 
   S.chapter('outcomes', {
-    n: 3, title: 'How many clients reach their destination?',
+    n: 2, title: 'Where are our clients today?',
     render(main, D, ch) {
       const oc = D.outcomes, at = oc.attainment, g = Object.fromEntries(oc.active_groups.map(x => [x.group, x.n]));
       const closedOrPost = g['Closed'] + g['Post-close'];

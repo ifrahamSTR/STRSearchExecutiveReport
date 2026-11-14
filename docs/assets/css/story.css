@@ -158,52 +158,6 @@ h1 { font: 700 clamp(40px, 6vw, 72px)/0.98 var(--f-display); letter-spacing: -.0
 .fig.arrow .v .to { color: var(--ink); }
 .fig.arrow .v .ar { font-size: .55em; color: var(--muted); }
 
-/* ---------- chapter 1: clocks */
-.clocks { position: relative; }
-.clocks svg { display: block; width: 100%; height: auto; overflow: visible; }
-.clk-track { fill: none; stroke-width: 9; stroke-linecap: round; }
-.clk-track.sales { stroke: var(--sales); }
-.clk-track.onb { stroke: var(--hold); }
-.clk-track.search { stroke: var(--wait); }
-.clk-track.contract { stroke: var(--uc); }
-.clk-ghost { fill: none; stroke: var(--line); stroke-width: 9; }
-.clk-tick { stroke: var(--line-2); stroke-width: 1.5; }
-.clk-dot { stroke: var(--surface); stroke-width: 3; }
-.clk-dot.sales { fill: var(--sales); }
-.clk-dot.onb { fill: var(--hold); }
-.clk-dot.search { fill: var(--wait); }
-.clk-dot.contract { fill: var(--uc); }
-.clk-dot.closed { fill: var(--closed); }
-.clk-check { fill: none; stroke: #fff; stroke-width: 3; stroke-linecap: round; stroke-linejoin: round; }
-.clk-st { font: 600 15px var(--f-body); fill: var(--ink); }
-.clk-sub { font: 400 12.5px var(--f-body); fill: var(--muted); }
-.clk-eyebrow { font: 600 11px var(--f-mono); letter-spacing: .05em; }
-.clk-eyebrow.sales { fill: var(--sales); }
-.clk-eyebrow.acq { fill: var(--acq); }
-.clk-title { font: 700 30px var(--f-display); fill: var(--ink); letter-spacing: -.01em; }
-.clk-win { font: 600 14px var(--f-body); }
-.clk-win.sales { fill: var(--sales); }
-.clk-win.acq { fill: var(--closed); }
-.clk-note { font: 500 12.5px var(--f-mono); fill: var(--muted); }
-.clk-hand { stroke: var(--ink-2); stroke-width: 2.5; stroke-linecap: round; }
-.clk-hub { fill: var(--ink-2); }
-.clk-link { fill: none; stroke: var(--ink-2); stroke-width: 2; }
-.clk-bridge { fill: none; stroke: var(--acq); stroke-width: 2.2; stroke-dasharray: 6 6; }
-.clk-head { fill: var(--ink-2); }
-.clk-head.acq { fill: var(--acq); }
-.clk-lab { font: 600 13.5px var(--f-body); fill: var(--ink-2); }
-.clk-bridge-t { font: 700 14px var(--f-body); fill: var(--acq); }
-.clk-bridge-s { font: 400 12.5px var(--f-body); fill: var(--ink-2); }
-.clk-mid { display: grid; justify-items: center; gap: 8px; padding: 10px 0 18px; text-align: center; font-size: 14px; color: var(--ink-2); }
-.clk-mid .arrow { font-size: 22px; color: var(--ink-2); line-height: 1; }
-.clk-mid .cc { border: 2px dashed var(--acq); border-radius: 12px; padding: 8px 12px; color: var(--ink-2); max-width: 34ch; }
-.clk-mid .cc b { color: var(--acq); }
-.outcome { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 16px; margin-top: 8px; }
-.outcome div { display: flex; align-items: center; gap: 12px; padding: 14px 16px; border-radius: 14px; background: var(--surface-2); font-size: 15px; color: var(--ink-2); }
-.outcome b { font: 650 18px var(--f-display); color: var(--ink); }
-.outcome i { width: 14px; height: 14px; border-radius: 50%; flex: none; }
-@media (max-width: 640px) { .outcome { grid-template-columns: 1fr; } }
-
 /* ---------- small multiples */
 .duo { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 16px; }
 @media (max-width: 860px) { .duo { grid-template-columns: 1fr; } }
@@ -238,3 +192,44 @@ details.method li { break-inside: avoid; margin-bottom: 8px; }
 @media (max-width: 800px) { details.method ul { columns: 1; } }
 footer.foot { border-top: 1px solid var(--line); padding-block: 18px 30px; font-size: 12.5px; color: var(--muted); }
 footer.foot .stage { display: flex; flex-wrap: wrap; gap: 6px 18px; justify-content: space-between; }
+
+/* ---------- chapter 1: route map */
+.diagram .scroll { overflow-x: auto; }
+.diagram svg { display: block; width: 100%; min-width: 940px; height: auto; }
+.jt { font: 700 15.5px var(--f-display); fill: var(--ink); }
+.jts { font: 400 12.5px var(--f-body); fill: var(--muted); }
+.jband.s { fill: var(--sales); opacity: .07; }
+.jband.a { fill: var(--acq); opacity: .07; }
+.jlane { font: 600 11.5px var(--f-mono); letter-spacing: .06em; }
+.jlane.s { fill: var(--sales); }
+.jlane.a { fill: var(--acq); }
+.jlsub { font: 400 12px var(--f-body); fill: var(--muted); }
+.jn rect { fill: var(--surface); stroke-width: 1.6; }
+.jn text { font: 600 13px var(--f-body); fill: var(--ink); }
+.jn.s rect { stroke: var(--sales); }
+.jn.a rect { stroke: var(--acq); }
+.jn.search rect { stroke: var(--wait); }
+.jn.uc rect { stroke: var(--uc); }
+.jn.won rect { fill: var(--sales); stroke: none; }
+.jn.closed rect { fill: var(--closed); stroke: none; }
+.jn.won text, .jn.closed text { fill: #fff; }
+.jn.exit rect { stroke: var(--hold); stroke-dasharray: 4 3; }
+.jn.exit text { fill: var(--ink-2); }
+.jn-check { fill: none; stroke: #fff; stroke-width: 2.4; stroke-linecap: round; stroke-linejoin: round; }
+.jsub { font: 400 11.5px var(--f-body); fill: var(--muted); }
+.jsub.flag { fill: var(--acq); font-weight: 600; }
+.jsub.count { font: 500 11px var(--f-mono); fill: var(--ink-2); }
+.je { fill: none; stroke: var(--ink-2); stroke-width: 1.6; }
+.je.x { stroke: var(--hold); stroke-dasharray: 5 4; }
+.jhead { fill: var(--ink-2); }
+.jhead.x { fill: var(--hold); }
+.joverlap { fill: var(--acq); fill-opacity: .07; stroke: var(--acq); stroke-opacity: .55; stroke-dasharray: 5 5; }
+.jlab { font: 500 12px var(--f-body); fill: var(--ink-2); }
+.jlab.a { font-weight: 700; fill: var(--acq); }
+.legend i.pill { width: 22px; height: 12px; border-radius: 6px; }
+.legend b.flag { color: var(--acq); font-size: 14px; }
+.legend i.diamond { width: 11px; height: 11px; border-radius: 1px; background: var(--ink-2); transform: rotate(45deg); }
+.legend .muted { color: var(--muted); }
+.chart.h-s2 { height: 250px; }
+
+.duo > .board + .board { margin-top: 0; }

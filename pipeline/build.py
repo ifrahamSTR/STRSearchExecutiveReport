@@ -22,14 +22,14 @@ from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 import core as C  # noqa: E402
-from chapters import clocks, outcomes, pace, speed  # noqa: E402
+from chapters import drivers, journey, outcomes, pace, speed  # noqa: E402
 
-CHAPTERS = {"clocks": clocks, "speed": speed, "outcomes": outcomes, "pace": pace}
+CHAPTERS = {"journey": journey, "outcomes": outcomes, "pace": pace, "speed": speed, "drivers": drivers}
 OUT = C.ROOT / "docs" / "data" / "story-data.js"
 
 
 def checks(ctx: C.Ctx, data: dict) -> list[dict]:
-    ex, sp, oc, pc = ctx.expected, data["speed"], data["outcomes"], data["pace"]
+    ex, sp, oc, pc, jn, dr = ctx.expected, data["speed"], data["outcomes"], data["pace"], data["journey"], data["drivers"]
     out = []
 
     def chk(name, got, want, hard=True):
@@ -48,6 +48,9 @@ def checks(ctx: C.Ctx, data: dict) -> list[dict]:
     chk("Active clients with UC / CLOSED recorded", (oc["attainment"]["uc"], oc["attainment"]["closed"]), (ex["q2"]["active_uc"], ex["q2"]["active_closed"]))
     q3 = {r["month"]: r for r in ex["q3"]}
     chk("Monthly rows that differ from the Explorer", sum(1 for r in pc["monthly"] if (r["new"], r["uc"], r["closed"]) != (q3[r["month"]]["new_signed_start"], q3[r["month"]]["uc"], q3[r["month"]]["closed"])), 0)
+    chk("Pre-sale Jira statuses = records outside the signed-up lists", sum(jn["presale"]["statuses"].values()), ex["jira"]["unmapped"])
+    chk("Fast/slow groups: matched clients never exceed eligible clients", all(g["matched"] <= g["eligible"] for g in dr["groups"]), True)
+    chk("Fast/slow groups: no reported share rests on fewer than 5 clients", all(v is None or r["n"][g] >= 5 for r in dr["rows"] for g, v in r["shares"].items()), True)
     # statements the presentation makes in words (warn only: on a refresh the page text follows the data)
     chk("Largest 15-day bin is 15-29 days", (sp["hist"]["largest"]["from"], sp["hist"]["largest"]["to"]), (15, 29), hard=False)
     chk("About 71% of recorded UC within 60 days", round(sp["hist"]["within60"]["share"] * 100), 71, hard=False)

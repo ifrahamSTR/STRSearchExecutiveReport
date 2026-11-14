@@ -63,8 +63,11 @@ def build(ctx: C.Ctx) -> dict:
         "n": int(len(s)),
         "recorded_curve": {"uc": C.daily(C.ecdf(j.days_uc), CURVE_DAYS), "closed": C.daily(C.ecdf(j.days_closed), CURVE_DAYS)},
     }
+    both = s[s.uc.notna() & s.closed.notna()]
+    gap = (both.closed - both.uc).dt.days
     return {
         "observed": observed, "hist": hist, "lanes": lanes, "estimate": estimate,
+        "uc_to_close": {"n": int(len(gap)), "median": float(gap.median())},     # recorded contract -> closing
         "running": int(sum(l["n"] for l in lanes.values())),
         # for the methodology note only
         "closed_without_uc_date": int((s.closed.notna() & s.uc.isna()).sum()),

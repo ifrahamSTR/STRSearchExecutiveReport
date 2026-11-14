@@ -28,6 +28,7 @@ class Ctx:
     meta: list
     D: object               # Explorer definitions module
     expected: dict          # Explorer headline metrics (metrics.expected), the figures the page shows
+    raw: dict               # raw sheets as read by the Explorer (row order matches ctx.jira)
 
 
 def _load_module(name: str, path: Path):
@@ -53,7 +54,7 @@ def load(explorer: Path, reports: Path | None, use_cache: bool) -> Ctx:
     asof = min(pd.Timestamp(snap["jira"]), pd.Timestamp(snap["deals"])).normalize()
     jira["elapsed"] = (asof - jira["start"]).dt.days       # days on the acquisition clock so far
     expected = M.expected(deals, jira, asof)
-    return Ctx(jira=jira, signed=jira[jira.carson_signed].copy(), deals=deals, asof=asof, meta=meta, D=D, expected=expected)
+    return Ctx(jira=jira, signed=jira[jira.carson_signed].copy(), deals=deals, asof=asof, meta=meta, D=D, expected=expected, raw=frames)
 
 
 def km_curve(t, e) -> pd.DataFrame:

@@ -8,50 +8,53 @@ This repository holds **"The Client Journey"**, a leadership presentation for **
 
 Live page: https://ifrahamstr.github.io/STRSearchExecutiveReport/
 
-## Chapter 1: one customer, two journeys
-- **Sales clock (Pipedrive):** discovers STRSearch → books a call → sales process → **Won** (buys the service). The median from deal created to Won is 21 days.
-- **Acquisition clock (Jira):** client start → property search → **Under Contract** → **CLOSED** (buys a property).
-  - Client start = `COALESCE(issue_due_date, issue_created_date)`, i.e. the onboarding-call date.
-- Winning a customer and closing a property are two different outcomes.
-- **Confidence Call (since late May 2026):** prospects enter Jira and meet the acquisition team before they buy.
+## Chapter 1: the client journey
+- **Two finish lines:**
+  - **Pipedrive Won:** the customer buys STRSearch's service.
+  - **Jira CLOSED:** the client buys a property.
+- **Before 27 May 2026 (sales first):** book a call → sales call → Won. The acquisition clock then starts at the onboarding call, a median 5 days after Won.
+  - Client start = `COALESCE(issue_due_date, issue_created_date)`.
+  - Acquisition then runs Client Start → Search (2–8+ week check-ins) → Under Contract (incl. inspection) → CLOSED.
+- **New Client Experience (since 27 May 2026):** the two clocks overlap.
+  - After booking, the prospect fills the onboarding form and enters Jira as a *New Client*.
+  - They meet Acquisitions in the **Confidence Call** (status *Onboarding Completed*), where the acquisition clock starts.
+  - They then either buy (Won) or decline (*Services Declined*).
+  - Confidence Call clients start the clock a median **8 days before** Won (219 clients). Other clients since late May still start about 5 days after.
+- **Pre-sale Jira records now:** 114 New Clients, 198 Onboarding Completed, 394 Services Declined.
 
-## Chapter 2: how long does it actually take?
-1. **Recorded durations** (clients with a recorded milestone):
-
-   | Milestone | Clients | Median | Average |
-   |---|---|---|---|
-   | Under Contract | 499 | 36 days | 53.8 days |
-   | CLOSED | 432 | 77 days | 96.3 days |
-
-2. **Distribution of days to Under Contract** (15-day bins):
-   - The largest group is **15–29 days** (130 clients).
-   - **71%** land within 60 days (days 0–59).
-   - A long tail continues past 180 days.
-3. **Journeys still running:** 185 clients.
-   - 119 are still searching; 90 of them have already waited longer than 36 days.
-   - 66 are under contract but not yet closed; 24 of them have already waited longer than 77 days.
-4. **Kaplan–Meier** (850 signed-up clients, unfinished journeys counted up to the snapshot date):
-   - **Under Contract:** 36 days recorded → **77 days** for all clients.
-   - **CLOSED:** 77 days recorded → **127 days** for all clients.
-   - **Limitation:** 61 clients have a recorded CLOSED date but no recorded Under Contract date and count as not reaching Under Contract, so the Under Contract estimate is likely on the high side.
-
-## Chapter 3: how many clients reach their destination?
+## Chapter 2: where are our clients today?
 - **850 signed-up clients:**
   - **644 Active:** 119 still searching, 66 under contract or inspection, 236 CLOSED, 223 post-close.
   - **206 Inactive:** 109 paused, 92 refunded, 5 additional service.
-- **Active is a reporting class, not "still searching"**: 459 Active clients are already CLOSED or post-close.
-- **Recorded milestones among the 644 Active clients:**
-  - **72%** have recorded Under Contract (464).
-  - **67%** have recorded CLOSED (429).
-  - These describe historical attainment, not a lifetime conversion rate.
+- Active includes clients who have already closed.
+- **Recorded milestones among the 644 Active clients:** **72%** have recorded Under Contract (464) and **67%** have recorded CLOSED (429). These describe historical attainment, not a lifetime conversion rate.
 
-## Chapter 4: are we keeping pace?
-Monthly totals from January 2025 (see `pace.monthly` in the JSON):
-- New signed-up clients, by month of client start.
-- Under Contract events and CLOSED events, by month recorded.
+## Chapter 3: are we keeping pace?
+- Monthly from January 2025: new signed-up clients (by month of client start) vs Under Contract and CLOSED events (by month recorded). See `pace.monthly`.
+- The late-May 2026 changes (Complete offer, Confidence Call) coincided with growth; their separate effects have not been established.
+- This is not same-cohort conversion.
 
-The late-May 2026 changes (the Complete offer and the Confidence Call) coincided with sales growth; their separate effects have not been established. This is an input/output comparison, not same-cohort conversion.
+## Chapter 4: how long does acquisition actually take?
+1. **Recorded durations:** median 36 / average 53.8 days to Under Contract (499 clients); median 77 / average 96.3 days to CLOSED (432 clients).
+2. **Distribution (15-day bins):** the largest group is 15–29 days (130 clients); 71% land within 60 days (days 0–59).
+3. **Still waiting:** 185 paid clients have not bought a property yet.
+   - 119 are searching; 90 of them are already past 36 days.
+   - 66 are under contract; 24 are already past 77 days. Recorded contracts close a median 38 days after Under Contract.
+4. **Kaplan–Meier** (850 signed-up clients): **77 days** to Under Contract and **127 days** to CLOSED.
+   - **Limitation:** 61 clients with a recorded CLOSED date but no recorded Under Contract date count as not reaching Under Contract, so 77 is likely on the high side.
+
+## Chapter 5: what distinguishes fast and slow clients?
+- **Groups,** by recorded days to first Under Contract: fast ≤30, middle 31–74, slow ≥75. Clients still searching are a separate group.
+- **Who is compared:** only clients with 75+ days on the clock (started by 28 Aug 2026).
+- **Onboarding answers** (current form, since 20 Apr 2026; matched for 204 of 491 eligible clients, mostly recent):
+  - Has submitted 3+ offers: fast 65%, slow 56%.
+  - Owns an Airbnb: fast 18%, slow 22%.
+  - All-in out-of-pocket capital of $300K+: fast 26%, slow 30%.
+  - Capital under $200K: fast 30%, slow 30%.
+  - **No difference is statistically clear** (Fisher's exact test, all p ≥ 0.48).
+  - Capital (column M) is total all-in out-of-pocket capital, not the purchase budget.
+- **Deals sent** (Jira *Total Deals Sent*): median 8 for fast clients, 13 middle, 20 slow, 15 for those still searching. Longer searches accumulate more deals, so this describes the search rather than explains it.
 
 ## Files
-- `docs/data/story-data.json`: all figures, keyed by chapter: `clocks`, `speed`, `outcomes`, `pace`, plus `meta` and `checks`.
+- `docs/data/story-data.json`: all figures, keyed by chapter: `journey`, `outcomes`, `pace`, `speed`, `drivers`, plus `meta` and `checks`.
 - `pipeline/`: how each figure is taken from the Explorer. `core.py` handles loading; `chapters/*.py` has one module per chapter.

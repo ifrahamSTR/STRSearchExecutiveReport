@@ -1,10 +1,285 @@
 {
- "clocks": {
+ "journey": {
   "median_days_to_win": 21.0,
   "won": 871,
   "signed": 850,
-  "confidence_call_since": "2026-05-27",
+  "presale": {
+   "statuses": {
+    "New Clients": 114,
+    "Onboarding Completed": 198,
+    "Services Declined": 394
+   },
+   "total": 706
+  },
+  "start_vs_won": {
+   "classic": {
+    "n": 451,
+    "median": 5.0
+   },
+   "nce": {
+    "n": 219,
+    "median": -8.0
+   },
+   "other_since": {
+    "n": 150,
+    "median": 5.0
+   }
+  },
+  "new_experience_date": "2026-05-27",
   "start_rule": "COALESCE(issue_due_date, issue_created_date)"
+ },
+ "outcomes": {
+  "signed": 850,
+  "active": 644,
+  "inactive": 206,
+  "active_groups": [
+   {
+    "group": "Searching",
+    "n": 119,
+    "statuses": {
+     "8 Weeks": 58,
+     "2 Weeks": 24,
+     "Client Start": 15,
+     "4 Weeks": 11,
+     "6 Weeks": 11
+    }
+   },
+   {
+    "group": "Under contract",
+    "n": 66,
+    "statuses": {
+     "Under Contract": 54,
+     "Passed Inspection": 12
+    }
+   },
+   {
+    "group": "Closed",
+    "n": 236,
+    "statuses": {
+     "CLOSED": 236
+    }
+   },
+   {
+    "group": "Post-close",
+    "n": 223,
+    "statuses": {
+     "Content Pulled": 126,
+     "Listed": 93,
+     "Photography Shared": 4
+    }
+   }
+  ],
+  "inactive_statuses": [
+   {
+    "status": "Paused",
+    "n": 109
+   },
+   {
+    "status": "Refunded",
+    "n": 92
+   },
+   {
+    "status": "Additional Service",
+    "n": 5
+   }
+  ],
+  "attainment": {
+   "active": 644,
+   "uc": 464,
+   "closed": 429,
+   "uc_share": 0.7205,
+   "closed_share": 0.6661
+  }
+ },
+ "pace": {
+  "monthly": [
+   {
+    "month": "2025-01",
+    "label": "Jan 2025",
+    "new": 12,
+    "uc": 7,
+    "closed": 4,
+    "partial": false
+   },
+   {
+    "month": "2025-02",
+    "label": "Feb 2025",
+    "new": 4,
+    "uc": 4,
+    "closed": 5,
+    "partial": false
+   },
+   {
+    "month": "2025-03",
+    "label": "Mar 2025",
+    "new": 12,
+    "uc": 5,
+    "closed": 7,
+    "partial": false
+   },
+   {
+    "month": "2025-04",
+    "label": "Apr 2025",
+    "new": 11,
+    "uc": 8,
+    "closed": 3,
+    "partial": false
+   },
+   {
+    "month": "2025-05",
+    "label": "May 2025",
+    "new": 15,
+    "uc": 6,
+    "closed": 9,
+    "partial": false
+   },
+   {
+    "month": "2025-06",
+    "label": "Jun 2025",
+    "new": 16,
+    "uc": 10,
+    "closed": 8,
+    "partial": false
+   },
+   {
+    "month": "2025-07",
+    "label": "Jul 2025",
+    "new": 25,
+    "uc": 4,
+    "closed": 9,
+    "partial": false
+   },
+   {
+    "month": "2025-08",
+    "label": "Aug 2025",
+    "new": 27,
+    "uc": 10,
+    "closed": 8,
+    "partial": false
+   },
+   {
+    "month": "2025-09",
+    "label": "Sep 2025",
+    "new": 41,
+    "uc": 7,
+    "closed": 12,
+    "partial": false
+   },
+   {
+    "month": "2025-10",
+    "label": "Oct 2025",
+    "new": 36,
+    "uc": 17,
+    "closed": 20,
+    "partial": false
+   },
+   {
+    "month": "2025-11",
+    "label": "Nov 2025",
+    "new": 19,
+    "uc": 8,
+    "closed": 4,
+    "partial": false
+   },
+   {
+    "month": "2025-12",
+    "label": "Dec 2025",
+    "new": 20,
+    "uc": 11,
+    "closed": 32,
+    "partial": false
+   },
+   {
+    "month": "2026-01",
+    "label": "Jan 2026",
+    "new": 31,
+    "uc": 13,
+    "closed": 13,
+    "partial": false
+   },
+   {
+    "month": "2026-02",
+    "label": "Feb 2026",
+    "new": 23,
+    "uc": 13,
+    "closed": 9,
+    "partial": false
+   },
+   {
+    "month": "2026-03",
+    "label": "Mar 2026",
+    "new": 32,
+    "uc": 22,
+    "closed": 14,
+    "partial": false
+   },
+   {
+    "month": "2026-04",
+    "label": "Apr 2026",
+    "new": 28,
+    "uc": 29,
+    "closed": 22,
+    "partial": false
+   },
+   {
+    "month": "2026-05",
+    "label": "May 2026",
+    "new": 34,
+    "uc": 21,
+    "closed": 26,
+    "partial": false
+   },
+   {
+    "month": "2026-06",
+    "label": "Jun 2026",
+    "new": 65,
+    "uc": 17,
+    "closed": 25,
+    "partial": false
+   },
+   {
+    "month": "2026-07",
+    "label": "Jul 2026",
+    "new": 92,
+    "uc": 44,
+    "closed": 14,
+    "partial": false
+   },
+   {
+    "month": "2026-08",
+    "label": "Aug 2026",
+    "new": 82,
+    "uc": 55,
+    "closed": 43,
+    "partial": false
+   },
+   {
+    "month": "2026-09",
+    "label": "Sep 2026",
+    "new": 76,
+    "uc": 59,
+    "closed": 44,
+    "partial": false
+   },
+   {
+    "month": "2026-10",
+    "label": "Oct 2026",
+    "new": 52,
+    "uc": 58,
+    "closed": 64,
+    "partial": false
+   },
+   {
+    "month": "2026-11",
+    "label": "Nov 2026",
+    "new": 9,
+    "uc": 17,
+    "closed": 10,
+    "partial": true
+   }
+  ],
+  "change_month": "2026-06",
+  "change_date": "2026-05-27"
  },
  "speed": {
   "observed": {
@@ -946,261 +1221,140 @@
     ]
    }
   },
+  "uc_to_close": {
+   "n": 369,
+   "median": 38.0
+  },
   "running": 185,
   "closed_without_uc_date": 61
  },
- "outcomes": {
-  "signed": 850,
-  "active": 644,
-  "inactive": 206,
-  "active_groups": [
+ "drivers": {
+  "form_from": "2026-04-20",
+  "min_days": 75,
+  "eligible_through": "2026-08-28",
+  "groups": [
    {
-    "group": "Searching",
-    "n": 119,
-    "statuses": {
-     "8 Weeks": 58,
-     "2 Weeks": 24,
-     "Client Start": 15,
-     "4 Weeks": 11,
-     "6 Weeks": 11
-    }
+    "key": "fast",
+    "label": "Under Contract within 30 days",
+    "eligible": 178,
+    "matched": 66
    },
    {
-    "group": "Under contract",
-    "n": 66,
-    "statuses": {
-     "Under Contract": 54,
-     "Passed Inspection": 12
-    }
+    "key": "middle",
+    "label": "31\u201374 days",
+    "eligible": 168,
+    "matched": 75
    },
    {
-    "group": "Closed",
-    "n": 236,
-    "statuses": {
-     "CLOSED": 236
-    }
+    "key": "slow",
+    "label": "75 days or longer",
+    "eligible": 99,
+    "matched": 27
    },
    {
-    "group": "Post-close",
-    "n": 223,
-    "statuses": {
-     "Content Pulled": 126,
-     "Listed": 93,
-     "Photography Shared": 4
-    }
+    "key": "searching",
+    "label": "Still searching, no contract yet",
+    "eligible": 46,
+    "matched": 36
    }
   ],
-  "inactive_statuses": [
+  "rows": [
    {
-    "status": "Paused",
-    "n": 109
+    "key": "offers3",
+    "label": "Has submitted 3+ real-estate offers",
+    "shares": {
+     "fast": 0.6515,
+     "middle": 0.4667,
+     "slow": 0.5556,
+     "searching": 0.5833
+    },
+    "n": {
+     "fast": 66,
+     "middle": 75,
+     "slow": 27,
+     "searching": 36
+    },
+    "p_fast_slow": 0.48
    },
    {
-    "status": "Refunded",
-    "n": 92
+    "key": "airbnb",
+    "label": "Already owns at least one Airbnb",
+    "shares": {
+     "fast": 0.1818,
+     "middle": 0.16,
+     "slow": 0.2222,
+     "searching": 0.1944
+    },
+    "n": {
+     "fast": 66,
+     "middle": 75,
+     "slow": 27,
+     "searching": 36
+    },
+    "p_fast_slow": 0.773
    },
    {
-    "status": "Additional Service",
-    "n": 5
+    "key": "cap300",
+    "label": "Capital (all-in, out of pocket) of $300K+",
+    "shares": {
+     "fast": 0.2576,
+     "middle": 0.3333,
+     "slow": 0.2963,
+     "searching": 0.3333
+    },
+    "n": {
+     "fast": 66,
+     "middle": 75,
+     "slow": 27,
+     "searching": 36
+    },
+    "p_fast_slow": 0.798
+   },
+   {
+    "key": "cap200",
+    "label": "Capital (all-in, out of pocket) under $200K",
+    "shares": {
+     "fast": 0.303,
+     "middle": 0.32,
+     "slow": 0.2963,
+     "searching": 0.3056
+    },
+    "n": {
+     "fast": 66,
+     "middle": 75,
+     "slow": 27,
+     "searching": 36
+    },
+    "p_fast_slow": 1.0
    }
   ],
-  "attainment": {
-   "active": 644,
-   "uc": 464,
-   "closed": 429,
-   "uc_share": 0.7205,
-   "closed_share": 0.6661
-  }
- },
- "pace": {
-  "monthly": [
-   {
-    "month": "2025-01",
-    "label": "Jan 2025",
-    "new": 12,
-    "uc": 7,
-    "closed": 4,
-    "partial": false
+  "deals": {
+   "fast": {
+    "n": 171,
+    "p25": 6.0,
+    "median": 8.0,
+    "p75": 10.5
    },
-   {
-    "month": "2025-02",
-    "label": "Feb 2025",
-    "new": 4,
-    "uc": 4,
-    "closed": 5,
-    "partial": false
+   "middle": {
+    "n": 160,
+    "p25": 11.0,
+    "median": 13.0,
+    "p75": 17.0
    },
-   {
-    "month": "2025-03",
-    "label": "Mar 2025",
-    "new": 12,
-    "uc": 5,
-    "closed": 7,
-    "partial": false
+   "slow": {
+    "n": 90,
+    "p25": 16.0,
+    "median": 20.0,
+    "p75": 29.0
    },
-   {
-    "month": "2025-04",
-    "label": "Apr 2025",
-    "new": 11,
-    "uc": 8,
-    "closed": 3,
-    "partial": false
-   },
-   {
-    "month": "2025-05",
-    "label": "May 2025",
-    "new": 15,
-    "uc": 6,
-    "closed": 9,
-    "partial": false
-   },
-   {
-    "month": "2025-06",
-    "label": "Jun 2025",
-    "new": 16,
-    "uc": 10,
-    "closed": 8,
-    "partial": false
-   },
-   {
-    "month": "2025-07",
-    "label": "Jul 2025",
-    "new": 25,
-    "uc": 4,
-    "closed": 9,
-    "partial": false
-   },
-   {
-    "month": "2025-08",
-    "label": "Aug 2025",
-    "new": 27,
-    "uc": 10,
-    "closed": 8,
-    "partial": false
-   },
-   {
-    "month": "2025-09",
-    "label": "Sep 2025",
-    "new": 41,
-    "uc": 7,
-    "closed": 12,
-    "partial": false
-   },
-   {
-    "month": "2025-10",
-    "label": "Oct 2025",
-    "new": 36,
-    "uc": 17,
-    "closed": 20,
-    "partial": false
-   },
-   {
-    "month": "2025-11",
-    "label": "Nov 2025",
-    "new": 19,
-    "uc": 8,
-    "closed": 4,
-    "partial": false
-   },
-   {
-    "month": "2025-12",
-    "label": "Dec 2025",
-    "new": 20,
-    "uc": 11,
-    "closed": 32,
-    "partial": false
-   },
-   {
-    "month": "2026-01",
-    "label": "Jan 2026",
-    "new": 31,
-    "uc": 13,
-    "closed": 13,
-    "partial": false
-   },
-   {
-    "month": "2026-02",
-    "label": "Feb 2026",
-    "new": 23,
-    "uc": 13,
-    "closed": 9,
-    "partial": false
-   },
-   {
-    "month": "2026-03",
-    "label": "Mar 2026",
-    "new": 32,
-    "uc": 22,
-    "closed": 14,
-    "partial": false
-   },
-   {
-    "month": "2026-04",
-    "label": "Apr 2026",
-    "new": 28,
-    "uc": 29,
-    "closed": 22,
-    "partial": false
-   },
-   {
-    "month": "2026-05",
-    "label": "May 2026",
-    "new": 34,
-    "uc": 21,
-    "closed": 26,
-    "partial": false
-   },
-   {
-    "month": "2026-06",
-    "label": "Jun 2026",
-    "new": 65,
-    "uc": 17,
-    "closed": 25,
-    "partial": false
-   },
-   {
-    "month": "2026-07",
-    "label": "Jul 2026",
-    "new": 92,
-    "uc": 44,
-    "closed": 14,
-    "partial": false
-   },
-   {
-    "month": "2026-08",
-    "label": "Aug 2026",
-    "new": 82,
-    "uc": 55,
-    "closed": 43,
-    "partial": false
-   },
-   {
-    "month": "2026-09",
-    "label": "Sep 2026",
-    "new": 76,
-    "uc": 59,
-    "closed": 44,
-    "partial": false
-   },
-   {
-    "month": "2026-10",
-    "label": "Oct 2026",
-    "new": 52,
-    "uc": 58,
-    "closed": 64,
-    "partial": false
-   },
-   {
-    "month": "2026-11",
-    "label": "Nov 2026",
-    "new": 9,
-    "uc": 17,
-    "closed": 10,
-    "partial": true
+   "searching": {
+    "n": 14,
+    "p25": 7.5,
+    "median": 15.0,
+    "p75": 29.75
    }
-  ],
-  "change_month": "2026-06",
-  "change_date": "2026-05-27"
+  },
+  "signed_matched": 399
  },
  "meta": {
   "title": "The Client Journey",
@@ -1209,12 +1363,13 @@
    "jira": "2026-11-11 16:46",
    "pipedrive": "2026-11-12 17:21"
   },
-  "built_at": "2026-11-14 08:47",
+  "built_at": "2026-11-14 09:45",
   "chapters": [
-   "clocks",
-   "speed",
+   "journey",
    "outcomes",
-   "pace"
+   "pace",
+   "speed",
+   "drivers"
   ],
   "source": "https://ifrahamstr.github.io/STRSearchBusinessDataExplorer-Public/"
  },
@@ -1308,6 +1463,27 @@
    "check": "Monthly rows that differ from the Explorer",
    "page": 0,
    "explorer": 0,
+   "ok": true,
+   "hard": true
+  },
+  {
+   "check": "Pre-sale Jira statuses = records outside the signed-up lists",
+   "page": 706,
+   "explorer": 706,
+   "ok": true,
+   "hard": true
+  },
+  {
+   "check": "Fast/slow groups: matched clients never exceed eligible clients",
+   "page": true,
+   "explorer": true,
+   "ok": true,
+   "hard": true
+  },
+  {
+   "check": "Fast/slow groups: no reported share rests on fewer than 5 clients",
+   "page": true,
+   "explorer": true,
    "ok": true,
    "hard": true
   },

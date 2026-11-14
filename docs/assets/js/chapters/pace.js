@@ -5,7 +5,7 @@
   const SERIES = ['New signed-up clients', 'Under Contract', 'CLOSED'];
 
   S.chapter('pace', {
-    n: 4, title: 'Are we keeping pace?',
+    n: 3, title: 'Are we keeping pace?',
     render(main, D, ch) {
       const pc = D.pace, rows = pc.monthly, last = rows[rows.length - 1];
       const ci = rows.findIndex(r => r.month === pc.change_month);
