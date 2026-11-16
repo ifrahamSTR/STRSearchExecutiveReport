@@ -20,7 +20,7 @@ from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 import core as C  # noqa: E402
-from chapters import drivers, journey, outcomes, pace, speed  # noqa: E402
+from chapters import cash, drivers, journey, outcomes, pace, speed  # noqa: E402
 
 CHAPTERS = {"journey": journey, "outcomes": outcomes, "pace": pace, "speed": speed, "drivers": drivers}
 OUT = C.ROOT / "docs" / C.VERSION_ID / "data" / "story-data.js"
@@ -101,6 +101,17 @@ def checks(ctx: C.Ctx, data: dict) -> list[dict]:
     chk("Capital: Cox 95% CI for capital includes 1 (Pipedrive capital)", cx.get("lo", 2) <= 1 <= cx.get("hi", 0), True, hard=False)
     of = [r["within30"]["share"] for r in dr["offers"]["rows"]]
     chk("Offer experience: share within 30 days rises 0 -> 1-2 -> 3+ offers", None not in of and of == sorted(of), True, hard=False)
+    # cash forecast tab: every engagement in exactly one group, balances reconcile with client_cash_forecast
+    cf = data["cash"]
+    g = cf["groups"]
+    chk("Cash forecast: every won engagement sits in exactly one group", (sum(x["n"] for x in g.values()) + cf["other"]["n"], cf["other"]["n"]), (cf["view"]["engagements"], 0))
+    chk("Cash forecast: group balances add up to the view's gross outstanding (scheduled closings excluded, as in the view)",
+        round(sum(x["amount"] for k, x in g.items() if k != "scheduled") + cf["other"]["amount"], 2), cf["view"]["gross_outstanding"])
+    chk("Cash forecast: the fixed-timing schedule holds exactly the under-contract balances and scheduled second installments",
+        round(sum(cf["fixed"]["cash"]) + cf["fixed"]["beyond_horizon"]["cash"]), round(g["under_contract"]["amount"] + g["scheduled"]["amount"]))   # whole dollars: daily cents are rounded
+    chk("Cash forecast: the fixed-timing schedule holds one expected closing per under-contract or scheduled engagement",
+        round(sum(cf["fixed"]["closings"]) + cf["fixed"]["beyond_horizon"]["closings"], 2), float(g["under_contract"]["n"] + g["scheduled"]["n"]))
+    chk("Cash forecast: no negative amounts", min(min(cf["fixed"]["cash"]), min(x["amount"] for x in g.values())) >= 0, True)
     return out
 
 
@@ -116,6 +127,7 @@ def main() -> None:
     t0 = time.time()
     ctx = C.load(args.explorer, args.reports, args.cache)
     data = {k: mod.build(ctx) for k, mod in CHAPTERS.items()}
+    data["cash"] = cash.build(ctx)          # the Cash forecast tab (cash.html), not a presentation chapter
     f = ctx.f
     data["meta"] = {
         "title": "The Client Journey", "asof": ctx.asof.strftime("%Y-%m-%d"),

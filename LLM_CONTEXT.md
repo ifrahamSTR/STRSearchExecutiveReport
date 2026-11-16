@@ -10,6 +10,13 @@ Definitions: client_start_date = due date for Jira issues created before 1 Jun 2
 - Capital (chapter 5, survival analysis incl. unfinished journeys): Pipedrive stated capital, 668 clients, log-rank p = 0.434, Cox HR per $100K 1.016 (95% 0.977–1.055). Offer experience (form column AA, self-reported, before STRSearch): within 30 days 19% / 28% / 40% for 0 / 1–2 / 3+ prior offers.
 - Deals sent: cumulative and undated; cannot measure early (first 14 days) deal velocity.
 
+
+## Cash forecast tab (16 Nov 2026 only)
+`docs/2026-11-16/cash.html` (header tab "Cash forecast") is an interactive scenario model of the cash STRSearch can still collect: second Split Pay installments plus affiliate revenue from future closings. Built from the reporting layer's modeled `client_cash_forecast` (contractual expectations, not verified receipts) by `pipeline/chapters/cash.py`; only aggregates are published.
+- Every won engagement sits in exactly one group (checked on each build, and reconciled with the view's gross outstanding of $3,893,254): under contract (59, timed by historical UC → CLOSED durations conditional on time already waited), closing scheduled (6, on its date; the view counts these as collected), no property yet (116), paused / additional service (110), refunded (79), closed with the date missing (22), already closed (437) and no Jira match (47, not forecast).
+- Controls: timing slider for clients without a property (optimistic: Under Contract tomorrow + 36-day median = day 37; pessimistic: 77 days, adjustable), paused / additional-service share that proceeds (default 50%), and conversion + revenue for realtor (93% × $4,000), lender (70% × $1,400) and STR Cribs (70% × $2,500).
+- Defaults: about $2.27M expected service cash + $1.52M affiliate revenue = $3.79M from a $3.96M contractual balance. The dashboard's expandable notes list every assumption and limitation, separating historical figures from business assumptions.
+
 ## 12 Nov 2026 version (archived). Everything below describes it, unchanged.
 
 # Context for AI assistants
