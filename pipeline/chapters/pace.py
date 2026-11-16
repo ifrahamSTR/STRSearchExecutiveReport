@@ -1,4 +1,12 @@
-"""Chapter 3: are we keeping pace? Two views of the Explorer's monthly Q3 figures.
+"""Chapter 3: are we keeping pace? (16 Nov 2026 reporting version)
+
+Starts are 'Client Started' events (won engagements with a confirmed Jira start, dated by client_start_date), Under
+Contract events use the latest valid UC date, CLOSED events the closing date up to the data date
+(daily_client_activity summed by month). From 1 Jun 2026 a start is the Pipedrive won date, so a month's starts do
+not change after it ends; only the current, partial month is still filling. The 90-day strip uses the
+client_cohort_performance rule (matured clients only).
+
+Original 12 Nov description, for reference:
 
 1. Jira intake: every new Jira issue by the month it was created (the Explorer's `new_all_created`), split by
    where each issue stands TODAY with the Explorer's onboarding-first funnel classes (signed client / still in
@@ -23,14 +31,14 @@ WINDOW = 5                 # full months compared on each side of the change (th
 COHORT_DAYS = 90           # the Explorer's same-cohort window (Q3 cohort chart)
 COHORT_FROM = "2026-01"    # earlier start months carry many CLOSED dates without a recorded Under Contract date
 GAP_FROM = "2026-01"       # same reason: missing Under Contract dates make earlier gaps read high
-SETTLE_DAYS = 30           # a month's starts count as settled this many days after it ends (late signers join it)
+SETTLE_DAYS = 0            # 16 Nov: starts are won dates from 1 Jun 2026 and never back-fill; only the partial month fills
 MIN_CELL = 5
 
 
 def funnel_class(j: pd.DataFrame) -> pd.Series:
     """The Explorer's onboarding-first funnel classes (Acquisition section): signed client if the current status is
     in the signed-up list, else Services Declined, else still in pre-sale onboarding (New Clients, Onboarding Completed)."""
-    return pd.Series(np.select([j.carson_signed, j.status == "Services Declined"], ["signed", "declined"], "presale"), index=j.index)
+    return pd.Series(np.select([j.signed, j.status == "Services Declined"], ["signed", "declined"], "presale"), index=j.index)
 
 
 def _month(s: pd.Series) -> pd.Series:
@@ -48,8 +56,9 @@ def build(ctx: C.Ctx) -> dict:
     change = pd.Timestamp(ctx.D.NEW_EXPERIENCE_DATE)
 
     # 2. the existing monthly acquisition view (Explorer Q3 table, unchanged)
-    rows = [{"month": r["month"], "label": C.month_label(r["month"]), "new": r["new_signed_start"], "uc": r["uc"],
-             "closed": r["closed"], "partial": partial(r["month"])}
+    rows = [{"month": r["month"], "label": C.month_label(r["month"]), "new": r["started"], "uc": r["uc"],
+             "closed": r["closed"], "partial": partial(r["month"]), "won": r["won"],
+             "replacement_rate": r["replacement_rate"], "cumulative": r["cumulative_net_change"]}
             for r in ctx.expected["q3"] if r["month"] >= FROM_MONTH]
 
     # 1. Jira intake by month created, split by where each issue stands today
@@ -75,7 +84,7 @@ def build(ctx: C.Ctx) -> dict:
     # monthly gap: starts minus first Under Contract events in the same month
     for r in rows:
         r["gap"] = r["new"] - r["uc"]
-        r["filling"] = bool(pd.Period(r["month"], "M").end_time.normalize() + pd.Timedelta(days=SETTLE_DAYS) > asof)
+        r["filling"] = bool(r["partial"])
 
     windows = {"before": before, "after": after,
                "intake": {"before": avg(in_m, before, "total"), "after": avg(in_m, after, "total")},
@@ -91,41 +100,40 @@ def build(ctx: C.Ctx) -> dict:
     peak_months = [r["month"] for r in settled if r["gap"] == peak]
     tail = [r for r in full_after if r["month"] > peak_months[-1]]
     seq = [peak] + [r["gap"] for r in tail]
-    signers = s[(s.start >= change) & s.pd_won_date.notna()]
-    late = int(((signers.pd_won_date - signers.start).dt.days > SETTLE_DAYS).sum())
+    co = ctx.cohort
+    since_rule = co[co.start_rule == "won"]
+    late = int((since_rule.start != since_rule.won_date).sum())        # by the rule this is 0: start = won date
     gap = {"from": GAP_FROM, "settle_days": SETTLE_DAYS, "peak": peak, "peak_months": peak_months,
            "tail": [{"month": r["month"], "gap": r["gap"], "filling": r["filling"]} for r in tail],
            "narrowing": bool(tail) and all(b < a for a, b in zip(seq, seq[1:])),
-           # how often a client who started since the change signed more than SETTLE_DAYS after starting (Pipedrive Won)
-           "late_signers": {"n": int(len(signers)), "k": late, "share": _share(late, len(signers))}}
+           "start_is_won_date": {"n": int(len(since_rule)), "differ": late},
+           "late_signers": {"n": int(len(since_rule)), "k": 0, "share": 0.0}}
 
-    # same-cohort view (the Explorer's Q3 cohort chart): of each start month's signed clients, the share under
-    # contract within 90 days; only once every client in the month has had the full 90 days
-    sm = _month(s.start)
-    elapsed = (asof - s.start).dt.days
-    uc90 = s.uc.notna() & (s.days_uc <= COHORT_DAYS)
-    no_uc_date = s.closed.notna() & s.uc.isna()
+    # same-cohort view: client_cohort_performance, share of each start month's confirmed starts under contract within
+    # 90 days (uc_within_90d x eligible_90d); shown once every client in the month is eligible
+    co = ctx.cohort
+    sm = _month(co.start)
+    no_uc_date = co.closed.notna() & co.uc.isna()
     cohort = []
     for m in (r["month"] for r in rows if r["month"] >= COHORT_FROM):
         g = sm == m
         n = int(g.sum())
-        mature = bool(n) and bool((elapsed[g] >= COHORT_DAYS).all())
-        k = int(uc90[g].sum()) if mature else None
+        el = int(co.eligible_90d[g].sum())
+        mature = bool(n) and el == n
+        k = int((co.uc_within_90d[g] * co.eligible_90d[g]).sum()) if mature else None
         share = _share(k, n) if mature else None
         cohort.append({"month": m, "n": n, "k": k if share is not None else None, "share": share, "mature": mature,
-                       "closed_no_uc": int(no_uc_date[g].sum())})
+                       "eligible": el, "closed_no_uc": int(no_uc_date[g].sum())})
     shown = [c for c in cohort if c["share"] is not None]
     pooled = lambda cs: round(sum(c["k"] for c in cs) / sum(c["n"] for c in cs), 4) if cs else None  # noqa: E731
     y25 = sm.str.startswith("2025")
     cohort_meta = {
-        "days": COHORT_DAYS, "from": COHORT_FROM, "rows": cohort,
-        # before = start months wholly before the change; the change month (May) is split and sits in neither
+        "days": COHORT_DAYS, "from": COHORT_FROM, "rows": cohort, "rule": "SUM(uc_within_90d * eligible_90d) / SUM(eligible_90d)",
         "pooled_before": pooled([c for c in shown if c["month"] < ctx.D.NEW_EXPERIENCE_DATE[:7]]),
         "pooled_after": pooled([c for c in shown if c["month"] >= CHANGE_MONTH]),
-        # why earlier start months are not shown: a CLOSED date without a recorded Under Contract date counts as no contract
         "no_uc_date": {"y2025": {"n": int(y25.sum()), "k": int(no_uc_date[y25].sum())},
                        "shown": {"n": sum(c["n"] for c in shown), "k": sum(c["closed_no_uc"] for c in shown)}},
-        "presale_pending": {c["month"]: int(((_month(j.start) == c["month"]) & (cls == "presale")).sum()) for c in shown if c["month"] >= CHANGE_MONTH},
+        "presale_pending": {},
     }
 
     # service sales (Pipedrive Won, official filter, by won date) next to starts, for the method note only

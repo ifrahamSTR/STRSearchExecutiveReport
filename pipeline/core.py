@@ -1,9 +1,12 @@
-"""Shared loading for "The Client Journey" presentation.
+"""Shared loading for "The Client Journey", 16 Nov 2026 reporting version.
 
-Nothing is re-analysed here. Records, definitions and headline metrics come straight from the
-Business Data Explorer's own pipeline (build.py, definitions.py, metrics.py), imported from its
-folder. Chapter modules only reshape those results into what each visual needs: bin counts and
-curve points. No dates are imputed and no record is reclassified.
+Records, rebuilt views, definitions and headline metrics come from the Business Data Explorer's 16 Nov foundation
+(pipeline/foundation.py in the Explorer repository, imported, not copied), so both sites publish the same figures.
+Populations are kept apart exactly as in the Explorer:
+  ctx.jira / ctx.signed   Jira issues (reporting-layer flags)            -> chapters 1-3 client counts
+  ctx.cohort              won engagements with a confirmed Jira start    -> chapters 4-5 durations
+  ctx.f.monthly           daily_client_activity summed by month          -> chapter 3 throughput
+The archived 12 Nov 2026 version keeps its own pipeline in versions/2026-11-12/pipeline/.
 """
 from __future__ import annotations
 
@@ -17,18 +20,20 @@ import pandas as pd
 
 ROOT = Path(__file__).resolve().parents[1]
 DEFAULT_EXPLORER = ROOT.parent / "STRSearch-Business-Data-Explorer"
+VERSION_ID = "2026-11-16"
 
 
 @dataclass
 class Ctx:
-    jira: pd.DataFrame      # every Jira issue, as built by the Explorer (plus elapsed days)
-    signed: pd.DataFrame    # issues in the signed-up statuses
-    deals: pd.DataFrame     # STR Search pipeline deals, as built by the Explorer
+    f: object               # the Explorer foundation (records, rebuilt views, recon, quality, expected)
+    jira: pd.DataFrame      # every Jira issue (reporting-layer flags) + aliases used by the chapter modules
+    signed: pd.DataFrame    # Jira issues with signed_up_client = 1
+    cohort: pd.DataFrame    # client_cohort_performance: won engagements with a confirmed Jira start
+    deals: pd.DataFrame     # pipedrive_reporting_base, cleaned (in_scope, status, won_date, ...)
     asof: pd.Timestamp
-    meta: list
-    D: object               # Explorer definitions module
-    expected: dict          # Explorer headline metrics (metrics.expected), the figures the page shows
-    raw: dict               # raw sheets as read by the Explorer (row order matches ctx.jira)
+    D: object               # Explorer 16 Nov definitions module
+    expected: dict          # Explorer headline metrics (the figures both sites show)
+    explorer: Path
 
 
 def _load_module(name: str, path: Path):
@@ -40,26 +45,28 @@ def _load_module(name: str, path: Path):
 
 
 def load(explorer: Path, reports: Path | None, use_cache: bool) -> Ctx:
-    if not (explorer / "pipeline" / "build.py").exists():
-        raise SystemExit(f"Business Data Explorer pipeline not found at: {explorer}\n"
+    fpath = explorer / "pipeline" / "foundation.py"
+    if not fpath.exists():
+        raise SystemExit(f"Business Data Explorer 16 Nov foundation not found at: {fpath}\n"
                          "Pass --explorer <path to STRSearch-Business-Data-Explorer>.")
-    XB = _load_module("explorer_build", explorer / "pipeline" / "build.py")
-    D, M = sys.modules["definitions"], sys.modules["metrics"]
-    frames, meta = XB.load_sources(reports or XB.DEFAULT_REPORTS, use_cache)
-    jira_keys = set(XB.clean_str(frames["jira"]["key"]).str.upper().dropna())
-    deals_all = XB.build_deals_all(frames["deals"])
-    deals = XB.build_deals(frames["deals"], frames["stages"], jira_keys)
-    jira = XB.build_jira(frames["jira"], deals_all)
-    snap = {m["key"]: m["snapshot"] for m in meta}
-    asof = min(pd.Timestamp(snap["jira"]), pd.Timestamp(snap["deals"])).normalize()
-    jira["elapsed"] = (asof - jira["start"]).dt.days       # days on the acquisition clock so far
-    expected = M.expected(deals, jira, asof)
-    return Ctx(jira=jira, signed=jira[jira.carson_signed].copy(), deals=deals, asof=asof, meta=meta, D=D, expected=expected, raw=frames)
+    F = _load_module("explorer_foundation", fpath)
+    D = sys.modules["definitions"]
+    f = F.load(reports, use_cache, cache_dir=explorer / ".cache")
+    if f.recon_failures:
+        raise SystemExit("Explorer reconciliation failed: " + "; ".join(r["check"] for r in f.recon_failures))
+    asof = f.asof
+    j = f.jira.copy()
+    j["carson_signed"], j["carson_active"], j["carson_inactive"] = j.signed, j.active, j.inactive   # names the chapter code uses
+    j["start_src"] = j.start_rule
+    j["elapsed"] = (asof - j.start).dt.days
+    c = f.cohort.copy()
+    c["days_uc"], c["days_closed"], c["elapsed"] = c.days_to_uc, c.days_to_close, c.days_since_start
+    c["start_src"], c["pd_experience"] = c.start_rule, c.experience
+    return Ctx(f=f, jira=j, signed=j[j.signed].copy(), cohort=c, deals=f.deals, asof=asof, D=D, expected=f.expected, explorer=explorer)
 
 
 def km_curve(t, e) -> pd.DataFrame:
-    """Kaplan-Meier product-limit estimate: the same estimator as the Explorer's km_median.
-    Returns the cumulative share reaching the milestone at each distinct day."""
+    """Kaplan-Meier product-limit estimate (the same estimator as the Explorer). Cumulative share reaching the milestone."""
     df = pd.DataFrame({"t": np.asarray(t, float), "e": np.asarray(e, bool)}).dropna()
     df = df[df.t >= 0]
     g = df.groupby("t").e.agg(["size", "sum"]).sort_index()
@@ -81,7 +88,7 @@ def daily(points: pd.DataFrame, upto: int) -> list:
 
 
 def ecdf(days: pd.Series) -> pd.DataFrame:
-    d = np.sort(days.dropna().values)
+    d = np.sort(pd.to_numeric(days, errors="coerce").dropna().values)
     d = d[d >= 0]
     u, cnt = np.unique(d, return_counts=True)
     return pd.DataFrame({"t": u, "cum": np.cumsum(cnt) / len(d)})

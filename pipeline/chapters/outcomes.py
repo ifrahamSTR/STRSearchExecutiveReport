@@ -1,15 +1,19 @@
-"""Chapter 3: how many clients reach their destination? (Explorer status groups and Q2 attainment)"""
+"""Chapter 2: where are our clients today? (16 Nov 2026: Jira-issue grain, reporting-layer flags)
+
+Active = signed-up minus Refunded, Paused and Additional Service; it includes clients who already closed and are in
+post-close services. Hunting = the Active clients still searching (Client Start to 8 Weeks). Attainment counts
+completed milestones only: closing dates after the data date are scheduled, not closed."""
 from __future__ import annotations
 
 import core as C
 
-ACTIVE_GROUPS = ["Searching", "Under contract", "Closed", "Post-close"]
+ACTIVE_GROUPS = ["Hunting", "Under contract", "Closed", "Post-close"]
 INACTIVE_STATUSES = ["Paused", "Refunded", "Additional Service"]
 
 
 def build(ctx: C.Ctx) -> dict:
     ex, s = ctx.expected, ctx.signed
-    act = s[s.carson_active]
+    act = s[s.active]
     groups = []
     for gname in ACTIVE_GROUPS:
         g = act[act.group == gname]
@@ -17,8 +21,10 @@ def build(ctx: C.Ctx) -> dict:
     inactive = [{"status": st, "n": int((s.status == st).sum())} for st in INACTIVE_STATUSES]
     q2 = ex["q2"]
     return {
-        "signed": ex["jira"]["signed"], "active": ex["jira"]["active"], "inactive": ex["jira"]["inactive"],
+        "signed": ex["jira"]["signed"], "active": ex["jira"]["active"], "inactive": ex["jira"]["inactive"], "hunting": ex["jira"]["hunting"],
         "active_groups": groups, "inactive_statuses": inactive,
         "attainment": {"active": q2["active"], "uc": q2["active_uc"], "closed": q2["active_closed"],
-                       "uc_share": round(q2["active_uc"] / q2["active"], 4), "closed_share": round(q2["active_closed"] / q2["active"], 4)},
+                       "uc_share": round(q2["active_uc"] / q2["active"], 4), "closed_share": round(q2["active_closed"] / q2["active"], 4),
+                       "closed_scheduled": q2["active_closed_scheduled"]},
+        "hunting_engagements": ex["engagements"]["hunting_official"],
     }

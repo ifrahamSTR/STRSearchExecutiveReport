@@ -1,0 +1,16 @@
+{
+  "id": "2026-11-12",
+  "label": "12 Nov 2026",
+  "title": "Original reporting",
+  "status": "archived",
+  "frozen": true,
+  "data_asof": "2026-11-11",
+  "sources": "Business Data Explorer 12 Nov pipeline (versions/2026-11-12/pipeline in the Explorer repo) + onboarding questionnaire",
+  "pipeline": "versions/2026-11-12/pipeline/build.py",
+  "rebuild": "python versions/2026-11-12/pipeline/build.py --cache   # writes versions/2026-11-12/rebuild/; only meta.built_at differs from docs/2026-11-12/data",
+  "outputs": {
+    "docs/2026-11-12/data/story-data.js": "c25b15438fa4959c3559d1b85f4e2402a22a73de4eb020a957fa074483ef19ea",
+    "docs/2026-11-12/data/story-data.json": "e5a06aa6f19d5af3b5284f8986d52214f5750c7ba8f77a91fd24398ed0d730fe"
+  },
+  "note": "Frozen on 2026-11-16 when the 16 Nov 2026 reporting layer became the default. Includes the Chapter 3 gap row and Chapter 4 start-date board (c578015)."
+}

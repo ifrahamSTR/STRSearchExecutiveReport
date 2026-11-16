@@ -1,0 +1,76 @@
+/* Reporting-version switcher (shared by every version folder). Colours come from the host page's tokens,
+   so the control follows its light/dark theme; literal fallbacks only apply if a token is missing. */
+.vs {
+  --vs-surface: var(--surface, #ffffff);
+  --vs-ink: var(--ink, #1d2a26);
+  --vs-ink-2: var(--ink-2, #485a55);
+  --vs-muted: var(--ink-muted, var(--muted, #6b7b76));
+  --vs-line: var(--border, var(--line, #d9e2de));
+  --vs-accent: var(--accent, var(--acq, #075646));
+  --vs-amber: #b87412;
+  position: relative;
+  flex: none;
+  font-family: inherit;
+}
+.vs-btn {
+  display: inline-flex; align-items: center; gap: 7px;
+  height: 32px; padding: 0 10px 0 9px;
+  border: 1px solid var(--vs-line); border-radius: 999px;
+  background: var(--vs-surface); color: var(--vs-ink-2);
+  font-family: inherit; font-size: 12.5px; font-weight: 600; line-height: 1;
+  font-variant-numeric: tabular-nums; letter-spacing: .01em;
+  cursor: pointer; white-space: nowrap;
+  transition: border-color .15s ease, color .15s ease;
+}
+.vs-btn:hover, .vs.is-open .vs-btn { border-color: var(--vs-accent); color: var(--vs-ink); }
+.vs-btn:focus-visible { outline: 2px solid var(--focus, #2a78d6); outline-offset: 2px; }
+.vs-dot { width: 7px; height: 7px; border-radius: 50%; background: var(--vs-accent); flex: none; }
+.vs-dot--archived { background: var(--vs-amber); }
+.vs-short { display: none; }
+.vs-chev { width: 12px; height: 12px; opacity: .7; transition: transform .15s ease; }
+.vs.is-open .vs-chev { transform: rotate(180deg); }
+
+.vs-pop {
+  position: absolute; right: 0; top: calc(100% + 8px); z-index: 1000;
+  width: min(300px, calc(100vw - 32px));
+  padding: 6px; border: 1px solid var(--vs-line); border-radius: 12px;
+  background: var(--vs-surface); color: var(--vs-ink);
+  box-shadow: 0 12px 32px rgba(8, 30, 25, .16), 0 2px 6px rgba(8, 30, 25, .08);
+}
+.vs-head { padding: 8px 10px 6px; font-size: 11px; font-weight: 600; letter-spacing: .08em; text-transform: uppercase; color: var(--vs-muted); }
+.vs-item {
+  display: grid; gap: 2px; padding: 9px 10px; border-radius: 8px;
+  color: inherit; text-decoration: none; border: 1px solid transparent;
+}
+.vs-item:hover, .vs-item:focus-visible { background: color-mix(in srgb, var(--vs-accent) 8%, transparent); outline: none; border-color: color-mix(in srgb, var(--vs-accent) 25%, transparent); }
+.vs-item.is-current { background: color-mix(in srgb, var(--vs-accent) 10%, transparent); }
+.vs-item-top { display: flex; align-items: center; justify-content: space-between; gap: 8px; }
+.vs-item-date { font-weight: 700; font-size: 14px; font-variant-numeric: tabular-nums; }
+.vs-item-title { font-size: 13px; color: var(--vs-ink-2); }
+.vs-item-asof { font-size: 12px; color: var(--vs-muted); font-variant-numeric: tabular-nums; }
+.vs-tag { font-size: 10.5px; font-weight: 600; letter-spacing: .04em; text-transform: uppercase; padding: 3px 7px; border-radius: 999px; }
+.vs-tag--current { color: var(--vs-accent); background: color-mix(in srgb, var(--vs-accent) 12%, transparent); }
+.vs-tag--archived { color: var(--vs-amber); background: color-mix(in srgb, var(--vs-amber) 14%, transparent); }
+.vs-note { margin: 4px 10px 6px; font-size: 11.5px; line-height: 1.45; color: var(--vs-muted); }
+.vs-cross { display: block; margin: 2px 4px 4px; padding: 8px 6px; border-top: 1px solid var(--vs-line); font-size: 12.5px; font-weight: 600; color: var(--vs-accent); text-decoration: none; }
+.vs-cross:hover, .vs-cross:focus-visible { text-decoration: underline; outline: none; }
+
+.vs--float { position: fixed; z-index: 1000; right: max(12px, env(safe-area-inset-right, 0px)); bottom: max(12px, env(safe-area-inset-bottom, 0px)); }
+.vs--float .vs-pop { top: auto; bottom: calc(100% + 8px); }
+
+.vs-banner {
+  display: flex; flex-wrap: wrap; align-items: center; justify-content: center; gap: 4px 10px;
+  padding: 7px max(16px, env(safe-area-inset-right, 0px)) 7px max(16px, env(safe-area-inset-left, 0px));
+  font-size: 12.5px; line-height: 1.4; text-align: center;
+  color: var(--ink-2, #485a55);
+  background: color-mix(in srgb, #ecaa4a 16%, var(--surface, #ffffff));
+  border-bottom: 1px solid color-mix(in srgb, #ecaa4a 40%, var(--border, var(--line, #d9e2de)));
+}
+.vs-banner a { color: var(--ink, #1d2a26); font-weight: 600; text-decoration: underline; text-underline-offset: 2px; }
+
+@media (max-width: 760px) {
+  .vs-label { display: none; }
+  .vs-short { display: inline; }
+  .vs-btn { height: 30px; padding: 0 8px; gap: 6px; }
+}
+@media print { .vs, .vs-banner { display: none !important; } }

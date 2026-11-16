@@ -1,15 +1,13 @@
 #!/usr/bin/env python3
-"""Build the data for "The Client Journey" presentation.
+"""Build the data for "The Client Journey", 16 Nov 2026 reporting version.
 
-    python pipeline/build.py [--explorer <path to STRSearch-Business-Data-Explorer>] [--reports <Reporting Tables>] [--cache]
+    python pipeline/build.py [--explorer <path to STRSearch-Business-Data-Explorer>] [--reports <16 Nov UpdatedReports>] [--cache]
 
-All figures come from the Business Data Explorer's validated pipeline (imported, not copied).
-Chapter modules reshape them for the visuals; nothing is re-analysed or imputed. Every build
-checks the output against the Explorer's own headline metrics and stops on any mismatch.
-Output: docs/data/story-data.js (window.STORY_DATA) and docs/data/story-data.json (aggregates only).
-
-Adding a chapter: write pipeline/chapters/<name>.py with build(ctx) -> dict, add it to CHAPTERS,
-then add docs/assets/js/chapters/<name>.js and one <script> tag in docs/index.html.
+All figures come from the Business Data Explorer's 16 Nov foundation (imported, not copied): the reporting-layer
+export, reconciled with its SQL reference. Every build checks the output against the foundation's headline metrics and
+against the Explorer's PUBLISHED 16 Nov data file, and stops on any mismatch, so the two sites always agree.
+Output: docs/2026-11-16/data/story-data.js (window.STORY_DATA) and story-data.json (aggregates only).
+The archived 12 Nov 2026 version is rebuilt only by versions/2026-11-12/pipeline/ and is never overwritten here.
 """
 from __future__ import annotations
 
@@ -25,11 +23,11 @@ import core as C  # noqa: E402
 from chapters import drivers, journey, outcomes, pace, speed  # noqa: E402
 
 CHAPTERS = {"journey": journey, "outcomes": outcomes, "pace": pace, "speed": speed, "drivers": drivers}
-OUT = C.ROOT / "docs" / "data" / "story-data.js"
+OUT = C.ROOT / "docs" / C.VERSION_ID / "data" / "story-data.js"
 
 
 def small_cells(obj) -> int:
-    """Count published {n, k, share} cells whose share rests on fewer than 5 clients (or reveals a suppressed count)."""
+    """Published {n, k, share} cells whose share rests on fewer than 5 clients (or reveals a suppressed count)."""
     if isinstance(obj, dict):
         bad = 0
         if {"n", "k", "share"} <= obj.keys() and obj["share"] is not None:
@@ -42,60 +40,67 @@ def small_cells(obj) -> int:
     return 0
 
 
+def explorer_published(explorer: Path) -> dict | None:
+    p = explorer / "docs" / C.VERSION_ID / "data" / "explorer-data.js"
+    if not p.exists():
+        return None
+    s = p.read_text(encoding="utf-8")
+    return json.loads(s[s.index("=") + 1:].rstrip().rstrip(";"))["expected"]
+
+
 def checks(ctx: C.Ctx, data: dict) -> list[dict]:
-    ex, sp, oc, pc, jn, dr = ctx.expected, data["speed"], data["outcomes"], data["pace"], data["journey"], data["drivers"]
+    ex, sp, oc, pc, dr = ctx.expected, data["speed"], data["outcomes"], data["pace"], data["drivers"]
     out = []
 
     def chk(name, got, want, hard=True):
         out.append({"check": name, "page": got, "explorer": want, "ok": got == want, "hard": hard})
 
-    chk("Days to UC: median / mean / n", (sp["observed"]["uc"]["median"], sp["observed"]["uc"]["mean"], sp["observed"]["uc"]["n"]),
-        (ex["q1"]["uc"]["median"], ex["q1"]["uc"]["mean"], ex["q1"]["uc"]["n"]))
-    chk("Days to CLOSED: median / mean / n", (sp["observed"]["closed"]["median"], sp["observed"]["closed"]["mean"], sp["observed"]["closed"]["n"]),
-        (ex["q1"]["closed"]["median"], ex["q1"]["closed"]["mean"], ex["q1"]["closed"]["n"]))
-    chk("Kaplan-Meier curve crosses 50% (UC)", sp["estimate"]["uc"]["check"], ex["q1"]["km_uc_signed"])
-    chk("Kaplan-Meier curve crosses 50% (CLOSED)", sp["estimate"]["closed"]["check"], ex["q1"]["km_closed_signed"])
+    pub = explorer_published(ctx.explorer)
+    chk("Explorer 16 Nov data file is published next to this build", pub is not None, True)
+    if pub:
+        chk("Shared headline: days to UC median / mean / n = the published Explorer", (sp["observed"]["uc"]["median"], sp["observed"]["uc"]["mean"], sp["observed"]["uc"]["n"]),
+            (pub["q1"]["uc"]["median"], pub["q1"]["uc"]["mean"], pub["q1"]["uc"]["n"]))
+        chk("Shared headline: days to CLOSED median / mean / n = the published Explorer", (sp["observed"]["closed"]["median"], sp["observed"]["closed"]["mean"], sp["observed"]["closed"]["n"]),
+            (pub["q1"]["closed"]["median"], pub["q1"]["closed"]["mean"], pub["q1"]["closed"]["n"]))
+        chk("Shared headline: Kaplan-Meier day 50% (UC / CLOSED) = the published Explorer", (sp["estimate"]["uc"]["median"], sp["estimate"]["closed"]["median"]), (pub["q1"]["km_uc"], pub["q1"]["km_closed"]))
+        chk("Shared headline: signed / active / inactive / hunting = the published Explorer", (oc["signed"], oc["active"], oc["inactive"], oc["hunting"]),
+            (pub["jira"]["signed"], pub["jira"]["active"], pub["jira"]["inactive"], pub["jira"]["hunting"]))
+        chk("Shared headline: Active with UC / CLOSED = the published Explorer", (oc["attainment"]["uc"], oc["attainment"]["closed"]), (pub["q2"]["active_uc"], pub["q2"]["active_closed"]))
+        pq = {r["month"]: r for r in pub["q3"]}
+        chk("Shared monthly starts / UC / CLOSED: months that differ from the published Explorer",
+            sum(1 for r in pc["monthly"] if (r["new"], r["uc"], r["closed"]) != (pq[r["month"]]["started"], pq[r["month"]]["uc"], pq[r["month"]]["closed"])), 0)
+    chk("Kaplan-Meier curve crosses 50% where the foundation says (UC)", sp["estimate"]["uc"]["check"], ex["q1"]["km_uc"])
+    chk("Kaplan-Meier curve crosses 50% where the foundation says (CLOSED)", sp["estimate"]["closed"]["check"], ex["q1"]["km_closed"])
     chk("Histogram bins + overflow = UC n", sum(sp["hist"]["counts"]) + sp["hist"]["overflow"], ex["q1"]["uc"]["n"])
+    chk("Clock start counts cover exactly the recorded durations (UC n / CLOSED n)", (sp["clock"]["uc"]["n"], sp["clock"]["closed"]["n"]), (ex["q1"]["uc"]["n"], ex["q1"]["closed"]["n"]))
+    chk("Start rules add up to the recorded UC durations", sum(sp["clock"]["uc"][r] for r in ("due", "created+4", "won")), sp["clock"]["uc"]["n"])
     chk("Active status groups add up to Active", sum(g["n"] for g in oc["active_groups"]), ex["jira"]["active"])
     chk("Inactive statuses add up to Inactive", sum(i["n"] for i in oc["inactive_statuses"]), ex["jira"]["inactive"])
     chk("Active + Inactive = signed-up", oc["active"] + oc["inactive"], ex["jira"]["signed"])
-    chk("Active clients with UC / CLOSED recorded", (oc["attainment"]["uc"], oc["attainment"]["closed"]), (ex["q2"]["active_uc"], ex["q2"]["active_closed"]))
+    chk("Hunting = the Active group 'Hunting'", next(g["n"] for g in oc["active_groups"] if g["group"] == "Hunting"), ex["jira"]["hunting"])
     q3 = {r["month"]: r for r in ex["q3"]}
-    chk("Monthly rows that differ from the Explorer", sum(1 for r in pc["monthly"] if (r["new"], r["uc"], r["closed"]) != (q3[r["month"]]["new_signed_start"], q3[r["month"]]["uc"], q3[r["month"]]["closed"])), 0)
-    chk("Monthly gap = the Explorer's signed starts minus its Under Contract events, months that differ",
-        sum(1 for r in pc["monthly"] if r["gap"] != q3[r["month"]]["new_signed_start"] - q3[r["month"]]["uc"]), 0)
-    ck = sp["clock"]
-    chk("Clock start shown for exactly the recorded durations (UC n / CLOSED n)", (ck["uc"]["n"], ck["closed"]["n"]), (ex["q1"]["uc"]["n"], ex["q1"]["closed"]["n"]))
-    chk("Jira intake: signed + pre-sale + declined = the Explorer's new Jira issues (all statuses), months that differ",
-        sum(1 for r in pc["intake"]["monthly"] if r["signed"] + r["presale"] + r["declined"] != q3[r["month"]]["new_all_created"]), 0)
-    ca = pc["intake"]["classes_all"]
-    chk("Jira intake classes cover every issue: signed = signed-up list, pre-sale + declined = records outside it",
-        (ca["signed"], ca["presale"] + ca["declined"]), (ex["jira"]["signed"], ex["jira"]["unmapped"]))
-    chk("Same-cohort view: start months whose size differs from the Explorer's signed starts",
-        sum(1 for c in pc["cohort"]["rows"] if c["n"] != q3[c["month"]]["new_signed_start"]), 0)
+    chk("Monthly rows that differ from daily_client_activity", sum(1 for r in pc["monthly"] if (r["new"], r["uc"], r["closed"]) != (q3[r["month"]]["started"], q3[r["month"]]["uc"], q3[r["month"]]["closed"])), 0)
+    chk("Monthly gap = starts minus Under Contract events (net_client_change), months that differ",
+        sum(1 for r in pc["monthly"] if r["gap"] != q3[r["month"]]["net_client_change"]), 0)
+    jt = ctx.jira.created.dt.strftime("%Y-%m").value_counts()
+    chk("Jira intake: signed + pre-sale + declined = every new Jira issue that month, months that differ",
+        sum(1 for r in pc["intake"]["monthly"] if r["signed"] + r["presale"] + r["declined"] != int(jt.get(r["month"], 0))), 0)
+    cs = ctx.cohort.start.dt.strftime("%Y-%m").value_counts()
+    chk("Same-cohort strip: start months whose size differs from the confirmed starts", sum(1 for c in pc["cohort"]["rows"] if c["n"] != int(cs.get(c["month"], 0))), 0)
     chk("Keeping pace: no published share rests on 1-4 clients", small_cells(pc), 0)
-    chk("Pre-sale Jira statuses = records outside the signed-up lists", sum(jn["presale"]["statuses"].values()), ex["jira"]["unmapped"])
-    chk("Fast/slow: the four speed groups add up to clients with 75+ days on the clock", sum(g["n"] for g in dr["composition"]["groups"]), dr["bases"]["d75"]["eligible"])
+    chk("Fast/slow: the four speed groups add up to classifiable clients with 75+ days on the clock", sum(g["n"] for g in dr["composition"]["groups"]), dr["bases"]["d75"]["eligible"])
     chk("Fast/slow: matched clients never exceed eligible clients", all(dr["bases"][b]["matched"] <= dr["bases"][b]["eligible"] for b in ("d30", "d75")), True)
-    ident = dr["matching"]["identifier"]
-    chk("Onboarding column AH behaves as a Pipedrive deal id, not a person id (>=95% agreement with e-mail matches)",
-        ident["deal"]["agree"] >= 0.95 * (ident["deal"]["agree"] + ident["deal"]["conflict"]) and ident["person"]["agree"] == 0, True)
-    chk("Onboarding answers used all precede the client's first Under Contract date", dr["matching"]["answers_after_uc_used"], 0)
+    chk("Onboarding answers used all precede the client's Under Contract date", dr["matching"]["answers_after_uc_used"], 0)
     chk("Fast/slow: no published share rests on 1-4 clients", small_cells(dr), 0)
+    chk("Capital (Pipedrive): every confirmed start with a stated capital is in the survival analysis", dr["capital"]["pipedrive"]["n"], dr["capital"]["pipedrive"]["coverage"]["known"])
     # statements the presentation makes in words (warn only: on a refresh the page text follows the data)
-    chk("Largest 15-day bin is 15-29 days", (sp["hist"]["largest"]["from"], sp["hist"]["largest"]["to"]), (15, 29), hard=False)
-    chk("About 71% of recorded UC within 60 days", round(sp["hist"]["within60"]["share"] * 100), 71, hard=False)
-    w, co = pc["windows"], pc["cohort"]
-    chk("Keeping pace: Jira intake and acquisition starts both rose after late May (five-month averages)",
-        w["intake"]["after"] > w["intake"]["before"] and w["starts"]["after"] > w["starts"]["before"], True, hard=False)
     gp = pc["gap"]
     chk("Keeping pace: 'the gap has narrowed every month since' its peak after late May", gp["narrowing"], True, hard=False)
-    chk(f"Keeping pace: starts settle {gp['settle_days']} days after a month ends - at most 10% of clients since late May signed later than that",
-        gp["late_signers"]["share"] is not None and gp["late_signers"]["share"] <= 0.10, True, hard=False)
+    chk("Capital: no capital band differs (log-rank p > 0.05, Pipedrive capital)", dr["capital"]["pipedrive"].get("logrank", {}).get("p", 0) > 0.05, True, hard=False)
+    cx = dr["capital"]["pipedrive"]["cox"] or {}
+    chk("Capital: Cox 95% CI for capital includes 1 (Pipedrive capital)", cx.get("lo", 2) <= 1 <= cx.get("hi", 0), True, hard=False)
     of = [r["within30"]["share"] for r in dr["offers"]["rows"]]
-    chk("Capital: no threshold beats chance (family-wise p > 0.05 on both outcomes)", min(dr["capital"]["family_p"].values()) > 0.05, True, hard=False)
     chk("Offer experience: share within 30 days rises 0 -> 1-2 -> 3+ offers", None not in of and of == sorted(of), True, hard=False)
-    chk("Deals seen: slow > middle > fast (medians)", dr["deals"]["groups"]["slow"]["median"] > dr["deals"]["groups"]["middle"]["median"] > dr["deals"]["groups"]["fast"]["median"], True, hard=False)
     return out
 
 
@@ -106,25 +111,33 @@ def main() -> None:
     ap.add_argument("--out", type=Path, default=OUT)
     ap.add_argument("--cache", action="store_true")
     args = ap.parse_args()
+    if "2026-11-12" in str(args.out):
+        raise SystemExit("Refusing to write into the frozen 2026-11-12 version.")
     t0 = time.time()
     ctx = C.load(args.explorer, args.reports, args.cache)
     data = {k: mod.build(ctx) for k, mod in CHAPTERS.items()}
-    snap = {m["key"]: m["snapshot"] for m in ctx.meta}
+    f = ctx.f
     data["meta"] = {
         "title": "The Client Journey", "asof": ctx.asof.strftime("%Y-%m-%d"),
-        "snapshots": {"jira": snap["jira"], "pipedrive": snap["deals"]},
+        "version": {"id": C.VERSION_ID, "label": "16 Nov 2026", "title": "Updated reporting", "status": "current"},
+        "snapshots": {"reporting_layer": ctx.asof.strftime("%Y-%m-%d")},
         "built_at": datetime.now().strftime("%Y-%m-%d %H:%M"), "chapters": list(CHAPTERS),
-        "source": "https://ifrahamstr.github.io/STRSearchBusinessDataExplorer-Public/",
+        "source": "https://ifrahamstr.github.io/STRSearchBusinessDataExplorer-Public/2026-11-16/",
+        "reconciliation": {"checks": len(f.recon), "ok": sum(r["ok"] for r in f.recon)},
+        "quality": [{"id": q["id"], "title": q["title"], "metric": q["metric"]} for q in f.quality if q["severity"] in ("serious", "warning")],
     }
+    ch = args.explorer / "docs" / C.VERSION_ID / "data" / "version-changes.json"
+    if ch.exists():
+        data["changes"] = json.loads(ch.read_text())
     data["checks"] = checks(ctx, data)
-    js = "/* Generated by pipeline/build.py from the Business Data Explorer. Aggregates only. */\nwindow.STORY_DATA = " + json.dumps(data, separators=(",", ":"), default=str) + ";\n"
+    js = "/* Generated by pipeline/build.py (16 Nov 2026 reporting version) from the Business Data Explorer foundation. Aggregates only. */\nwindow.STORY_DATA = " + json.dumps(data, separators=(",", ":"), default=str) + ";\n"
     args.out.parent.mkdir(parents=True, exist_ok=True)
     args.out.write_text(js, encoding="utf-8")
     args.out.with_suffix(".json").write_text(json.dumps(data, indent=1, default=str), encoding="utf-8")
     bad = [c for c in data["checks"] if not c["ok"]]
     print(f"Wrote {args.out.name} ({len(js) / 1e3:.0f} KB) in {time.time() - t0:.1f}s; checks: {len(data['checks']) - len(bad)}/{len(data['checks'])} ok")
     for c in bad:
-        print(f"  {'CHECK FAILED' if c['hard'] else 'NOTE'}: {c['check']}: page {c['page']} vs explorer/brief {c['explorer']}")
+        print(f"  {'CHECK FAILED' if c['hard'] else 'NOTE'}: {c['check']}: page {c['page']} vs explorer {c['explorer']}")
     if any(c["hard"] for c in bad):
         sys.exit(1)
 

@@ -2,11 +2,24 @@
 
 A visually led leadership presentation that shows how STRSearch turns paying clients into property owners.
 
-**Live:** https://ifrahamstr.github.io/STRSearchExecutiveReport/ · data as of 2026-11-11 (static snapshot, aggregates only).
+**Live:** https://ifrahamstr.github.io/STRSearchExecutiveReport/ opens the default version. Two reporting versions are published (see [`VERSIONS.md`](VERSIONS.md)):
+- **16 Nov 2026 · Updated reporting (default):** https://ifrahamstr.github.io/STRSearchExecutiveReport/2026-11-16/ · Supabase reporting layer · data as of 2026-11-16.
+- **12 Nov 2026 · Original reporting (archived, unchanged):** https://ifrahamstr.github.io/STRSearchExecutiveReport/2026-11-12/ · DIM extracts · data as of 2026-11-11.
 
-**Using this repo with an AI assistant?** Start with [`LLM_CONTEXT.md`](LLM_CONTEXT.md). Every figure on the page is in [`docs/data/story-data.json`](docs/data/story-data.json).
+The date menu in the header switches version and keeps the chapter. Links to the Business Data Explorer open the same version there.
 
-## Chapters
+**Rebuild:** `python pipeline/build.py --cache` (16 Nov, imports the Explorer's 16 Nov foundation and checks it matches the published Explorer). `python versions/2026-11-12/pipeline/build.py --cache` reproduces the frozen 12 Nov data into `versions/2026-11-12/rebuild/`.
+
+**Using this repo with an AI assistant?** Start with [`LLM_CONTEXT.md`](LLM_CONTEXT.md). Every figure is in `docs/<version>/data/story-data.json`.
+
+## 16 Nov 2026 headline figures
+- Durations (won engagements with a confirmed Jira start, n = 825): median 37.5 days to Under Contract (mean 56.17, n = 492), median 73.0 to CLOSED (mean 92.82, n = 438); Kaplan–Meier 76 / 117 days.
+- Jira clients (reporting-layer flags): 843 signed-up = 648 Active + 195 Inactive; 123 hunting. Active reaching UC / CLOSED: 72% / 68% (6 further closings scheduled after the data date).
+- Monthly starts minus Under Contract (net client change): peak +40 in 2026-06, then 2026-07 +31, 2026-08 +22, 2026-09 +19, 2026-10 +13.
+- Capital (chapter 5, survival analysis incl. unfinished journeys): Pipedrive stated capital, 668 clients, log-rank p = 0.434, Cox HR per $100K 1.016 (95% 0.977–1.055). Offer experience (form column AA, self-reported, before STRSearch): within 30 days 19% / 28% / 40% for 0 / 1–2 / 3+ prior offers.
+- Deals sent: cumulative and undated; cannot measure early (first 14 days) deal velocity.
+
+## Chapters (structure shared by both versions; the figures below are the archived 12 Nov ones)
 | Chapter | Shows | Pipeline module | Page script |
 |---|---|---|---|
 | 1 · The Client Journey | Route map: Pipedrive Won (buys STRSearch) vs Jira CLOSED (buys a property); sales-first route before 27 May 2026 vs the New Client Experience (New Clients → Confidence Call → Won or Services Declined), where the clocks overlap | `pipeline/chapters/journey.py` | `docs/assets/js/chapters/journey.js` |

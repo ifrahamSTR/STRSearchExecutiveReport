@@ -1,3 +1,17 @@
+# LLM context — The Client Journey (two reporting versions)
+
+The site publishes two versions: **16 Nov 2026** (default, `docs/2026-11-16/`, Supabase reporting layer, data as of 2026-11-16) and **12 Nov 2026** (archived, frozen, `docs/2026-11-12/`, DIM extracts, data as of 2026-11-11). Their figures differ by design; see `VERSIONS.md` for why. Data files: `docs/2026-11-16/data/story-data.json` and `docs/2026-11-12/data/story-data.json`.
+
+## 16 Nov 2026 version (default)
+Definitions: client_start_date = due date for Jira issues created before 1 Jun 2026 (else created + 4 days), Pipedrive won date from 1 Jun 2026; Under Contract = latest valid contract; CLOSED = closing date up to the data date; durations use won engagements with a confirmed Jira start; client counts use the reporting-layer flags (Active includes closed / post-close clients; hunting = still searching). 27 May 2026 (New Client Experience) is an operational change; 1 Jun 2026 is a reporting rule.
+- Durations (won engagements with a confirmed Jira start, n = 825): median 37.5 days to Under Contract (mean 56.17, n = 492), median 73.0 to CLOSED (mean 92.82, n = 438); Kaplan–Meier 76 / 117 days.
+- Jira clients (reporting-layer flags): 843 signed-up = 648 Active + 195 Inactive; 123 hunting. Active reaching UC / CLOSED: 72% / 68% (6 further closings scheduled after the data date).
+- Monthly starts minus Under Contract (net client change): peak +40 in 2026-06, then 2026-07 +31, 2026-08 +22, 2026-09 +19, 2026-10 +13.
+- Capital (chapter 5, survival analysis incl. unfinished journeys): Pipedrive stated capital, 668 clients, log-rank p = 0.434, Cox HR per $100K 1.016 (95% 0.977–1.055). Offer experience (form column AA, self-reported, before STRSearch): within 30 days 19% / 28% / 40% for 0 / 1–2 / 3+ prior offers.
+- Deals sent: cumulative and undated; cannot measure early (first 14 days) deal velocity.
+
+## 12 Nov 2026 version (archived). Everything below describes it, unchanged.
+
 # Context for AI assistants
 
 This repository holds **"The Client Journey"**, a leadership presentation for **STRSearch**, a company that helps clients buy short-term-rental (STR) properties.

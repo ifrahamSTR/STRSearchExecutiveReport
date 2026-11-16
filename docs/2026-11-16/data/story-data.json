@@ -1,0 +1,3079 @@
+{
+ "journey": {
+  "median_days_to_win": 21.0,
+  "won": 876,
+  "signed": 843,
+  "hunting": 123,
+  "presale": {
+   "statuses": {
+    "New Clients": 141,
+    "Onboarding Completed": 206,
+    "Services Declined": 401
+   },
+   "total": 748
+  },
+  "start_vs_won": {
+   "classic": {
+    "n": 451,
+    "median": 5.0
+   },
+   "nce_before_rule": {
+    "n": 5,
+    "median": 3.0
+   },
+   "from_rule": {
+    "n": 361,
+    "median": 0.0
+   }
+  },
+  "start_rules": {
+   "due": 439,
+   "created+4": 26,
+   "won": 361
+  },
+  "signed_no_start": 17,
+  "new_experience_date": "2026-05-27",
+  "start_rule_date": "2026-06-01",
+  "start_rule": "client_start_date (Jira): for issues created before 1 Jun 2026, the issue due date, or the issue created date + 4 days when no due date is set; for issues created from 1 Jun 2026, the Pipedrive won date. won_clients_master falls back to the won date when no Jira start exists and labels it 'Pipedrive Fallback'; fallback dates are not confirmed starts and are excluded from starts and cohorts.",
+  "engagements": {
+   "total": 876,
+   "has_jira": 829,
+   "no_jira": 47,
+   "confirmed_starts": 825,
+   "fallback": 51,
+   "repeat": 25,
+   "anomalies": 14,
+   "key_mismatch": 4,
+   "refunded": 79,
+   "hunting_official": 108,
+   "jira_not_signed": 10,
+   "scheduled_closings": 6
+  }
+ },
+ "outcomes": {
+  "signed": 843,
+  "active": 648,
+  "inactive": 195,
+  "hunting": 123,
+  "active_groups": [
+   {
+    "group": "Hunting",
+    "n": 123,
+    "statuses": {
+     "8 Weeks": 61,
+     "2 Weeks": 22,
+     "Client Start": 18,
+     "4 Weeks": 11,
+     "6 Weeks": 11
+    }
+   },
+   {
+    "group": "Under contract",
+    "n": 71,
+    "statuses": {
+     "Under Contract": 58,
+     "Passed Inspection": 13
+    }
+   },
+   {
+    "group": "Closed",
+    "n": 229,
+    "statuses": {
+     "CLOSED": 229
+    }
+   },
+   {
+    "group": "Post-close",
+    "n": 225,
+    "statuses": {
+     "Content Pulled": 123,
+     "Listed": 97,
+     "Photography Shared": 5
+    }
+   }
+  ],
+  "inactive_statuses": [
+   {
+    "status": "Paused",
+    "n": 108
+   },
+   {
+    "status": "Refunded",
+    "n": 82
+   },
+   {
+    "status": "Additional Service",
+    "n": 5
+   }
+  ],
+  "attainment": {
+   "active": 648,
+   "uc": 464,
+   "closed": 438,
+   "uc_share": 0.716,
+   "closed_share": 0.6759,
+   "closed_scheduled": 6
+  },
+  "hunting_engagements": 108
+ },
+ "pace": {
+  "monthly": [
+   {
+    "month": "2025-01",
+    "label": "Jan 2025",
+    "new": 10,
+    "uc": 7,
+    "closed": 4,
+    "partial": false,
+    "won": 12,
+    "replacement_rate": 0.7,
+    "cumulative": 23,
+    "gap": 3,
+    "filling": false
+   },
+   {
+    "month": "2025-02",
+    "label": "Feb 2025",
+    "new": 4,
+    "uc": 3,
+    "closed": 5,
+    "partial": false,
+    "won": 6,
+    "replacement_rate": 0.75,
+    "cumulative": 24,
+    "gap": 1,
+    "filling": false
+   },
+   {
+    "month": "2025-03",
+    "label": "Mar 2025",
+    "new": 12,
+    "uc": 4,
+    "closed": 5,
+    "partial": false,
+    "won": 12,
+    "replacement_rate": 0.3333,
+    "cumulative": 32,
+    "gap": 8,
+    "filling": false
+   },
+   {
+    "month": "2025-04",
+    "label": "Apr 2025",
+    "new": 11,
+    "uc": 7,
+    "closed": 3,
+    "partial": false,
+    "won": 11,
+    "replacement_rate": 0.6364,
+    "cumulative": 36,
+    "gap": 4,
+    "filling": false
+   },
+   {
+    "month": "2025-05",
+    "label": "May 2025",
+    "new": 15,
+    "uc": 6,
+    "closed": 8,
+    "partial": false,
+    "won": 16,
+    "replacement_rate": 0.4,
+    "cumulative": 45,
+    "gap": 9,
+    "filling": false
+   },
+   {
+    "month": "2025-06",
+    "label": "Jun 2025",
+    "new": 15,
+    "uc": 11,
+    "closed": 8,
+    "partial": false,
+    "won": 16,
+    "replacement_rate": 0.7333,
+    "cumulative": 49,
+    "gap": 4,
+    "filling": false
+   },
+   {
+    "month": "2025-07",
+    "label": "Jul 2025",
+    "new": 24,
+    "uc": 4,
+    "closed": 9,
+    "partial": false,
+    "won": 24,
+    "replacement_rate": 0.1667,
+    "cumulative": 69,
+    "gap": 20,
+    "filling": false
+   },
+   {
+    "month": "2025-08",
+    "label": "Aug 2025",
+    "new": 29,
+    "uc": 10,
+    "closed": 12,
+    "partial": false,
+    "won": 38,
+    "replacement_rate": 0.3448,
+    "cumulative": 88,
+    "gap": 19,
+    "filling": false
+   },
+   {
+    "month": "2025-09",
+    "label": "Sep 2025",
+    "new": 39,
+    "uc": 7,
+    "closed": 14,
+    "partial": false,
+    "won": 37,
+    "replacement_rate": 0.1795,
+    "cumulative": 120,
+    "gap": 32,
+    "filling": false
+   },
+   {
+    "month": "2025-10",
+    "label": "Oct 2025",
+    "new": 38,
+    "uc": 17,
+    "closed": 18,
+    "partial": false,
+    "won": 38,
+    "replacement_rate": 0.4474,
+    "cumulative": 141,
+    "gap": 21,
+    "filling": false
+   },
+   {
+    "month": "2025-11",
+    "label": "Nov 2025",
+    "new": 20,
+    "uc": 8,
+    "closed": 18,
+    "partial": false,
+    "won": 17,
+    "replacement_rate": 0.4,
+    "cumulative": 153,
+    "gap": 12,
+    "filling": false
+   },
+   {
+    "month": "2025-12",
+    "label": "Dec 2025",
+    "new": 21,
+    "uc": 10,
+    "closed": 24,
+    "partial": false,
+    "won": 42,
+    "replacement_rate": 0.4762,
+    "cumulative": 164,
+    "gap": 11,
+    "filling": false
+   },
+   {
+    "month": "2026-01",
+    "label": "Jan 2026",
+    "new": 35,
+    "uc": 12,
+    "closed": 8,
+    "partial": false,
+    "won": 32,
+    "replacement_rate": 0.3429,
+    "cumulative": 187,
+    "gap": 23,
+    "filling": false
+   },
+   {
+    "month": "2026-02",
+    "label": "Feb 2026",
+    "new": 24,
+    "uc": 12,
+    "closed": 10,
+    "partial": false,
+    "won": 20,
+    "replacement_rate": 0.5,
+    "cumulative": 199,
+    "gap": 12,
+    "filling": false
+   },
+   {
+    "month": "2026-03",
+    "label": "Mar 2026",
+    "new": 31,
+    "uc": 24,
+    "closed": 14,
+    "partial": false,
+    "won": 36,
+    "replacement_rate": 0.7742,
+    "cumulative": 206,
+    "gap": 7,
+    "filling": false
+   },
+   {
+    "month": "2026-04",
+    "label": "Apr 2026",
+    "new": 27,
+    "uc": 28,
+    "closed": 22,
+    "partial": false,
+    "won": 31,
+    "replacement_rate": 1.037,
+    "cumulative": 205,
+    "gap": -1,
+    "filling": false
+   },
+   {
+    "month": "2026-05",
+    "label": "May 2026",
+    "new": 37,
+    "uc": 19,
+    "closed": 26,
+    "partial": false,
+    "won": 25,
+    "replacement_rate": 0.5135,
+    "cumulative": 223,
+    "gap": 18,
+    "filling": false
+   },
+   {
+    "month": "2026-06",
+    "label": "Jun 2026",
+    "new": 57,
+    "uc": 17,
+    "closed": 25,
+    "partial": false,
+    "won": 58,
+    "replacement_rate": 0.2982,
+    "cumulative": 263,
+    "gap": 40,
+    "filling": false
+   },
+   {
+    "month": "2026-07",
+    "label": "Jul 2026",
+    "new": 74,
+    "uc": 43,
+    "closed": 17,
+    "partial": false,
+    "won": 79,
+    "replacement_rate": 0.5811,
+    "cumulative": 294,
+    "gap": 31,
+    "filling": false
+   },
+   {
+    "month": "2026-08",
+    "label": "Aug 2026",
+    "new": 74,
+    "uc": 52,
+    "closed": 43,
+    "partial": false,
+    "won": 76,
+    "replacement_rate": 0.7027,
+    "cumulative": 316,
+    "gap": 22,
+    "filling": false
+   },
+   {
+    "month": "2026-09",
+    "label": "Sep 2026",
+    "new": 79,
+    "uc": 60,
+    "closed": 40,
+    "partial": false,
+    "won": 82,
+    "replacement_rate": 0.7595,
+    "cumulative": 335,
+    "gap": 19,
+    "filling": false
+   },
+   {
+    "month": "2026-10",
+    "label": "Oct 2026",
+    "new": 68,
+    "uc": 55,
+    "closed": 64,
+    "partial": false,
+    "won": 69,
+    "replacement_rate": 0.8088,
+    "cumulative": 348,
+    "gap": 13,
+    "filling": false
+   },
+   {
+    "month": "2026-11",
+    "label": "Nov 2026",
+    "new": 10,
+    "uc": 26,
+    "closed": 15,
+    "partial": true,
+    "won": 11,
+    "replacement_rate": 2.6,
+    "cumulative": 332,
+    "gap": -16,
+    "filling": true
+   }
+  ],
+  "change_month": "2026-06",
+  "change_date": "2026-05-27",
+  "intake": {
+   "monthly": [
+    {
+     "month": "2025-01",
+     "label": "Jan 2025",
+     "signed": 11,
+     "presale": 0,
+     "declined": 0,
+     "partial": false,
+     "total": 11
+    },
+    {
+     "month": "2025-02",
+     "label": "Feb 2025",
+     "signed": 6,
+     "presale": 0,
+     "declined": 0,
+     "partial": false,
+     "total": 6
+    },
+    {
+     "month": "2025-03",
+     "label": "Mar 2025",
+     "signed": 13,
+     "presale": 0,
+     "declined": 0,
+     "partial": false,
+     "total": 13
+    },
+    {
+     "month": "2025-04",
+     "label": "Apr 2025",
+     "signed": 9,
+     "presale": 0,
+     "declined": 0,
+     "partial": false,
+     "total": 9
+    },
+    {
+     "month": "2025-05",
+     "label": "May 2025",
+     "signed": 14,
+     "presale": 0,
+     "declined": 0,
+     "partial": false,
+     "total": 14
+    },
+    {
+     "month": "2025-06",
+     "label": "Jun 2025",
+     "signed": 16,
+     "presale": 0,
+     "declined": 0,
+     "partial": false,
+     "total": 16
+    },
+    {
+     "month": "2025-07",
+     "label": "Jul 2025",
+     "signed": 26,
+     "presale": 0,
+     "declined": 0,
+     "partial": false,
+     "total": 26
+    },
+    {
+     "month": "2025-08",
+     "label": "Aug 2025",
+     "signed": 34,
+     "presale": 0,
+     "declined": 0,
+     "partial": false,
+     "total": 34
+    },
+    {
+     "month": "2025-09",
+     "label": "Sep 2025",
+     "signed": 38,
+     "presale": 0,
+     "declined": 0,
+     "partial": false,
+     "total": 38
+    },
+    {
+     "month": "2025-10",
+     "label": "Oct 2025",
+     "signed": 35,
+     "presale": 0,
+     "declined": 0,
+     "partial": false,
+     "total": 35
+    },
+    {
+     "month": "2025-11",
+     "label": "Nov 2025",
+     "signed": 17,
+     "presale": 0,
+     "declined": 0,
+     "partial": false,
+     "total": 17
+    },
+    {
+     "month": "2025-12",
+     "label": "Dec 2025",
+     "signed": 24,
+     "presale": 1,
+     "declined": 0,
+     "partial": false,
+     "total": 25
+    },
+    {
+     "month": "2026-01",
+     "label": "Jan 2026",
+     "signed": 34,
+     "presale": 3,
+     "declined": 0,
+     "partial": false,
+     "total": 37
+    },
+    {
+     "month": "2026-02",
+     "label": "Feb 2026",
+     "signed": 18,
+     "presale": 2,
+     "declined": 2,
+     "partial": false,
+     "total": 22
+    },
+    {
+     "month": "2026-03",
+     "label": "Mar 2026",
+     "signed": 35,
+     "presale": 0,
+     "declined": 0,
+     "partial": false,
+     "total": 35
+    },
+    {
+     "month": "2026-04",
+     "label": "Apr 2026",
+     "signed": 31,
+     "presale": 1,
+     "declined": 1,
+     "partial": false,
+     "total": 33
+    },
+    {
+     "month": "2026-05",
+     "label": "May 2026",
+     "signed": 31,
+     "presale": 6,
+     "declined": 8,
+     "partial": false,
+     "total": 45
+    },
+    {
+     "month": "2026-06",
+     "label": "Jun 2026",
+     "signed": 75,
+     "presale": 28,
+     "declined": 66,
+     "partial": false,
+     "total": 169
+    },
+    {
+     "month": "2026-07",
+     "label": "Jul 2026",
+     "signed": 86,
+     "presale": 47,
+     "declined": 68,
+     "partial": false,
+     "total": 201
+    },
+    {
+     "month": "2026-08",
+     "label": "Aug 2026",
+     "signed": 88,
+     "presale": 64,
+     "declined": 116,
+     "partial": false,
+     "total": 268
+    },
+    {
+     "month": "2026-09",
+     "label": "Sep 2026",
+     "signed": 69,
+     "presale": 70,
+     "declined": 101,
+     "partial": false,
+     "total": 240
+    },
+    {
+     "month": "2026-10",
+     "label": "Oct 2026",
+     "signed": 49,
+     "presale": 85,
+     "declined": 39,
+     "partial": false,
+     "total": 173
+    },
+    {
+     "month": "2026-11",
+     "label": "Nov 2026",
+     "signed": 11,
+     "presale": 40,
+     "declined": 0,
+     "partial": true,
+     "total": 51
+    }
+   ],
+   "since_change": {
+    "from": "2026-05-27",
+    "total": 1120,
+    "signed": 384,
+    "presale": 339,
+    "declined": 397
+   },
+   "classes_all": {
+    "signed": 843,
+    "presale": 347,
+    "declined": 401
+   },
+   "early_prospects": 12
+  },
+  "windows": {
+   "before": [
+    "2025-12",
+    "2026-01",
+    "2026-02",
+    "2026-03",
+    "2026-04"
+   ],
+   "after": [
+    "2026-06",
+    "2026-07",
+    "2026-08",
+    "2026-09",
+    "2026-10"
+   ],
+   "intake": {
+    "before": 30.4,
+    "after": 210.2
+   },
+   "starts": {
+    "before": 27.6,
+    "after": 70.4
+   },
+   "uc": {
+    "before": 17.2,
+    "after": 45.4
+   },
+   "closed": {
+    "before": 15.6,
+    "after": 37.8
+   },
+   "gap": {
+    "before": 10.4,
+    "after": 25.0
+   }
+  },
+  "gap": {
+   "from": "2026-01",
+   "settle_days": 0,
+   "peak": 40,
+   "peak_months": [
+    "2026-06"
+   ],
+   "tail": [
+    {
+     "month": "2026-07",
+     "gap": 31,
+     "filling": false
+    },
+    {
+     "month": "2026-08",
+     "gap": 22,
+     "filling": false
+    },
+    {
+     "month": "2026-09",
+     "gap": 19,
+     "filling": false
+    },
+    {
+     "month": "2026-10",
+     "gap": 13,
+     "filling": false
+    }
+   ],
+   "narrowing": true,
+   "start_is_won_date": {
+    "n": 361,
+    "differ": 1
+   },
+   "late_signers": {
+    "n": 361,
+    "k": 0,
+    "share": 0.0
+   }
+  },
+  "cohort": {
+   "days": 90,
+   "from": "2026-01",
+   "rows": [
+    {
+     "month": "2026-01",
+     "n": 35,
+     "k": 17,
+     "share": 0.4857,
+     "mature": true,
+     "eligible": 35,
+     "closed_no_uc": 0
+    },
+    {
+     "month": "2026-02",
+     "n": 24,
+     "k": 11,
+     "share": 0.4583,
+     "mature": true,
+     "eligible": 24,
+     "closed_no_uc": 1
+    },
+    {
+     "month": "2026-03",
+     "n": 31,
+     "k": 17,
+     "share": 0.5484,
+     "mature": true,
+     "eligible": 31,
+     "closed_no_uc": 3
+    },
+    {
+     "month": "2026-04",
+     "n": 27,
+     "k": 15,
+     "share": 0.5556,
+     "mature": true,
+     "eligible": 27,
+     "closed_no_uc": 1
+    },
+    {
+     "month": "2026-05",
+     "n": 37,
+     "k": 23,
+     "share": 0.6216,
+     "mature": true,
+     "eligible": 37,
+     "closed_no_uc": 2
+    },
+    {
+     "month": "2026-06",
+     "n": 57,
+     "k": 36,
+     "share": 0.6316,
+     "mature": true,
+     "eligible": 57,
+     "closed_no_uc": 2
+    },
+    {
+     "month": "2026-07",
+     "n": 74,
+     "k": 52,
+     "share": 0.7027,
+     "mature": true,
+     "eligible": 74,
+     "closed_no_uc": 0
+    },
+    {
+     "month": "2026-08",
+     "n": 74,
+     "k": null,
+     "share": null,
+     "mature": false,
+     "eligible": 43,
+     "closed_no_uc": 0
+    },
+    {
+     "month": "2026-09",
+     "n": 79,
+     "k": null,
+     "share": null,
+     "mature": false,
+     "eligible": 0,
+     "closed_no_uc": 0
+    },
+    {
+     "month": "2026-10",
+     "n": 68,
+     "k": null,
+     "share": null,
+     "mature": false,
+     "eligible": 0,
+     "closed_no_uc": 0
+    },
+    {
+     "month": "2026-11",
+     "n": 10,
+     "k": null,
+     "share": null,
+     "mature": false,
+     "eligible": 0,
+     "closed_no_uc": 0
+    }
+   ],
+   "rule": "SUM(uc_within_90d * eligible_90d) / SUM(eligible_90d)",
+   "pooled_before": 0.5128,
+   "pooled_after": 0.6718,
+   "no_uc_date": {
+    "y2025": {
+     "n": 238,
+     "k": 54
+    },
+    "shown": {
+     "n": 285,
+     "k": 9
+    }
+   },
+   "presale_pending": {}
+  },
+  "sales": {
+   "before": {
+    "won": 161,
+    "starts": 138
+   },
+   "after": {
+    "won": 363,
+    "starts": 352
+   }
+  }
+ },
+ "speed": {
+  "observed": {
+   "uc": {
+    "n": 492,
+    "median": 37.5,
+    "mean": 56.17
+   },
+   "closed": {
+    "n": 438,
+    "median": 73.0,
+    "mean": 92.82
+   }
+  },
+  "hist": {
+   "width": 15,
+   "cap": 180,
+   "counts": [
+    72,
+    121,
+    91,
+    56,
+    45,
+    25,
+    26,
+    10,
+    8,
+    3,
+    8,
+    6
+   ],
+   "overflow": 21,
+   "n": 492,
+   "largest": {
+    "from": 15,
+    "to": 29,
+    "n": 121
+   },
+   "within60": {
+    "n": 340,
+    "share": 0.6911
+   },
+   "median": 37.5,
+   "mean": 56.17
+  },
+  "lanes": {
+   "searching": {
+    "width": 10,
+    "cap": 180,
+    "counts": [
+     5,
+     9,
+     12,
+     10,
+     10,
+     8,
+     7,
+     9,
+     4,
+     5,
+     4,
+     4,
+     1,
+     0,
+     1,
+     1,
+     0,
+     1
+    ],
+    "overflow": 17,
+    "n": 108,
+    "ref": 37.5,
+    "past_ref": 77,
+    "within_ref": 31,
+    "statuses": {
+     "8 Weeks": 52,
+     "2 Weeks": 22,
+     "Client Start": 14,
+     "4 Weeks": 10,
+     "6 Weeks": 10
+    }
+   },
+   "under_contract": {
+    "width": 10,
+    "cap": 180,
+    "counts": [
+     0,
+     2,
+     5,
+     8,
+     8,
+     6,
+     10,
+     5,
+     7,
+     5,
+     2,
+     1,
+     0,
+     3,
+     0,
+     1,
+     1,
+     0
+    ],
+    "overflow": 7,
+    "n": 71,
+    "ref": 73.0,
+    "past_ref": 31,
+    "within_ref": 40,
+    "statuses": {
+     "Under Contract": 58,
+     "Passed Inspection": 13
+    }
+   }
+  },
+  "estimate": {
+   "uc": {
+    "median": 76.0,
+    "curve": [
+     0.0,
+     0.0,
+     0.0012,
+     0.0012,
+     0.0049,
+     0.0061,
+     0.0097,
+     0.0195,
+     0.0232,
+     0.0329,
+     0.0403,
+     0.0549,
+     0.0647,
+     0.0757,
+     0.088,
+     0.099,
+     0.1113,
+     0.1162,
+     0.1248,
+     0.1347,
+     0.1459,
+     0.1534,
+     0.1608,
+     0.172,
+     0.192,
+     0.2069,
+     0.2119,
+     0.222,
+     0.2308,
+     0.2384,
+     0.2486,
+     0.2614,
+     0.2716,
+     0.2755,
+     0.2793,
+     0.2883,
+     0.2974,
+     0.3064,
+     0.3181,
+     0.3259,
+     0.3376,
+     0.3429,
+     0.3494,
+     0.3547,
+     0.356,
+     0.36,
+     0.3626,
+     0.3693,
+     0.3747,
+     0.3869,
+     0.3977,
+     0.4004,
+     0.4058,
+     0.4058,
+     0.4099,
+     0.4113,
+     0.4196,
+     0.428,
+     0.4294,
+     0.4322,
+     0.4378,
+     0.4421,
+     0.4492,
+     0.4549,
+     0.4591,
+     0.462,
+     0.4677,
+     0.4748,
+     0.4762,
+     0.4791,
+     0.4849,
+     0.4878,
+     0.4907,
+     0.4936,
+     0.4965,
+     0.4979,
+     0.5023,
+     0.5082,
+     0.5082,
+     0.5112,
+     0.5127,
+     0.5171,
+     0.5186,
+     0.5186,
+     0.5201,
+     0.5201,
+     0.5261,
+     0.5261,
+     0.5276,
+     0.5336,
+     0.5396,
+     0.5427,
+     0.5442,
+     0.5457,
+     0.5503,
+     0.5503,
+     0.5518,
+     0.5518,
+     0.555,
+     0.5581,
+     0.5612,
+     0.566,
+     0.5691,
+     0.5707,
+     0.5739,
+     0.5739,
+     0.5739,
+     0.5739,
+     0.5739,
+     0.5739,
+     0.5739,
+     0.5739,
+     0.5773,
+     0.5823,
+     0.584,
+     0.584,
+     0.584,
+     0.5857,
+     0.5891,
+     0.5908,
+     0.5926,
+     0.5926,
+     0.5943,
+     0.5943,
+     0.5943,
+     0.5943,
+     0.596,
+     0.596,
+     0.596,
+     0.5978,
+     0.5995,
+     0.5995,
+     0.6012,
+     0.603,
+     0.6047,
+     0.6065,
+     0.6065,
+     0.6065,
+     0.6065,
+     0.6065,
+     0.6065,
+     0.6065,
+     0.6065,
+     0.6065,
+     0.6082,
+     0.6082,
+     0.6082,
+     0.6082,
+     0.6082,
+     0.61,
+     0.61,
+     0.6135,
+     0.6135,
+     0.6153,
+     0.6153,
+     0.6189,
+     0.6189,
+     0.6189,
+     0.6189,
+     0.6189,
+     0.6208,
+     0.6226,
+     0.6226,
+     0.6244,
+     0.6244,
+     0.6262,
+     0.6262,
+     0.6262,
+     0.6262,
+     0.6262,
+     0.6262,
+     0.6281,
+     0.6281,
+     0.6281,
+     0.6281,
+     0.63,
+     0.6319,
+     0.6319,
+     0.6319,
+     0.6357,
+     0.6357,
+     0.6357,
+     0.6377,
+     0.6377,
+     0.6377,
+     0.6396,
+     0.6396,
+     0.6415,
+     0.6415,
+     0.6415,
+     0.6415,
+     0.6415,
+     0.6415,
+     0.6415,
+     0.6415,
+     0.6415,
+     0.6415,
+     0.6415,
+     0.6415,
+     0.6415,
+     0.6415
+    ],
+    "check": 76.0
+   },
+   "closed": {
+    "median": 117.0,
+    "curve": [
+     0.0,
+     0.0,
+     0.0,
+     0.0,
+     0.0,
+     0.0,
+     0.0,
+     0.0,
+     0.0,
+     0.0,
+     0.0,
+     0.0,
+     0.0,
+     0.0,
+     0.0,
+     0.0,
+     0.0,
+     0.0,
+     0.0012,
+     0.0012,
+     0.0012,
+     0.0012,
+     0.0012,
+     0.0025,
+     0.0025,
+     0.0025,
+     0.0025,
+     0.0025,
+     0.0037,
+     0.0037,
+     0.0037,
+     0.0037,
+     0.0063,
+     0.0076,
+     0.0102,
+     0.014,
+     0.0166,
+     0.0218,
+     0.0244,
+     0.027,
+     0.0336,
+     0.0362,
+     0.0415,
+     0.0454,
+     0.0507,
+     0.06,
+     0.0666,
+     0.0666,
+     0.0734,
+     0.0828,
+     0.0951,
+     0.1046,
+     0.1196,
+     0.1306,
+     0.1402,
+     0.1471,
+     0.1596,
+     0.1667,
+     0.1779,
+     0.1906,
+     0.1977,
+     0.2033,
+     0.2119,
+     0.2247,
+     0.2305,
+     0.2333,
+     0.242,
+     0.2463,
+     0.2593,
+     0.2724,
+     0.2797,
+     0.2899,
+     0.2943,
+     0.3061,
+     0.3135,
+     0.3209,
+     0.3313,
+     0.3343,
+     0.3373,
+     0.3449,
+     0.351,
+     0.3556,
+     0.3556,
+     0.3617,
+     0.3709,
+     0.3771,
+     0.3771,
+     0.3802,
+     0.3848,
+     0.391,
+     0.3926,
+     0.3989,
+     0.4052,
+     0.4068,
+     0.4084,
+     0.4116,
+     0.4196,
+     0.4245,
+     0.4326,
+     0.4342,
+     0.4375,
+     0.4424,
+     0.4457,
+     0.4507,
+     0.454,
+     0.464,
+     0.4657,
+     0.4708,
+     0.4775,
+     0.4792,
+     0.4809,
+     0.4844,
+     0.488,
+     0.4932,
+     0.4932,
+     0.4968,
+     0.4968,
+     0.5021,
+     0.5057,
+     0.5128,
+     0.5164,
+     0.5201,
+     0.5255,
+     0.5273,
+     0.5327,
+     0.5346,
+     0.5455,
+     0.5455,
+     0.5473,
+     0.5492,
+     0.551,
+     0.551,
+     0.5546,
+     0.5601,
+     0.5638,
+     0.5675,
+     0.573,
+     0.573,
+     0.573,
+     0.5749,
+     0.5767,
+     0.5804,
+     0.5804,
+     0.5823,
+     0.5823,
+     0.5842,
+     0.5898,
+     0.5898,
+     0.5898,
+     0.5936,
+     0.5936,
+     0.5955,
+     0.5993,
+     0.605,
+     0.605,
+     0.6089,
+     0.6089,
+     0.6089,
+     0.6108,
+     0.6108,
+     0.6108,
+     0.6128,
+     0.6128,
+     0.6128,
+     0.6128,
+     0.6128,
+     0.6128,
+     0.6128,
+     0.6128,
+     0.6128,
+     0.6148,
+     0.6189,
+     0.6209,
+     0.6209,
+     0.6209,
+     0.6229,
+     0.6229,
+     0.6229,
+     0.6229,
+     0.6229,
+     0.6229,
+     0.6229,
+     0.6229,
+     0.625,
+     0.6271,
+     0.6271,
+     0.6271,
+     0.6271,
+     0.6271,
+     0.6271,
+     0.6271,
+     0.6271,
+     0.6292,
+     0.6292,
+     0.6292,
+     0.6292,
+     0.6292,
+     0.6335,
+     0.6335,
+     0.6335,
+     0.6356
+    ],
+    "check": 117.0
+   },
+   "n": 825,
+   "recorded_curve": {
+    "uc": [
+     0.0,
+     0.0,
+     0.002,
+     0.002,
+     0.0081,
+     0.0102,
+     0.0163,
+     0.0325,
+     0.0386,
+     0.0549,
+     0.0671,
+     0.0915,
+     0.1077,
+     0.126,
+     0.1463,
+     0.1646,
+     0.185,
+     0.1931,
+     0.2073,
+     0.2236,
+     0.2419,
+     0.2541,
+     0.2663,
+     0.2846,
+     0.3171,
+     0.3415,
+     0.3496,
+     0.3659,
+     0.3801,
+     0.3923,
+     0.4085,
+     0.4289,
+     0.4451,
+     0.4512,
+     0.4573,
+     0.4715,
+     0.4858,
+     0.5,
+     0.5183,
+     0.5305,
+     0.5488,
+     0.5569,
+     0.5671,
+     0.5752,
+     0.5772,
+     0.5833,
+     0.5874,
+     0.5976,
+     0.6057,
+     0.624,
+     0.6402,
+     0.6443,
+     0.6524,
+     0.6524,
+     0.6585,
+     0.6606,
+     0.6728,
+     0.685,
+     0.687,
+     0.6911,
+     0.6992,
+     0.7053,
+     0.7154,
+     0.7236,
+     0.7297,
+     0.7337,
+     0.7419,
+     0.752,
+     0.7541,
+     0.7581,
+     0.7663,
+     0.7703,
+     0.7744,
+     0.7785,
+     0.7825,
+     0.7846,
+     0.7907,
+     0.7988,
+     0.7988,
+     0.8028,
+     0.8049,
+     0.811,
+     0.813,
+     0.813,
+     0.815,
+     0.815,
+     0.8232,
+     0.8232,
+     0.8252,
+     0.8333,
+     0.8415,
+     0.8455,
+     0.8476,
+     0.8496,
+     0.8557,
+     0.8557,
+     0.8577,
+     0.8577,
+     0.8618,
+     0.8659,
+     0.8699,
+     0.876,
+     0.8801,
+     0.8821,
+     0.8862,
+     0.8862,
+     0.8862,
+     0.8862,
+     0.8862,
+     0.8862,
+     0.8862,
+     0.8862,
+     0.8902,
+     0.8963,
+     0.8984,
+     0.8984,
+     0.8984,
+     0.9004,
+     0.9045,
+     0.9065,
+     0.9085,
+     0.9085,
+     0.9106,
+     0.9106,
+     0.9106,
+     0.9106,
+     0.9126,
+     0.9126,
+     0.9126,
+     0.9146,
+     0.9167,
+     0.9167,
+     0.9187,
+     0.9207,
+     0.9228,
+     0.9248,
+     0.9248,
+     0.9248,
+     0.9248,
+     0.9248,
+     0.9248,
+     0.9248,
+     0.9248,
+     0.9248,
+     0.9268,
+     0.9268,
+     0.9268,
+     0.9268,
+     0.9268,
+     0.9289,
+     0.9289,
+     0.9329,
+     0.9329,
+     0.935,
+     0.935,
+     0.939,
+     0.939,
+     0.939,
+     0.939,
+     0.939,
+     0.9411,
+     0.9431,
+     0.9431,
+     0.9451,
+     0.9451,
+     0.9472,
+     0.9472,
+     0.9472,
+     0.9472,
+     0.9472,
+     0.9472,
+     0.9492,
+     0.9492,
+     0.9492,
+     0.9492,
+     0.9512,
+     0.9533,
+     0.9533,
+     0.9533,
+     0.9573,
+     0.9573,
+     0.9573,
+     0.9593,
+     0.9593,
+     0.9593,
+     0.9614,
+     0.9614,
+     0.9634,
+     0.9634,
+     0.9634,
+     0.9634,
+     0.9634,
+     0.9634,
+     0.9634,
+     0.9634,
+     0.9634,
+     0.9634,
+     0.9634,
+     0.9634,
+     0.9634,
+     0.9634
+    ],
+    "closed": [
+     0.0,
+     0.0,
+     0.0,
+     0.0,
+     0.0,
+     0.0,
+     0.0,
+     0.0,
+     0.0,
+     0.0,
+     0.0,
+     0.0,
+     0.0,
+     0.0,
+     0.0,
+     0.0,
+     0.0,
+     0.0,
+     0.0023,
+     0.0023,
+     0.0023,
+     0.0023,
+     0.0023,
+     0.0046,
+     0.0046,
+     0.0046,
+     0.0046,
+     0.0046,
+     0.0068,
+     0.0068,
+     0.0068,
+     0.0068,
+     0.0114,
+     0.0137,
+     0.0183,
+     0.0251,
+     0.0297,
+     0.0388,
+     0.0434,
+     0.0479,
+     0.0594,
+     0.0639,
+     0.0731,
+     0.0799,
+     0.089,
+     0.105,
+     0.1164,
+     0.1164,
+     0.1279,
+     0.1438,
+     0.1644,
+     0.1804,
+     0.2055,
+     0.2237,
+     0.2397,
+     0.2511,
+     0.2717,
+     0.2831,
+     0.3014,
+     0.3219,
+     0.3333,
+     0.3425,
+     0.3562,
+     0.3767,
+     0.3858,
+     0.3904,
+     0.4041,
+     0.411,
+     0.4315,
+     0.4521,
+     0.4635,
+     0.4795,
+     0.4863,
+     0.5046,
+     0.516,
+     0.5274,
+     0.5434,
+     0.5479,
+     0.5525,
+     0.5639,
+     0.5731,
+     0.5799,
+     0.5799,
+     0.589,
+     0.6027,
+     0.6119,
+     0.6119,
+     0.6164,
+     0.6233,
+     0.6324,
+     0.6347,
+     0.6438,
+     0.653,
+     0.6553,
+     0.6575,
+     0.6621,
+     0.6735,
+     0.6804,
+     0.6918,
+     0.6941,
+     0.6986,
+     0.7055,
+     0.71,
+     0.7169,
+     0.7215,
+     0.7352,
+     0.7374,
+     0.7443,
+     0.7534,
+     0.7557,
+     0.758,
+     0.7626,
+     0.7671,
+     0.774,
+     0.774,
+     0.7785,
+     0.7785,
+     0.7854,
+     0.79,
+     0.7991,
+     0.8037,
+     0.8082,
+     0.8151,
+     0.8174,
+     0.8242,
+     0.8265,
+     0.8402,
+     0.8402,
+     0.8425,
+     0.8447,
+     0.847,
+     0.847,
+     0.8516,
+     0.8584,
+     0.863,
+     0.8676,
+     0.8744,
+     0.8744,
+     0.8744,
+     0.8767,
+     0.879,
+     0.8836,
+     0.8836,
+     0.8858,
+     0.8858,
+     0.8881,
+     0.895,
+     0.895,
+     0.895,
+     0.8995,
+     0.8995,
+     0.9018,
+     0.9064,
+     0.9132,
+     0.9132,
+     0.9178,
+     0.9178,
+     0.9178,
+     0.9201,
+     0.9201,
+     0.9201,
+     0.9224,
+     0.9224,
+     0.9224,
+     0.9224,
+     0.9224,
+     0.9224,
+     0.9224,
+     0.9224,
+     0.9224,
+     0.9247,
+     0.9292,
+     0.9315,
+     0.9315,
+     0.9315,
+     0.9338,
+     0.9338,
+     0.9338,
+     0.9338,
+     0.9338,
+     0.9338,
+     0.9338,
+     0.9338,
+     0.9361,
+     0.9384,
+     0.9384,
+     0.9384,
+     0.9384,
+     0.9384,
+     0.9384,
+     0.9384,
+     0.9384,
+     0.9406,
+     0.9406,
+     0.9406,
+     0.9406,
+     0.9406,
+     0.9452,
+     0.9452,
+     0.9452,
+     0.9475
+    ]
+   }
+  },
+  "clock": {
+   "uc": {
+    "n": 492,
+    "due": 279,
+    "created+4": 11,
+    "won": 202
+   },
+   "closed": {
+    "n": 438,
+    "due": 293,
+    "created+4": 16,
+    "won": 129
+   },
+   "population": {
+    "n": 825,
+    "due": 436,
+    "created+4": 28,
+    "won": 361
+   },
+   "fallback_excluded": 51,
+   "scheduled_closings": 6,
+   "negative_excluded": 1
+  },
+  "uc_to_close": {
+   "n": 372,
+   "median": 36.0
+  },
+  "running": 179,
+  "closed_without_uc_date": 66
+ },
+ "drivers": {
+  "form_from": "2026-04-20",
+  "min_days": 75,
+  "fast_days": 30,
+  "eligible_through": "2026-09-02",
+  "population": "won engagements with a confirmed Jira start",
+  "composition": {
+   "n": 476,
+   "groups": [
+    {
+     "key": "fast",
+     "label": "Under Contract within 30 days",
+     "n": 169,
+     "median_days": 19.0,
+     "median_elapsed": null
+    },
+    {
+     "key": "middle",
+     "label": "31\u201374 days",
+     "n": 163,
+     "median_days": 48.0,
+     "median_elapsed": null
+    },
+    {
+     "key": "slow",
+     "label": "75 days or longer",
+     "n": 107,
+     "median_days": 113.0,
+     "median_elapsed": null
+    },
+    {
+     "key": "searching",
+     "label": "Still hunting, no contract yet",
+     "n": 37,
+     "median_days": null,
+     "median_elapsed": 111.0
+    }
+   ],
+   "stopped_no_contract": 203
+  },
+  "bases": {
+   "d30": {
+    "eligible": 557,
+    "matched": 279,
+    "share": 0.3405
+   },
+   "d75": {
+    "eligible": 476,
+    "matched": 198,
+    "share": 0.7374
+   }
+  },
+  "matching": {
+   "via_deal_only": 2,
+   "rejected_conflicts": 2,
+   "only_after_uc": 0,
+   "answer_lag_days": {
+    "median": -4.5,
+    "max": 22.0
+   },
+   "cohort_matched": 394,
+   "cohort_n": 825,
+   "answers_after_uc_used": 0
+  },
+  "capital": {
+   "pipedrive": {
+    "n": 668,
+    "events": 385,
+    "bands": [
+     {
+      "label": "Under $200K",
+      "n": 426,
+      "events": 250,
+      "km_median": 76.0,
+      "curve": [
+       0.0,
+       0.0047,
+       0.0401,
+       0.1038,
+       0.1609,
+       0.2258,
+       0.2575,
+       0.29,
+       0.3454,
+       0.3758,
+       0.4097,
+       0.4228,
+       0.4416,
+       0.4636,
+       0.4802,
+       0.497,
+       0.5083,
+       0.5111,
+       0.5368,
+       0.5482,
+       0.5513,
+       0.5665,
+       0.5665,
+       0.5795,
+       0.5827,
+       0.5861,
+       0.5861,
+       0.5894,
+       0.5894,
+       0.5928,
+       0.5928,
+       0.5996,
+       0.5996,
+       0.6066,
+       0.6066,
+       0.6066,
+       0.6138
+      ],
+      "uc90": {
+       "n": 333,
+       "k": 171,
+       "share": 0.5135
+      }
+     },
+     {
+      "label": "$200K\u2013$299K",
+      "n": 204,
+      "events": 108,
+      "km_median": 98.0,
+      "curve": [
+       0.0,
+       0.0099,
+       0.0298,
+       0.0898,
+       0.1352,
+       0.1913,
+       0.248,
+       0.2898,
+       0.3275,
+       0.3275,
+       0.339,
+       0.3507,
+       0.3751,
+       0.4057,
+       0.4366,
+       0.4429,
+       0.4626,
+       0.483,
+       0.483,
+       0.4902,
+       0.5189,
+       0.5333,
+       0.5333,
+       0.5333,
+       0.5494,
+       0.5494,
+       0.5577,
+       0.5827,
+       0.5827,
+       0.5827,
+       0.5827,
+       0.5918,
+       0.6011,
+       0.6104,
+       0.6104,
+       0.6104,
+       0.6104
+      ],
+      "uc90": {
+       "n": 141,
+       "k": 67,
+       "share": 0.4752
+      }
+     },
+     {
+      "label": "$300K+",
+      "n": 38,
+      "events": 27,
+      "km_median": 48.0,
+      "curve": [
+       0.0,
+       0.0,
+       0.0526,
+       0.1053,
+       0.1053,
+       0.2105,
+       0.2632,
+       0.3684,
+       0.3959,
+       0.4508,
+       0.5057,
+       0.5057,
+       0.5332,
+       0.5332,
+       0.5606,
+       0.5881,
+       0.5881,
+       0.5881,
+       0.5881,
+       0.6156,
+       0.6156,
+       0.6156,
+       0.6156,
+       0.6156,
+       0.6451,
+       0.6451,
+       0.6747,
+       0.6747,
+       0.6747,
+       0.6747,
+       0.6747,
+       0.6747,
+       0.6747,
+       0.6747,
+       0.6747,
+       0.6747,
+       0.6747
+      ],
+      "uc90": {
+       "n": 35,
+       "k": 20,
+       "share": 0.5714
+      }
+     }
+    ],
+    "logrank": {
+     "chi2": 1.67,
+     "df": 2,
+     "p": 0.434
+    },
+    "cox": {
+     "hr": 1.016,
+     "lo": 0.977,
+     "hi": 1.055,
+     "p": 0.428,
+     "per": 100000
+    },
+    "detectable_hr": 1.33,
+    "coverage": {
+     "known": 668,
+     "unknown": 156,
+     "share_known": 0.81,
+     "known_km_median": 81.0,
+     "unknown_km_median": 64.0,
+     "missing_logrank_p": 0.152,
+     "known_with_uc": 0.576,
+     "unknown_with_uc": 0.686
+    },
+    "oop_recorded": {
+     "with_uc": 0.875,
+     "without_uc": 0.263,
+     "hunting": 0.065
+    }
+   },
+   "form": {
+    "n": 394,
+    "events": 226,
+    "bands": [
+     {
+      "label": "Up to $250K",
+      "n": 198,
+      "events": 116,
+      "km_median": 57.0,
+      "curve": [
+       0.0,
+       0.0,
+       0.0305,
+       0.0867,
+       0.144,
+       0.2344,
+       0.2619,
+       0.3178,
+       0.4035,
+       0.4152,
+       0.4589,
+       0.472,
+       0.5146,
+       0.5525,
+       0.5679,
+       0.6001,
+       0.6256,
+       0.6256,
+       0.6528,
+       0.662,
+       0.6835,
+       0.6835,
+       0.6835,
+       0.7152,
+       0.7152,
+       0.7152,
+       0.7152,
+       0.7411,
+       0.7411,
+       0.7411,
+       0.7411,
+       0.7411,
+       0.7411,
+       0.7411,
+       0.7411,
+       0.7411,
+       0.7411
+      ],
+      "uc90": {
+       "n": 102,
+       "k": 64,
+       "share": 0.6275
+      }
+     },
+     {
+      "label": "$300K\u2013$400K",
+      "n": 133,
+      "events": 68,
+      "km_median": 65.0,
+      "curve": [
+       0.0,
+       0.0,
+       0.0231,
+       0.0696,
+       0.1481,
+       0.2126,
+       0.271,
+       0.2974,
+       0.3256,
+       0.3644,
+       0.3957,
+       0.4063,
+       0.4526,
+       0.5013,
+       0.5266,
+       0.5398,
+       0.5668,
+       0.5967,
+       0.6116,
+       0.6116,
+       0.6285,
+       0.6454,
+       0.6454,
+       0.6454,
+       0.6676,
+       0.6676,
+       0.6676,
+       0.6897,
+       0.6897,
+       0.6897,
+       0.6897,
+       0.6897,
+       0.6897,
+       0.6897,
+       0.6897,
+       0.6897,
+       0.6897
+      ],
+      "uc90": {
+       "n": 66,
+       "k": 40,
+       "share": 0.6061
+      }
+     },
+     {
+      "label": "$450K+",
+      "n": 63,
+      "events": 42,
+      "km_median": 49.0,
+      "curve": [
+       0.0,
+       0.0,
+       0.0317,
+       0.0952,
+       0.1755,
+       0.2563,
+       0.307,
+       0.3408,
+       0.3934,
+       0.4469,
+       0.5183,
+       0.5183,
+       0.5361,
+       0.5539,
+       0.6075,
+       0.6262,
+       0.6458,
+       0.6667,
+       0.6889,
+       0.6889,
+       0.7148,
+       0.7148,
+       0.7148,
+       0.7623,
+       0.7623,
+       0.7623,
+       0.7623,
+       0.7623,
+       0.7623,
+       0.7623,
+       0.7623,
+       0.7623,
+       0.7623,
+       0.7623,
+       0.7623,
+       0.7623,
+       0.7623
+      ],
+      "uc90": {
+       "n": 40,
+       "k": 26,
+       "share": 0.65
+      }
+     }
+    ],
+    "logrank": {
+     "chi2": 1.56,
+     "df": 2,
+     "p": 0.459
+    },
+    "cox": {
+     "hr": 0.995,
+     "lo": 0.877,
+     "hi": 1.129,
+     "p": 0.939,
+     "per": 100
+    },
+    "detectable_hr": 1.45,
+    "threshold_family_p": {
+     "d30": 0.877,
+     "d75": 0.967
+    }
+   },
+   "everyone_from": 200,
+   "top_option": 500
+  },
+  "offers": {
+   "rows": [
+    {
+     "key": "0",
+     "label": "No offers yet",
+     "within30": {
+      "n": 32,
+      "k": 6,
+      "share": 0.1875
+     },
+     "within75": {
+      "n": 26,
+      "k": 20,
+      "share": 0.7692
+     },
+     "median_days": 51.0,
+     "km_median": 74.0,
+     "n_all": 50
+    },
+    {
+     "key": "1-2",
+     "label": "1\u20132 offers",
+     "within30": {
+      "n": 83,
+      "k": 23,
+      "share": 0.2771
+     },
+     "within75": {
+      "n": 62,
+      "k": 44,
+      "share": 0.7097
+     },
+     "median_days": 43.0,
+     "km_median": 65.0,
+     "n_all": 116
+    },
+    {
+     "key": "3+",
+     "label": "3+ offers",
+     "within30": {
+      "n": 164,
+      "k": 66,
+      "share": 0.4024
+     },
+     "within75": {
+      "n": 110,
+      "k": 82,
+      "share": 0.7455
+     },
+     "median_days": 31.0,
+     "km_median": 50.0,
+     "n_all": 228
+    }
+   ],
+   "trend": {
+    "or": 1.71,
+    "lo": 1.14,
+    "hi": 2.55,
+    "p": 0.0087
+   },
+   "gap_3plus_vs_0": [
+    0.034,
+    0.34
+   ],
+   "logrank_p": 0.031,
+   "source": "Onboarding questionnaire (Form Responses 2), column AA: self-reported experience submitting real-estate offers before STRSearch"
+  },
+  "tested": [
+   {
+    "key": "capital",
+    "label": "All-in capital (per $100K)",
+    "within30": {
+     "or": 1.01,
+     "lo": 0.79,
+     "hi": 1.28,
+     "p": 0.9654,
+     "p_holm": 1.0
+    },
+    "within75": {
+     "or": 0.94,
+     "lo": 0.7,
+     "hi": 1.26,
+     "p": 0.6587,
+     "p_holm": 1.0
+    }
+   },
+   {
+    "key": "liquidity",
+    "label": "Capital partly tied up (not liquid)",
+    "within30": {
+     "or": 0.65,
+     "lo": 0.34,
+     "hi": 1.25,
+     "p": 0.1929,
+     "p_holm": 1.0
+    },
+    "within75": {
+     "or": 0.42,
+     "lo": 0.2,
+     "hi": 0.88,
+     "p": 0.0211,
+     "p_holm": 0.274
+    }
+   },
+   {
+    "key": "budget",
+    "label": "Strict budget",
+    "within30": {
+     "or": 1.32,
+     "lo": 0.62,
+     "hi": 2.81,
+     "p": 0.47,
+     "p_holm": 1.0
+    },
+    "within75": {
+     "or": 1.92,
+     "lo": 0.62,
+     "hi": 5.91,
+     "p": 0.2571,
+     "p_holm": 1.0
+    }
+   },
+   {
+    "key": "markets",
+    "label": "Named specific markets",
+    "within30": {
+     "or": 1.3,
+     "lo": 0.75,
+     "hi": 2.24,
+     "p": 0.3469,
+     "p_holm": 1.0
+    },
+    "within75": {
+     "or": 0.84,
+     "lo": 0.41,
+     "hi": 1.71,
+     "p": 0.6279,
+     "p_holm": 1.0
+    }
+   },
+   {
+    "key": "property",
+    "label": "Turnkey or light renovation only",
+    "within30": {
+     "or": 1.06,
+     "lo": 0.56,
+     "hi": 1.99,
+     "p": 0.8628,
+     "p_holm": 1.0
+    },
+    "within75": {
+     "or": 1.39,
+     "lo": 0.53,
+     "hi": 3.64,
+     "p": 0.5079,
+     "p_holm": 1.0
+    }
+   },
+   {
+    "key": "offers",
+    "label": "Real-estate offers submitted before STRSearch (0 / 1\u20132 / 3+)",
+    "within30": {
+     "or": 1.71,
+     "lo": 1.14,
+     "hi": 2.55,
+     "p": 0.0087,
+     "p_holm": 0.122
+    },
+    "within75": {
+     "or": 1.0,
+     "lo": 0.64,
+     "hi": 1.55,
+     "p": 0.9833,
+     "p_holm": 1.0
+    }
+   },
+   {
+    "key": "airbnb",
+    "label": "Already owns an Airbnb",
+    "within30": {
+     "or": 0.98,
+     "lo": 0.52,
+     "hi": 1.85,
+     "p": 0.9521,
+     "p_holm": 1.0
+    },
+    "within75": {
+     "or": 1.01,
+     "lo": 0.45,
+     "hi": 2.26,
+     "p": 0.9822,
+     "p_holm": 1.0
+    }
+   }
+  ],
+  "deals": {
+   "groups": {
+    "fast": {
+     "n": 162,
+     "median": 8.0,
+     "p25": 6.0,
+     "p75": 11.0,
+     "median_days": 19.0
+    },
+    "middle": {
+     "n": 154,
+     "median": 13.0,
+     "p25": 10.25,
+     "p75": 17.75,
+     "median_days": 48.0
+    },
+    "slow": {
+     "n": 99,
+     "median": 20.0,
+     "p25": 15.0,
+     "p75": 29.0,
+     "median_days": 112.0
+    }
+   },
+   "rho_days": 0.68,
+   "coverage": {
+    "with_uc": 0.924,
+    "hunting": 0.228,
+    "hunting_n": 123,
+    "hunting_with_count": 28
+   },
+   "dated_log": false
+  },
+  "matched_cohort": {
+   "from": "2026-04-28",
+   "to": "2026-10-17"
+  }
+ },
+ "meta": {
+  "title": "The Client Journey",
+  "asof": "2026-11-16",
+  "version": {
+   "id": "2026-11-16",
+   "label": "16 Nov 2026",
+   "title": "Updated reporting",
+   "status": "current"
+  },
+  "snapshots": {
+   "reporting_layer": "2026-11-16"
+  },
+  "built_at": "2026-11-16 22:53",
+  "chapters": [
+   "journey",
+   "outcomes",
+   "pace",
+   "speed",
+   "drivers"
+  ],
+  "source": "https://ifrahamstr.github.io/STRSearchBusinessDataExplorer-Public/2026-11-16/",
+  "reconciliation": {
+   "checks": 36,
+   "ok": 36
+  },
+  "quality": [
+   {
+    "id": "scheduled_closings",
+    "title": "Closing dates after the data date",
+    "metric": "6 closings dated after 16 Nov 2026"
+   },
+   {
+    "id": "latest_uc",
+    "title": "Under Contract = latest valid contract, not the first",
+    "metric": "Definition"
+   },
+   {
+    "id": "won_no_jira",
+    "title": "Won engagements with no Jira match",
+    "metric": "47 of 876"
+   },
+   {
+    "id": "key_mismatch",
+    "title": "Jira key in Pipedrive differs from the matched issue",
+    "metric": "4"
+   },
+   {
+    "id": "won_presale_status",
+    "title": "Won engagements whose Jira issue is still pre-sale",
+    "metric": "10"
+   },
+   {
+    "id": "signed_not_won",
+    "title": "Signed Jira clients with no won engagement",
+    "metric": "24 of 843"
+   },
+   {
+    "id": "anomalies",
+    "title": "Engagements flagged has_data_anomaly",
+    "metric": "14"
+   },
+   {
+    "id": "payment_default",
+    "title": "Payment type looks defaulted to Split Pay",
+    "metric": "Split Pay on 5,999 of 6,005 lost deals"
+   },
+   {
+    "id": "abnormal_values",
+    "title": "Abnormal values excluded from aggregates",
+    "metric": "1 total_oop \u00b7 2 budget \u00b7 1 deals sent \u00b7 5 zero-value wins"
+   },
+   {
+    "id": "henry_unknown",
+    "title": "HENRY is unknown for signed clients without total_oop",
+    "metric": "317 of 843 signed clients"
+   },
+   {
+    "id": "refund_proxy",
+    "title": "Refunds are a Jira status proxy",
+    "metric": "82 refunded \u00b7 most in Oct 2026 (26)"
+   },
+   {
+    "id": "channel_coverage",
+    "title": "Lead channel (utm_source) is sparse",
+    "metric": "24% of in-scope deals"
+   },
+   {
+    "id": "funnel_flags",
+    "title": "Funnel flags changed meaning on 27 May 2026",
+    "metric": "Legacy: call booked 28%; New Client Experience: call booked 0%"
+   },
+   {
+    "id": "deals_sent",
+    "title": "Deals sent is a current cumulative total",
+    "metric": "592 signed clients with a value"
+   }
+  ]
+ },
+ "changes": {
+  "versions": {
+   "old": {
+    "id": "2026-11-12",
+    "data_asof": "2026-11-11"
+   },
+   "new": {
+    "id": "2026-11-16",
+    "data_asof": "2026-11-16"
+   }
+  },
+  "records": {
+   "jira_old": 1556,
+   "jira_new": 1591,
+   "jira_both": 1535,
+   "dropped": {
+    "n": 21,
+    "signed": 21,
+    "by_status": {
+     "Refunded": 12,
+     "Paused": 3,
+     "Content Pulled": 3,
+     "CLOSED": 2,
+     "8 Weeks": 1
+    },
+    "created_2024": 15
+   },
+   "added": {
+    "n": 56,
+    "created_before_old_asof": 41,
+    "by_status": {
+     "New Clients": 34,
+     "8 Weeks": 6,
+     "Client Start": 5,
+     "Services Declined": 5,
+     "Onboarding Completed": 3,
+     "6 Weeks": 1,
+     "4 Weeks": 1,
+     "Refunded": 1
+    }
+   },
+   "signed_changes": {
+    "was_signed_now_not": 1,
+    "newly_signed": 1
+   }
+  },
+  "start_date": {
+   "signed_compared": 821,
+   "same": 467,
+   "differ": 354,
+   "pre_june_plus4": 25,
+   "pre_june_other": 0,
+   "post_june": {
+    "n": 357,
+    "differ": 329,
+    "later": 197,
+    "earlier": 132,
+    "median_shift": 2.0,
+    "p10": -8.0,
+    "p90": 22.0
+   }
+  },
+  "under_contract": {
+   "compared": 493,
+   "same": 452,
+   "moved": 41,
+   "moved_later": 41,
+   "median_move_days": 20.0,
+   "max_move_days": 107.0,
+   "new_only": 7,
+   "old_only": 0,
+   "old_had_repeat_contracts": 42
+  },
+  "closing": {
+   "compared": 429,
+   "same": 314,
+   "differ": 115,
+   "earlier": 104,
+   "later": 11,
+   "median_diff_days": -5.0,
+   "new_only": 20,
+   "scheduled_after_asof": 6
+  },
+  "headline": {
+   "old": {
+    "signed": 850,
+    "active": 644,
+    "inactive": 206,
+    "uc_median": 36.0,
+    "uc_mean": 53.75,
+    "uc_n": 499,
+    "closed_median": 77.0,
+    "closed_mean": 96.31,
+    "closed_n": 432,
+    "km_uc": 77.0,
+    "km_closed": 127.0,
+    "active_uc_share": 0.7205,
+    "active_closed_share": 0.6661
+   },
+   "new": {
+    "signed": 843,
+    "active": 648,
+    "inactive": 195,
+    "hunting": 123,
+    "uc_median": 37.5,
+    "uc_mean": 56.17,
+    "uc_n": 492,
+    "closed_median": 73.0,
+    "closed_mean": 92.82,
+    "closed_n": 438,
+    "km_uc": 76.0,
+    "km_closed": 117.0,
+    "active_uc_share": 0.716,
+    "active_closed_share": 0.6759
+   },
+   "populations": {
+    "old": "Q1: every Jira issue with a first UC / CLOSED date; KM and Q2: signed-up Jira issues",
+    "new": "Q1 and KM: won engagements with a confirmed Jira start; Q2: Jira issues by reporting-layer flags"
+   }
+  },
+  "monthly": [
+   {
+    "month": "2026-01",
+    "starts_old": 31,
+    "starts_new": 35,
+    "uc_old": 13,
+    "uc_new": 12,
+    "closed_old": 13,
+    "closed_new": 8,
+    "gap_old": 18,
+    "gap_new": 23
+   },
+   {
+    "month": "2026-02",
+    "starts_old": 23,
+    "starts_new": 24,
+    "uc_old": 13,
+    "uc_new": 12,
+    "closed_old": 9,
+    "closed_new": 10,
+    "gap_old": 10,
+    "gap_new": 12
+   },
+   {
+    "month": "2026-03",
+    "starts_old": 32,
+    "starts_new": 31,
+    "uc_old": 22,
+    "uc_new": 24,
+    "closed_old": 14,
+    "closed_new": 14,
+    "gap_old": 10,
+    "gap_new": 7
+   },
+   {
+    "month": "2026-04",
+    "starts_old": 28,
+    "starts_new": 27,
+    "uc_old": 29,
+    "uc_new": 28,
+    "closed_old": 22,
+    "closed_new": 22,
+    "gap_old": -1,
+    "gap_new": -1
+   },
+   {
+    "month": "2026-05",
+    "starts_old": 34,
+    "starts_new": 37,
+    "uc_old": 21,
+    "uc_new": 19,
+    "closed_old": 26,
+    "closed_new": 26,
+    "gap_old": 13,
+    "gap_new": 18
+   },
+   {
+    "month": "2026-06",
+    "starts_old": 65,
+    "starts_new": 57,
+    "uc_old": 17,
+    "uc_new": 17,
+    "closed_old": 25,
+    "closed_new": 25,
+    "gap_old": 48,
+    "gap_new": 40
+   },
+   {
+    "month": "2026-07",
+    "starts_old": 92,
+    "starts_new": 74,
+    "uc_old": 44,
+    "uc_new": 43,
+    "closed_old": 14,
+    "closed_new": 17,
+    "gap_old": 48,
+    "gap_new": 31
+   },
+   {
+    "month": "2026-08",
+    "starts_old": 82,
+    "starts_new": 74,
+    "uc_old": 55,
+    "uc_new": 52,
+    "closed_old": 43,
+    "closed_new": 43,
+    "gap_old": 27,
+    "gap_new": 22
+   },
+   {
+    "month": "2026-09",
+    "starts_old": 76,
+    "starts_new": 79,
+    "uc_old": 59,
+    "uc_new": 60,
+    "closed_old": 44,
+    "closed_new": 40,
+    "gap_old": 17,
+    "gap_new": 19
+   },
+   {
+    "month": "2026-10",
+    "starts_old": 52,
+    "starts_new": 68,
+    "uc_old": 58,
+    "uc_new": 55,
+    "closed_old": 64,
+    "closed_new": 64,
+    "gap_old": -6,
+    "gap_new": 13
+   },
+   {
+    "month": "2026-11",
+    "starts_old": 9,
+    "starts_new": 10,
+    "uc_old": 17,
+    "uc_new": 26,
+    "closed_old": 10,
+    "closed_new": 15,
+    "gap_old": -8,
+    "gap_new": -16
+   }
+  ]
+ },
+ "checks": [
+  {
+   "check": "Explorer 16 Nov data file is published next to this build",
+   "page": true,
+   "explorer": true,
+   "ok": true,
+   "hard": true
+  },
+  {
+   "check": "Shared headline: days to UC median / mean / n = the published Explorer",
+   "page": [
+    37.5,
+    56.17,
+    492
+   ],
+   "explorer": [
+    37.5,
+    56.17,
+    492
+   ],
+   "ok": true,
+   "hard": true
+  },
+  {
+   "check": "Shared headline: days to CLOSED median / mean / n = the published Explorer",
+   "page": [
+    73.0,
+    92.82,
+    438
+   ],
+   "explorer": [
+    73,
+    92.82,
+    438
+   ],
+   "ok": true,
+   "hard": true
+  },
+  {
+   "check": "Shared headline: Kaplan-Meier day 50% (UC / CLOSED) = the published Explorer",
+   "page": [
+    76.0,
+    117.0
+   ],
+   "explorer": [
+    76,
+    117
+   ],
+   "ok": true,
+   "hard": true
+  },
+  {
+   "check": "Shared headline: signed / active / inactive / hunting = the published Explorer",
+   "page": [
+    843,
+    648,
+    195,
+    123
+   ],
+   "explorer": [
+    843,
+    648,
+    195,
+    123
+   ],
+   "ok": true,
+   "hard": true
+  },
+  {
+   "check": "Shared headline: Active with UC / CLOSED = the published Explorer",
+   "page": [
+    464,
+    438
+   ],
+   "explorer": [
+    464,
+    438
+   ],
+   "ok": true,
+   "hard": true
+  },
+  {
+   "check": "Shared monthly starts / UC / CLOSED: months that differ from the published Explorer",
+   "page": 0,
+   "explorer": 0,
+   "ok": true,
+   "hard": true
+  },
+  {
+   "check": "Kaplan-Meier curve crosses 50% where the foundation says (UC)",
+   "page": 76.0,
+   "explorer": 76.0,
+   "ok": true,
+   "hard": true
+  },
+  {
+   "check": "Kaplan-Meier curve crosses 50% where the foundation says (CLOSED)",
+   "page": 117.0,
+   "explorer": 117.0,
+   "ok": true,
+   "hard": true
+  },
+  {
+   "check": "Histogram bins + overflow = UC n",
+   "page": 492,
+   "explorer": 492,
+   "ok": true,
+   "hard": true
+  },
+  {
+   "check": "Clock start counts cover exactly the recorded durations (UC n / CLOSED n)",
+   "page": [
+    492,
+    438
+   ],
+   "explorer": [
+    492,
+    438
+   ],
+   "ok": true,
+   "hard": true
+  },
+  {
+   "check": "Start rules add up to the recorded UC durations",
+   "page": 492,
+   "explorer": 492,
+   "ok": true,
+   "hard": true
+  },
+  {
+   "check": "Active status groups add up to Active",
+   "page": 648,
+   "explorer": 648,
+   "ok": true,
+   "hard": true
+  },
+  {
+   "check": "Inactive statuses add up to Inactive",
+   "page": 195,
+   "explorer": 195,
+   "ok": true,
+   "hard": true
+  },
+  {
+   "check": "Active + Inactive = signed-up",
+   "page": 843,
+   "explorer": 843,
+   "ok": true,
+   "hard": true
+  },
+  {
+   "check": "Hunting = the Active group 'Hunting'",
+   "page": 123,
+   "explorer": 123,
+   "ok": true,
+   "hard": true
+  },
+  {
+   "check": "Monthly rows that differ from daily_client_activity",
+   "page": 0,
+   "explorer": 0,
+   "ok": true,
+   "hard": true
+  },
+  {
+   "check": "Monthly gap = starts minus Under Contract events (net_client_change), months that differ",
+   "page": 0,
+   "explorer": 0,
+   "ok": true,
+   "hard": true
+  },
+  {
+   "check": "Jira intake: signed + pre-sale + declined = every new Jira issue that month, months that differ",
+   "page": 0,
+   "explorer": 0,
+   "ok": true,
+   "hard": true
+  },
+  {
+   "check": "Same-cohort strip: start months whose size differs from the confirmed starts",
+   "page": 0,
+   "explorer": 0,
+   "ok": true,
+   "hard": true
+  },
+  {
+   "check": "Keeping pace: no published share rests on 1-4 clients",
+   "page": 0,
+   "explorer": 0,
+   "ok": true,
+   "hard": true
+  },
+  {
+   "check": "Fast/slow: the four speed groups add up to classifiable clients with 75+ days on the clock",
+   "page": 476,
+   "explorer": 476,
+   "ok": true,
+   "hard": true
+  },
+  {
+   "check": "Fast/slow: matched clients never exceed eligible clients",
+   "page": true,
+   "explorer": true,
+   "ok": true,
+   "hard": true
+  },
+  {
+   "check": "Onboarding answers used all precede the client's Under Contract date",
+   "page": 0,
+   "explorer": 0,
+   "ok": true,
+   "hard": true
+  },
+  {
+   "check": "Fast/slow: no published share rests on 1-4 clients",
+   "page": 0,
+   "explorer": 0,
+   "ok": true,
+   "hard": true
+  },
+  {
+   "check": "Capital (Pipedrive): every confirmed start with a stated capital is in the survival analysis",
+   "page": 668,
+   "explorer": 668,
+   "ok": true,
+   "hard": true
+  },
+  {
+   "check": "Keeping pace: 'the gap has narrowed every month since' its peak after late May",
+   "page": true,
+   "explorer": true,
+   "ok": true,
+   "hard": false
+  },
+  {
+   "check": "Capital: no capital band differs (log-rank p > 0.05, Pipedrive capital)",
+   "page": true,
+   "explorer": true,
+   "ok": true,
+   "hard": false
+  },
+  {
+   "check": "Capital: Cox 95% CI for capital includes 1 (Pipedrive capital)",
+   "page": true,
+   "explorer": true,
+   "ok": true,
+   "hard": false
+  },
+  {
+   "check": "Offer experience: share within 30 days rises 0 -> 1-2 -> 3+ offers",
+   "page": true,
+   "explorer": true,
+   "ok": true,
+   "hard": false
+  }
+ ]
+}
