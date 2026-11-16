@@ -99,7 +99,9 @@
     "new": 12,
     "uc": 7,
     "closed": 4,
-    "partial": false
+    "partial": false,
+    "gap": 5,
+    "filling": false
    },
    {
     "month": "2025-02",
@@ -107,7 +109,9 @@
     "new": 4,
     "uc": 4,
     "closed": 5,
-    "partial": false
+    "partial": false,
+    "gap": 0,
+    "filling": false
    },
    {
     "month": "2025-03",
@@ -115,7 +119,9 @@
     "new": 12,
     "uc": 5,
     "closed": 7,
-    "partial": false
+    "partial": false,
+    "gap": 7,
+    "filling": false
    },
    {
     "month": "2025-04",
@@ -123,7 +129,9 @@
     "new": 11,
     "uc": 8,
     "closed": 3,
-    "partial": false
+    "partial": false,
+    "gap": 3,
+    "filling": false
    },
    {
     "month": "2025-05",
@@ -131,7 +139,9 @@
     "new": 15,
     "uc": 6,
     "closed": 9,
-    "partial": false
+    "partial": false,
+    "gap": 9,
+    "filling": false
    },
    {
     "month": "2025-06",
@@ -139,7 +149,9 @@
     "new": 16,
     "uc": 10,
     "closed": 8,
-    "partial": false
+    "partial": false,
+    "gap": 6,
+    "filling": false
    },
    {
     "month": "2025-07",
@@ -147,7 +159,9 @@
     "new": 25,
     "uc": 4,
     "closed": 9,
-    "partial": false
+    "partial": false,
+    "gap": 21,
+    "filling": false
    },
    {
     "month": "2025-08",
@@ -155,7 +169,9 @@
     "new": 27,
     "uc": 10,
     "closed": 8,
-    "partial": false
+    "partial": false,
+    "gap": 17,
+    "filling": false
    },
    {
     "month": "2025-09",
@@ -163,7 +179,9 @@
     "new": 41,
     "uc": 7,
     "closed": 12,
-    "partial": false
+    "partial": false,
+    "gap": 34,
+    "filling": false
    },
    {
     "month": "2025-10",
@@ -171,7 +189,9 @@
     "new": 36,
     "uc": 17,
     "closed": 20,
-    "partial": false
+    "partial": false,
+    "gap": 19,
+    "filling": false
    },
    {
     "month": "2025-11",
@@ -179,7 +199,9 @@
     "new": 19,
     "uc": 8,
     "closed": 4,
-    "partial": false
+    "partial": false,
+    "gap": 11,
+    "filling": false
    },
    {
     "month": "2025-12",
@@ -187,7 +209,9 @@
     "new": 20,
     "uc": 11,
     "closed": 32,
-    "partial": false
+    "partial": false,
+    "gap": 9,
+    "filling": false
    },
    {
     "month": "2026-01",
@@ -195,7 +219,9 @@
     "new": 31,
     "uc": 13,
     "closed": 13,
-    "partial": false
+    "partial": false,
+    "gap": 18,
+    "filling": false
    },
    {
     "month": "2026-02",
@@ -203,7 +229,9 @@
     "new": 23,
     "uc": 13,
     "closed": 9,
-    "partial": false
+    "partial": false,
+    "gap": 10,
+    "filling": false
    },
    {
     "month": "2026-03",
@@ -211,7 +239,9 @@
     "new": 32,
     "uc": 22,
     "closed": 14,
-    "partial": false
+    "partial": false,
+    "gap": 10,
+    "filling": false
    },
    {
     "month": "2026-04",
@@ -219,7 +249,9 @@
     "new": 28,
     "uc": 29,
     "closed": 22,
-    "partial": false
+    "partial": false,
+    "gap": -1,
+    "filling": false
    },
    {
     "month": "2026-05",
@@ -227,7 +259,9 @@
     "new": 34,
     "uc": 21,
     "closed": 26,
-    "partial": false
+    "partial": false,
+    "gap": 13,
+    "filling": false
    },
    {
     "month": "2026-06",
@@ -235,7 +269,9 @@
     "new": 65,
     "uc": 17,
     "closed": 25,
-    "partial": false
+    "partial": false,
+    "gap": 48,
+    "filling": false
    },
    {
     "month": "2026-07",
@@ -243,7 +279,9 @@
     "new": 92,
     "uc": 44,
     "closed": 14,
-    "partial": false
+    "partial": false,
+    "gap": 48,
+    "filling": false
    },
    {
     "month": "2026-08",
@@ -251,7 +289,9 @@
     "new": 82,
     "uc": 55,
     "closed": 43,
-    "partial": false
+    "partial": false,
+    "gap": 27,
+    "filling": false
    },
    {
     "month": "2026-09",
@@ -259,7 +299,9 @@
     "new": 76,
     "uc": 59,
     "closed": 44,
-    "partial": false
+    "partial": false,
+    "gap": 17,
+    "filling": false
    },
    {
     "month": "2026-10",
@@ -267,7 +309,9 @@
     "new": 52,
     "uc": 58,
     "closed": 64,
-    "partial": false
+    "partial": false,
+    "gap": -6,
+    "filling": true
    },
    {
     "month": "2026-11",
@@ -275,7 +319,9 @@
     "new": 9,
     "uc": 17,
     "closed": 10,
-    "partial": true
+    "partial": true,
+    "gap": -8,
+    "filling": true
    }
   ],
   "change_month": "2026-06",
@@ -534,6 +580,42 @@
    "closed": {
     "before": 18.0,
     "after": 38.0
+   },
+   "gap": {
+    "before": 9.2,
+    "after": 26.8
+   }
+  },
+  "gap": {
+   "from": "2026-01",
+   "settle_days": 30,
+   "peak": 48,
+   "peak_months": [
+    "2026-06",
+    "2026-07"
+   ],
+   "tail": [
+    {
+     "month": "2026-08",
+     "gap": 27,
+     "filling": false
+    },
+    {
+     "month": "2026-09",
+     "gap": 17,
+     "filling": false
+    },
+    {
+     "month": "2026-10",
+     "gap": -6,
+     "filling": true
+    }
+   ],
+   "narrowing": true,
+   "late_signers": {
+    "n": 369,
+    "k": 23,
+    "share": 0.0623
    }
   },
   "cohort": {
@@ -1597,6 +1679,20 @@
     ]
    }
   },
+  "clock": {
+   "uc": {
+    "n": 499,
+    "created": 51
+   },
+   "closed": {
+    "n": 432,
+    "created": 29
+   },
+   "signed": {
+    "n": 850,
+    "created": 126
+   }
+  },
   "uc_to_close": {
    "n": 369,
    "median": 38.0
@@ -2230,7 +2326,7 @@
    "jira": "2026-11-11 16:46",
    "pipedrive": "2026-11-12 17:21"
   },
-  "built_at": "2026-11-15 03:54",
+  "built_at": "2026-11-16 20:16",
   "chapters": [
    "journey",
    "outcomes",
@@ -2330,6 +2426,26 @@
    "check": "Monthly rows that differ from the Explorer",
    "page": 0,
    "explorer": 0,
+   "ok": true,
+   "hard": true
+  },
+  {
+   "check": "Monthly gap = the Explorer's signed starts minus its Under Contract events, months that differ",
+   "page": 0,
+   "explorer": 0,
+   "ok": true,
+   "hard": true
+  },
+  {
+   "check": "Clock start shown for exactly the recorded durations (UC n / CLOSED n)",
+   "page": [
+    499,
+    432
+   ],
+   "explorer": [
+    499,
+    432
+   ],
    "ok": true,
    "hard": true
   },
@@ -2437,7 +2553,14 @@
    "hard": false
   },
   {
-   "check": "Keeping pace: 'still about N in 10' - starters before and after late May reach UC within 90 days at the same rounded rate",
+   "check": "Keeping pace: 'the gap has narrowed every month since' its peak after late May",
+   "page": true,
+   "explorer": true,
+   "ok": true,
+   "hard": false
+  },
+  {
+   "check": "Keeping pace: starts settle 30 days after a month ends - at most 10% of clients since late May signed later than that",
    "page": true,
    "explorer": true,
    "ok": true,

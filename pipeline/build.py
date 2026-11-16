@@ -62,6 +62,10 @@ def checks(ctx: C.Ctx, data: dict) -> list[dict]:
     chk("Active clients with UC / CLOSED recorded", (oc["attainment"]["uc"], oc["attainment"]["closed"]), (ex["q2"]["active_uc"], ex["q2"]["active_closed"]))
     q3 = {r["month"]: r for r in ex["q3"]}
     chk("Monthly rows that differ from the Explorer", sum(1 for r in pc["monthly"] if (r["new"], r["uc"], r["closed"]) != (q3[r["month"]]["new_signed_start"], q3[r["month"]]["uc"], q3[r["month"]]["closed"])), 0)
+    chk("Monthly gap = the Explorer's signed starts minus its Under Contract events, months that differ",
+        sum(1 for r in pc["monthly"] if r["gap"] != q3[r["month"]]["new_signed_start"] - q3[r["month"]]["uc"]), 0)
+    ck = sp["clock"]
+    chk("Clock start shown for exactly the recorded durations (UC n / CLOSED n)", (ck["uc"]["n"], ck["closed"]["n"]), (ex["q1"]["uc"]["n"], ex["q1"]["closed"]["n"]))
     chk("Jira intake: signed + pre-sale + declined = the Explorer's new Jira issues (all statuses), months that differ",
         sum(1 for r in pc["intake"]["monthly"] if r["signed"] + r["presale"] + r["declined"] != q3[r["month"]]["new_all_created"]), 0)
     ca = pc["intake"]["classes_all"]
@@ -84,8 +88,10 @@ def checks(ctx: C.Ctx, data: dict) -> list[dict]:
     w, co = pc["windows"], pc["cohort"]
     chk("Keeping pace: Jira intake and acquisition starts both rose after late May (five-month averages)",
         w["intake"]["after"] > w["intake"]["before"] and w["starts"]["after"] > w["starts"]["before"], True, hard=False)
-    chk("Keeping pace: 'still about N in 10' - starters before and after late May reach UC within 90 days at the same rounded rate",
-        co["pooled_before"] is not None and round(co["pooled_before"] * 10) == round(co["pooled_after"] * 10), True, hard=False)
+    gp = pc["gap"]
+    chk("Keeping pace: 'the gap has narrowed every month since' its peak after late May", gp["narrowing"], True, hard=False)
+    chk(f"Keeping pace: starts settle {gp['settle_days']} days after a month ends - at most 10% of clients since late May signed later than that",
+        gp["late_signers"]["share"] is not None and gp["late_signers"]["share"] <= 0.10, True, hard=False)
     of = [r["within30"]["share"] for r in dr["offers"]["rows"]]
     chk("Capital: no threshold beats chance (family-wise p > 0.05 on both outcomes)", min(dr["capital"]["family_p"].values()) > 0.05, True, hard=False)
     chk("Offer experience: share within 30 days rises 0 -> 1-2 -> 3+ offers", None not in of and of == sorted(of), True, hard=False)

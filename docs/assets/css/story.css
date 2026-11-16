@@ -271,8 +271,17 @@ footer.foot .stage { display: flex; flex-wrap: wrap; gap: 6px 18px; justify-cont
 
 /* ---------- chapter 3: Jira intake tally + taller throughput chart */
 .chart.h-xxl { height: 500px; }
+.chart.h-pace { height: 620px; }
 .legend.legend-top { margin: 0 0 4px; }
-@media (max-width: 640px) { .chart.h-xxl { height: 470px; } }
+@media (max-width: 640px) { .chart.h-xxl { height: 470px; } .chart.h-pace { height: 570px; } }
+
+/* ---------- chapter 4: how the clock is counted */
+.clock { display: grid; gap: 6px; margin: 0 0 6px; padding-bottom: 14px; border-bottom: 1px solid var(--line); }
+.clk { display: flex; align-items: baseline; gap: 10px; font-size: 15.5px; line-height: 1.45; color: var(--ink-2); }
+.clk i { flex: none; width: 12px; height: 12px; border-radius: 3px; transform: translateY(1px); }
+.clk b { color: var(--ink); font-weight: 650; }
+.clk-def { margin: 6px 0 0; font-size: 13.5px; line-height: 1.5; color: var(--muted); max-width: 78ch; }
+.clk-def b { color: var(--ink-2); font-weight: 650; }
 .in-signed { background: var(--acq); }
 .in-presale { background: repeating-linear-gradient(135deg, var(--sales) 0 2px, var(--sales-2) 2px 4px); }
 .in-declined { background: var(--decl); }

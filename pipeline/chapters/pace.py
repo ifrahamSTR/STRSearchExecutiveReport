@@ -6,6 +6,9 @@
 2. Acquisition: signed clients by the month their acquisition clock started vs first Under Contract and first
    CLOSED events in the month they happened (the Explorer's Q3 table, unchanged), plus the Explorer's same-cohort
    view: the share of each start month's signed clients under contract within 90 days of starting.
+   The monthly gap = that month's starts minus that month's first Under Contract events: two Explorer counts side by
+   side, not a cohort (contracts often belong to earlier starters) and never summed into a backlog. A prospect who
+   signs later joins the month their clock started, so a month's starts settle SETTLE_DAYS after it ends.
 """
 from __future__ import annotations
 
@@ -19,6 +22,8 @@ CHANGE_MONTH = "2026-06"   # first full month after the late-May changes (Comple
 WINDOW = 5                 # full months compared on each side of the change (the change month itself is split)
 COHORT_DAYS = 90           # the Explorer's same-cohort window (Q3 cohort chart)
 COHORT_FROM = "2026-01"    # earlier start months carry many CLOSED dates without a recorded Under Contract date
+GAP_FROM = "2026-01"       # same reason: missing Under Contract dates make earlier gaps read high
+SETTLE_DAYS = 30           # a month's starts count as settled this many days after it ends (late signers join it)
 MIN_CELL = 5
 
 
@@ -67,11 +72,32 @@ def build(ctx: C.Ctx) -> dict:
     def avg(src, months, key):
         return round(sum(src[m][key] for m in months) / len(months), 1)
 
+    # monthly gap: starts minus first Under Contract events in the same month
+    for r in rows:
+        r["gap"] = r["new"] - r["uc"]
+        r["filling"] = bool(pd.Period(r["month"], "M").end_time.normalize() + pd.Timedelta(days=SETTLE_DAYS) > asof)
+
     windows = {"before": before, "after": after,
                "intake": {"before": avg(in_m, before, "total"), "after": avg(in_m, after, "total")},
                "starts": {"before": avg(by_m, before, "new"), "after": avg(by_m, after, "new")},
                "uc": {"before": avg(by_m, before, "uc"), "after": avg(by_m, after, "uc")},
-               "closed": {"before": avg(by_m, before, "closed"), "after": avg(by_m, after, "closed")}}
+               "closed": {"before": avg(by_m, before, "closed"), "after": avg(by_m, after, "closed")},
+               "gap": {"before": avg(by_m, before, "gap"), "after": avg(by_m, after, "gap")}}
+
+    # the gap since the change: its peak (settled months only), then each full month after the last peak month
+    full_after = [r for r in rows if r["month"] >= CHANGE_MONTH and not r["partial"]]
+    settled = [r for r in full_after if not r["filling"]]
+    peak = max(r["gap"] for r in settled)
+    peak_months = [r["month"] for r in settled if r["gap"] == peak]
+    tail = [r for r in full_after if r["month"] > peak_months[-1]]
+    seq = [peak] + [r["gap"] for r in tail]
+    signers = s[(s.start >= change) & s.pd_won_date.notna()]
+    late = int(((signers.pd_won_date - signers.start).dt.days > SETTLE_DAYS).sum())
+    gap = {"from": GAP_FROM, "settle_days": SETTLE_DAYS, "peak": peak, "peak_months": peak_months,
+           "tail": [{"month": r["month"], "gap": r["gap"], "filling": r["filling"]} for r in tail],
+           "narrowing": bool(tail) and all(b < a for a, b in zip(seq, seq[1:])),
+           # how often a client who started since the change signed more than SETTLE_DAYS after starting (Pipedrive Won)
+           "late_signers": {"n": int(len(signers)), "k": late, "share": _share(late, len(signers))}}
 
     # same-cohort view (the Explorer's Q3 cohort chart): of each start month's signed clients, the share under
     # contract within 90 days; only once every client in the month has had the full 90 days
@@ -113,5 +139,5 @@ def build(ctx: C.Ctx) -> dict:
         "intake": {"monthly": intake, "since_change": since_change,
                    "classes_all": {k: int((cls == k).sum()) for k in ("signed", "presale", "declined")},
                    "early_prospects": int(((cls != "signed") & (j.created < change)).sum())},
-        "windows": windows, "cohort": cohort_meta, "sales": sales,
+        "windows": windows, "gap": gap, "cohort": cohort_meta, "sales": sales,
     }

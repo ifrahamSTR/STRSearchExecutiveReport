@@ -13,7 +13,8 @@ Live page: https://ifrahamstr.github.io/STRSearchExecutiveReport/
   - **Pipedrive Won:** the customer buys STRSearch's service.
   - **Jira CLOSED:** the client buys a property.
 - **Before 27 May 2026 (sales first):** book a call → sales call → Won. The acquisition clock then starts at the onboarding call, a median 5 days after Won.
-  - Client start = `COALESCE(issue_due_date, issue_created_date)`.
+  - **Client start date** = the Jira due date (since May 2026, the onboarding-call date), or the date the Jira issue was created when no due date is set (126 of 850 signed-up clients). In code: `COALESCE(issue_due_date, issue_created_date)`.
+  - Every duration = first recorded Under Contract (or CLOSED) date − client start date.
   - Acquisition then runs Client Start → Search (2–8+ week check-ins) → Under Contract (incl. inspection) → CLOSED.
 - **New Client Experience (since 27 May 2026):** the two clocks overlap.
   - After booking, the prospect fills the onboarding form and enters Jira as a *New Client*.
@@ -40,12 +41,16 @@ Two views of monthly input vs output, January 2025 to November 2026 (November pa
    - Starts: 26.8 → 73.4 a month; Under Contract events 17.6 → 46.6; CLOSED events 18.0 → 38.0 (same five-month windows).
    - Starts are currently signed clients grouped by clock start, not purchases in that month. For reference, Pipedrive Won (service sales): 362 in Jun–Oct 2026 vs 367 starts.
    - Monthly events often belong to clients who started earlier. Never divide monthly Under Contract by monthly starts or intake: that is not a conversion rate.
+   - **Monthly gap** (`pace.monthly[].gap`, `pace.gap`): that month's starts minus its Under Contract events, two counts side by side, shown from January 2026 (missing Under Contract dates make 2025 gaps read high). 2026: Jan +18, Feb +10, Mar +10, Apr −1, May +13, Jun +48, Jul +48, Aug +27, Sep +17, Oct −6 (Nov partial). Peak +48 in June and July; it has narrowed every month since. Five-month averages: 9.2 before vs 26.8 after late May.
+   - A month's starts count as settled 30 days after it ends, because a prospect who signs later joins the month their clock started (23 of 369 clients who started since 27 May signed more than 30 days after starting). October and November 2026 are not settled yet, so their starts (and gaps) can still rise.
+   - Never add the gaps up into a backlog: other exits (pauses, refunds) are not counted.
    - **Same-cohort view** (`pace.cohort`, the Explorer's Q3 cohort chart): share of each start month's signed clients under contract within 90 days, shown once every client has had 90 days. 2026-01 55%, 2026-02 48%, 2026-03 53%, 2026-04 64%, 2026-05 62%, 2026-06 58%, 2026-07 62%. Pooled: 55% for Jan–Apr 2026 starters vs 61% for Jun–Jul 2026.
    - 2025 start months are not shown: 48 of 238 clients who started in 2025 have a CLOSED date but no recorded Under Contract date, which would understate them. Shares shown are a slight floor (9 of 305 affected).
 - The late-May 2026 changes (Complete offer, Confidence Call) coincided with growth; their separate effects have not been established.
 - No historical backlog is reconstructed from today's statuses.
 
 ## Chapter 4: how long does acquisition actually take?
+Every figure counts days from the **client start date** (Jira due date; issue creation date when none is set: 51 of the 499 recorded contracts and 29 of the 432 closings) to the first recorded Under Contract or CLOSED date. The chapter states this formula at the top.
 1. **Recorded durations:** median 36 / average 53.8 days to Under Contract (499 clients); median 77 / average 96.3 days to CLOSED (432 clients).
 2. **Distribution (15-day bins):** the largest group is 15–29 days (130 clients); 71% land within 60 days (days 0–59).
 3. **Still waiting:** 185 paid clients have not bought a property yet.

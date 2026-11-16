@@ -13,7 +13,7 @@
       return Object.assign(S.base(t), {
         tooltip: { show: false },
         grid: { left: 150, right: 28, top: 30, bottom: 44 },
-        xAxis: S.dayAxis(t, 150, { name: 'days from client start' }),
+        xAxis: S.dayAxis(t, 150, { name: 'days from client start date' }),
         yAxis: { type: 'category', data: rows.map(r => r.name), inverse: true, show: false },
         series: [{
           type: 'custom', encode: { x: 1, y: 0 }, data: rows.map((r, i) => [i, r.median, r.mean]),
@@ -44,7 +44,7 @@
       return Object.assign(S.base(t), {
         tooltip: { show: false },
         grid: { left: 150, right: 28, top: 34, bottom: 40 },
-        xAxis: S.dayAxis(t, 150, { name: 'days from client start' }),
+        xAxis: S.dayAxis(t, 150, { name: 'days from client start date' }),
         yAxis: { type: 'category', data: rows.map(r => r.name), inverse: true, show: false },
         series: [{
           type: 'custom', encode: { x: [1, 2], y: 0 }, data: rows.map((r, i) => [i, r.obs, r.km]),
@@ -75,7 +75,7 @@
       return Object.assign(S.base(t), {
         grid: { left: 8, right: 16, top: 44, bottom: 36, containLabel: true },
         tooltip: Object.assign(S.base(t).tooltip, { trigger: 'item', formatter: p => { const b = p.data.value; return `<b>${b[0] >= cap ? cap + '+ days' : `${b[0]}–${b[1] - 1} days`}</b><br>${b[2]} clients · ${S.pct(b[2] / h.n)}`; } }),
-        xAxis: S.dayAxis(t, cap + W, { interval: 30, name: 'days from client start to Under Contract', axisLabel: { color: t.label, fontSize: 12.5, formatter: v => (v >= cap ? cap + '+' : v) } }),
+        xAxis: S.dayAxis(t, cap + W, { interval: 30, name: 'days from client start date to first Under Contract', axisLabel: { color: t.label, fontSize: 12.5, formatter: v => (v >= cap ? cap + '+' : v) } }),
         yAxis: S.valAxis(t, { max: ymax }),
         series: [{
           type: 'custom', encode: { x: [0, 1], y: 2 },
@@ -113,7 +113,7 @@
       return Object.assign(S.base(t), {
         tooltip: { show: false },
         grid: { left: 40, right: 16, top, bottom },
-        xAxis: S.dayAxis(t, cap + W, { interval: 30, name: showAxis ? 'days on the acquisition clock so far' : '', axisLabel: { show: showAxis, color: t.label, fontSize: 12.5, formatter: v => (v >= cap ? cap + '+' : v) } }),
+        xAxis: S.dayAxis(t, cap + W, { interval: 30, name: showAxis ? 'days since client start date, so far' : '', axisLabel: { show: showAxis, color: t.label, fontSize: 12.5, formatter: v => (v >= cap ? cap + '+' : v) } }),
         yAxis: { type: 'value', min: 0, max: rows + 0.6, show: false },
         series: [{
           type: 'scatter', data: pts, symbolSize: size, itemStyle: { color, opacity: 0.92 }, silent: true,
@@ -131,7 +131,7 @@
       return Object.assign(S.base(t), {
         grid: { left: 8, right: 22, top: 18, bottom: 36, containLabel: true },
         tooltip: Object.assign(S.base(t).tooltip, { formatter: ps => `<b>Day ${ps[0].value[0]}</b><br>` + ps.map(p => `${p.marker} ${p.seriesName}: ${S.pct(p.value[1])}`).join('<br>') }),
-        xAxis: S.dayAxis(t, 200, { interval: 30, name: 'days from client start' }),
+        xAxis: S.dayAxis(t, 200, { interval: 30, name: 'days from client start date' }),
         yAxis: S.valAxis(t, { min: 0, max: 1, interval: 0.25, axisLabel: { color: t.label, fontSize: 12, formatter: v => S.pct(v) } }),
         series: [
           { name: 'Recorded journeys only', type: 'line', step: 'end', showSymbol: false, data: rec.map((v, d) => [d, v]), lineStyle: { color, width: 2.2, type: 'dashed', opacity: 0.7 }, itemStyle: { color },
@@ -154,8 +154,15 @@
 
       // 2.1
       let body = S.scene(main, { ch, step: 1, of: 4, label: 'What has happened', title: `Recorded journeys: ${ob.uc.median} days to Under Contract, ${ob.closed.median} to CLOSED` });
-      body.innerHTML = `<div class="board"><div class="chart h-m" id="rulerChart" role="img" aria-label="Median ${ob.uc.median} and average ${S.d1(ob.uc.mean)} days to Under Contract; median ${ob.closed.median} and average ${S.d1(ob.closed.mean)} days to CLOSED."></div></div>
-        <p class="cap">Clients with a recorded milestone · clock starts at the onboarding call.</p>`;
+      const ck = sp.clock;
+      body.innerHTML = `<div class="board">
+          <div class="clock" aria-label="How the days are counted">
+            <div class="clk"><i style="background:var(--uc)"></i><span><b>Days to Under Contract</b> = first Under Contract date − <b>client start date</b></span></div>
+            <div class="clk"><i style="background:var(--closed)"></i><span><b>Days to CLOSED</b> = first CLOSED date − <b>client start date</b></span></div>
+            <p class="clk-def"><b>Client start date</b> = the Jira due date (since May 2026, the onboarding-call date). Where no due date is set, the date the Jira issue was created: ${S.int(ck.uc.created)} of the ${S.int(ck.uc.n)} recorded contracts and ${S.int(ck.closed.created)} of the ${S.int(ck.closed.n)} closings.</p>
+          </div>
+          <div class="chart h-m" id="rulerChart" role="img" aria-label="Median ${ob.uc.median} and average ${S.d1(ob.uc.mean)} days from client start date to Under Contract; median ${ob.closed.median} and average ${S.d1(ob.closed.mean)} days to CLOSED."></div></div>
+        <p class="cap">Clients with a recorded milestone.</p>`;
       ruler(S.$('#rulerChart', body), ob);
 
       // 2.2

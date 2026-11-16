@@ -65,8 +65,13 @@ def build(ctx: C.Ctx) -> dict:
     }
     both = s[s.uc.notna() & s.closed.notna()]
     gap = (both.closed - both.uc).dt.days
+    # where each clock starts (the Explorer's effective start): the Jira due date, or the issue's creation date when
+    # no due date is set. Counted on the same populations as the recorded durations and the signed-up list.
+    clock = {k: {"n": int(j[col].notna().sum()), "created": int((j[col].notna() & (j.start_src == "created")).sum())}
+             for k, col in (("uc", "days_uc"), ("closed", "days_closed"))}
+    clock["signed"] = {"n": int(len(s)), "created": int((s.start_src == "created").sum())}
     return {
-        "observed": observed, "hist": hist, "lanes": lanes, "estimate": estimate,
+        "observed": observed, "hist": hist, "lanes": lanes, "estimate": estimate, "clock": clock,
         "uc_to_close": {"n": int(len(gap)), "median": float(gap.median())},     # recorded contract -> closing
         "running": int(sum(l["n"] for l in lanes.values())),
         # for the methodology note only
