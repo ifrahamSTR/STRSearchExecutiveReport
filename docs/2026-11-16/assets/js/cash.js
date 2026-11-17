@@ -32,7 +32,7 @@
   const css = n => getComputedStyle(document.documentElement).getPropertyValue(n).trim();
   const tok = () => Object.assign(S.tok(), { neg: css('--neg'), total: css('--total'), band: css('--wf-band') });
 
-  const defaults = () => ({ d: DEF.expected_days, max: DEF.expected_days_max, p: DEF.paused_proceed, s: DEF.refundable_share,
+  const defaults = () => ({ d: DEF.expected_days, max: DEF.expected_days_max, p: DEF.paused_proceed, s: DEF.refundable_share, h: true,
     aff: Object.fromEntries(AFF.map(k => [k, { conv: DEF.affiliates[k].conv, rev: DEF.affiliates[k].rev }])) });
   let st = defaults();
 
@@ -52,13 +52,14 @@
       AFF.forEach(k => { affBy[k][d] += s.aff[k].rev * (F.known[k][d] + s.aff[k].conv * F.unknown[k][d]); });
     });
     const npAff = affValue(NP.aff, s), paAff = s.p * affValue(PA.aff, s);
+    const hv = s.h === false ? 0 : 1;          // simulation switch: refunds projected for clients still searching (1 = on)
     const kAff = Object.fromEntries(AFF.map(k => [k, s.aff[k].rev * (NP.aff[k].known + s.aff[k].conv * NP.aff[k].unknown + s.p * (PA.aff[k].known + s.aff[k].conv * PA.aff[k].unknown))]));
     spread.forEach(([d, w]) => {
       noprop[d] += NP.collect * w;
       paused[d] += s.p * PA.second * w;
       aff[d] += (npAff + paAff) * w;
-      refund[d] -= s.s * (NP.refund_base + (1 - s.p) * PA.paid) * w;
-      refNP[d] -= s.s * NP.refund_base * w;
+      refund[d] -= s.s * (hv * NP.refund_base + (1 - s.p) * PA.paid) * w;
+      refNP[d] -= s.s * hv * NP.refund_base * w;
       refPA[d] -= s.s * (1 - s.p) * PA.paid * w;
       AFF.forEach(k => { affBy[k][d] += kAff[k] * w; });
     });
@@ -190,7 +191,9 @@
           <h3><span class="ic" style="--ic:var(--neg)">${IC.refund}</span>Refund size</h3>
           <div class="range"><div class="range-top"><label for="r-s">Share of the upfront payment returned</label><output id="o-s" for="r-s"></output></div>
             <input type="range" id="r-s" min="0" max="100" step="5" style="--c:var(--neg)"><div class="range-ends"><span>0% · none returned</span><span>100% · all returned</span></div></div>
-          <p class="hint">Applies to future refunds only: paused or Additional Service clients who don’t proceed, and other clients expected to refund. The upfront payment is the first Split Pay installment, or the full Paid In Full price; a refunded client never pays the second installment. Clients already marked Refunded in Jira were paid back in the past and are not in the forecast. Refunds still show at 100% paused: clients still searching are refunded at the historical rate for their stage (${pct(NP.p_refund)}), and under-contract clients who don’t close at ${pct(H0.uc_fail_refund)}. The paused slider does not change these.</p>
+          <div class="sw-row"><button type="button" role="switch" id="t-hunt" class="sw-btn" aria-checked="true"><i></i></button>
+            <div><label for="t-hunt">Include projected refunds from clients still searching</label><small id="t-hunt-s"></small></div></div>
+          <p class="hint">Applies to future refunds only: paused or Additional Service clients who don’t proceed, and other clients expected to refund. The upfront payment is the first Split Pay installment, or the full Paid In Full price; a refunded client never pays the second installment. Clients already marked Refunded in Jira were paid back in the past and are not in the forecast. Refunds can remain at 100% paused: under-contract clients who don’t close are refunded at ${pct(H0.uc_fail_refund)}, and with the switch on, so are clients still searching at the historical rate for their stage (${pct(NP.p_refund)}). The paused slider does not change these.</p>
         </div>
         <div class="ctl">
           <h3><span class="ic" style="--ic:var(--closed)">${IC.partner}</span>Affiliate revenue</h3>
@@ -241,11 +244,11 @@
   /* ------------------------------------------------------------------ controls */
   const $ = id => document.getElementById(id);
   const fill = el => el.style.setProperty('--fill', ((el.value - el.min) / (el.max - el.min) * 100) + '%');
-  const inputs = { d: $('r-d'), max: $('r-max'), p: $('r-p'), s: $('r-s') };
+  const inputs = { d: $('r-d'), max: $('r-max'), p: $('r-p'), s: $('r-s') }, huntBtn = $('t-hunt');
   AFF.forEach(k => { inputs[k + 'c'] = $('r-' + k + '-c'); inputs[k + 'r'] = $('r-' + k + '-r'); });
   function sync() {
     inputs.max.value = st.max; inputs.d.max = st.max; st.d = Math.min(st.d, st.max); inputs.d.value = st.d;
-    inputs.p.value = Math.round(st.p * 100); inputs.s.value = Math.round(st.s * 100);
+    inputs.p.value = Math.round(st.p * 100); inputs.s.value = Math.round(st.s * 100); huntBtn.setAttribute('aria-checked', String(st.h));
     AFF.forEach(k => { inputs[k + 'c'].value = Math.round(st.aff[k].conv * 100); inputs[k + 'r'].value = st.aff[k].rev; });
     Object.values(inputs).forEach(fill);
   }
@@ -258,6 +261,7 @@
   Object.values(inputs).forEach(el => el.addEventListener('input', () => { fill(el); read(el); cancelAnimationFrame(raf); raf = requestAnimationFrame(render); }));
   const presetDay = k => (k === 'opt' ? OPT : k === 'pes' ? st.max : Math.round((OPT + st.max) / 2));
   document.querySelectorAll('.presets [data-preset]').forEach(b => b.addEventListener('click', () => { st.d = presetDay(b.dataset.preset); sync(); render(); }));
+  huntBtn.addEventListener('click', () => { st.h = !st.h; sync(); render(); });
   $('b-reset').addEventListener('click', () => { st = defaults(); sync(); render(); });
 
   /* ------------------------------------------------------------------ chart helpers */
@@ -591,7 +595,7 @@
     const shown = months.length > 6 ? months.slice(0, 5) : months, later = months.length > 6 ? months.slice(5) : [];
     const driver = {
       refPA: `${pct(1 - st.p)} of ${S.int(PA.n)} paused / Additional Service clients don’t proceed and get ${pct(st.s)} of their upfront payment back`,
-      refNP: `${S.int(NP.n)} clients still searching: ${pct(NP.p_refund)} expected to refund, like past clients at the same stage`,
+      refNP: st.h ? `${S.int(NP.n)} clients still searching: ${pct(NP.p_refund)} expected to refund, like past clients at the same stage` : `${S.int(NP.n)} clients still searching: refunds switched off in this simulation`,
       refUC: `${S.int(G.under_contract.n + G.scheduled.n)} clients under contract or scheduled: ${pct(H0.uc_fail_refund)} of past clients who didn’t close were refunded`,
     };
     const tot = M.tot.refund;
@@ -636,7 +640,7 @@
       { _group: 'In the forecast' },
       ['under_contract', 'var(--uc)', XU.svc, -st.s * XU.refund_base, affValue(XU.aff, st), `${pct(G.under_contract.p_close)} expected to close, from past clients who had waited as long; timed by the remaining historical Under Contract → closing times (${S.int(U.n)} closings, median ${U.median} days)`],
       ['scheduled', 'var(--uc)', XS.svc, -st.s * XS.refund_base, affValue(XS.aff, st), `${pct(G.scheduled.p_close)} expected to close on the scheduled date (all by ${S.date(C.notes.scheduled_dates_to)}); the cash forecast view already counts these ${short(C.view.scheduled_counted_collected)} as collected`],
-      ['noprop', 'var(--wait)', M.tot.noprop, -st.s * NP.refund_base, affValue(NP.aff, st), `${S.int(NP.hunting)} searching + ${S.int(NP.not_started)} won but not started; like past clients at the same stage: ${pct(NP.p_close)} close, ${pct(NP.p_refund)} refund, ${pct(NP.p_pause)} pause or keep searching`],
+      ['noprop', 'var(--wait)', M.tot.noprop, -(st.h ? st.s * NP.refund_base : 0), affValue(NP.aff, st), `${S.int(NP.hunting)} searching + ${S.int(NP.not_started)} won but not started; like past clients at the same stage: ${pct(NP.p_close)} close, ${st.h ? `${pct(NP.p_refund)} refund` : 'refunds switched off'}, ${pct(NP.p_pause)} pause or keep searching`],
       ['paused', 'var(--sales)', M.tot.paused, -st.s * (1 - st.p) * PA.paid, st.p * affValue(PA.aff, st), `${pct(st.p)} proceed and pay the second installment; ${pct(1 - st.p)} are refunded ${pct(st.s)} of their upfront payment and never pay the second installment`],
       { _group: 'Set aside: not future cash' },
       ['refunded', null, 0, 0, 0, 'Refund already paid back (historical): nothing more to collect or refund'],
@@ -699,6 +703,7 @@
     $('o-p').textContent = pct(st.p);
     $('o-p-hint').textContent = `${S.int(PA.paused_n)} paused and ${S.int(PA.additional_n)} Additional Service clients. Those who proceed pay their second installment (${short(st.p * PA.second)}). Those who don’t are refunded ${pct(st.s)} of their upfront payment, paid back and subtracted from net cash (−${short((1 - st.p) * PA.paid * st.s)}), and never pay the second installment.`;
     $('o-s').textContent = pct(st.s);
+    $('t-hunt-s').textContent = st.h ? `Simulation setting: past clients at the same stage refunded ${pct(NP.p_refund)} of the time, about ${short(st.s * NP.refund_base)} at this refund size. Historical data is not changed.` : 'Switched off: no refunds are projected for clients still searching. Their collections, closing chances and affiliate revenue are unchanged.';
     AFF.forEach(k => {
       $('o-' + k + '-c').textContent = pct(st.aff[k].conv); $('o-' + k + '-r').textContent = money(st.aff[k].rev);
       $('o-' + k + '-val').textContent = short(P[k].total);
@@ -710,7 +715,7 @@
       { cls: 'hero', l: 'Net expected future cash flow', v: short(M.tot.net), s: `${short(M.tot.service + M.tot.aff)} in · ${short(-M.tot.refund)} out · ${short(M.within(lastMonthEnd(2)))} by ${dLong(lastMonthEnd(2))}` },
       { l: 'Expected service collections', c: 'var(--uc)', v: short(M.tot.service), s: `Second installments: ${pct(M.tot.service / contractual)} of the ${short(contractual)} still owed on contracts` },
       { l: 'Expected affiliate revenue', c: 'var(--closed)', v: short(M.tot.aff), s: 'Realtor, lender and STR Cribs fees on expected closings' },
-      { l: 'Projected refund outflows', c: 'var(--neg)', v: short(M.tot.refund), s: `Future refunds only · ${pct(st.s)} of the upfront payment returned` },
+      { l: 'Projected refund outflows', c: 'var(--neg)', v: short(M.tot.refund), s: `Future refunds only · ${pct(st.s)} of the upfront payment returned${st.h ? '' : ' · none projected for clients still searching'}` },
     ].map(k => `<div class="kpi ${k.cls || ''}"><div class="l">${k.c ? `<i style="background:${k.c}"></i>` : ''}${k.l}</div><div class="v">${k.v}</div><div class="s">${k.s}</div></div>`).join('');
 
     // panel subtitles and legends
@@ -721,7 +726,7 @@
     cashLegend();
     const refShare = M.tot.refund ? M.tot.refPA / M.tot.refund : 0, noRefunds = Math.abs(M.tot.refund) < 0.5;
     $('s-ref').textContent = noRefunds ? 'No future refunds at a 0% refund size' : `${short(M.tot.refund)} in total · ${pct(st.s)} of the upfront payment returned · ${pct(refShare)} from paused and Additional Service clients`;
-    $('lg-ref').innerHTML = RSRC(tok()).map(s => `<span><i style="background:${s.css}"></i>${s.name}<b>${cellM(M.tot[s.k])}</b><em>${M.tot.refund ? pct(M.tot[s.k] / M.tot.refund) : ''}</em></span>`).join('');
+    $('lg-ref').innerHTML = RSRC(tok()).map(s => `<span><i style="background:${s.css}"></i>${s.name}<b>${cellM(M.tot[s.k])}</b><em>${s.k === 'refNP' && !st.h ? 'switched off' : M.tot.refund ? pct(M.tot[s.k] / M.tot.refund) : ''}</em></span>`).join('');
     $('p-ref').classList.toggle('is-empty', noRefunds);
     $('e-ref').textContent = noRefunds ? 'With the refund size at 0%, no upfront money is returned, so there are no future refunds to show.' : '';
     const chosen = AFF.reduce((a, k) => a + P[k].chosen, 0), affTot = AFF.reduce((a, k) => a + P[k].total, 0);
@@ -745,11 +750,12 @@
       card(`${st.d} days`, 'Expected days until collection', `For clients still searching and paused clients who resume; payments spread around ${dLong(st.d)} like past closings.`),
       card(pct(st.p), 'Paused + Additional Service who proceed', `They pay their second installment; the other ${pct(1 - st.p)} are refunded and never pay it.`),
       card(pct(st.s), 'Refund size', 'Share of the upfront payment returned on each future refund.'),
+      card(st.h ? 'On' : 'Off', 'Refunds from clients still searching', st.h ? `Simulation using the historical ${pct(NP.p_refund)} refund rate.` : 'Simulation switched off: none projected.'),
       `<div class="ag-i"><span>Affiliate assumptions</span><ul class="ag-l">${AFF.map(k => `<li><i>${P[k].label}</i><b>${pct(P[k].conv)} · ${money(P[k].rev)}</b></li>`).join('')}</ul><small>Conversion where no partner choice is recorded · revenue per conversion</small></div>`,
     ].join('');
     $('ag-data').innerHTML = [
       card(pct(G.under_contract.p_close), 'Under-contract clients expected to close', 'From past clients who had been under contract as long.'),
-      card(`${pct(NP.p_close)} · ${pct(NP.p_refund)}`, 'Still searching: close · refund', `Like past clients at the same stage; the other ${pct(NP.p_pause)} pause or keep searching.`),
+      card(`${pct(NP.p_close)} · ${st.h ? pct(NP.p_refund) : 'off'}`, 'Still searching: close · refund', `Like past clients at the same stage; the other ${pct(NP.p_pause)} pause or keep searching.`),
       card(`${U.median} days`, 'Typical Under Contract to closing', `Middle half ${U.p25}–${U.p75} days, across ${S.int(U.n)} closings.`),
       card('50 / 50', 'Split Pay', 'Half at the win, half at closing. Paid In Full is collected at the win, so only second installments are future cash.'),
       card(S.int(G.refunded.n), 'Clients already refunded', 'Paid back in the past: not future outflows, and their unpaid balance is not collected.'),
@@ -764,7 +770,7 @@
     <div class="nb"><h3>Refund rules</h3><ul>
       ${li(`Clients already marked Refunded in Jira (${S.int(G.refunded.n)}) were paid back in the past. They are not future cash outflows, and their unpaid second installments will not be collected.`)}
       ${li(`Paused and Additional Service clients: by default ${pct(DEF.paused_proceed)} eventually proceed and pay their second installment, and ${pct(1 - DEF.paused_proceed)} are refunded (adjustable). The refunded amount is paid back to the client and subtracted from net cash.`)}
-      ${li(`Clients still searching are refunded at the historical rate for their stage (${pct(NP.p_refund)} on average). Under-contract clients who don’t close are refunded at the historical rate (${pct(H0.uc_fail_refund)} of past clients who didn’t close).`)}
+      ${li(`With the “clients still searching” switch on (default), they are refunded at the historical rate for their stage (${pct(NP.p_refund)} on average); the switch is a simulation setting and changes no historical data. Under-contract clients who don’t close are refunded at the historical rate (${pct(H0.uc_fail_refund)} of past clients who didn’t close).`)}
       ${li(`Refund size (0–100%, default ${pct(DEF.refundable_share)}) is the share of the upfront payment returned on future refunds: 0% returns nothing, 100% returns all of it. The upfront payment is the first Split Pay installment, or the full price for Paid In Full.`)}
       ${li('A client who is refunded never pays their remaining installment.')}
       ${li('Each client counts once: as a past refund, a projected refund or an expected collection. Projected refunds are timed with the same spread as collections.')}
@@ -807,5 +813,5 @@
   render();
   if (document.fonts && document.fonts.ready) document.fonts.ready.then(() => render());
   window.__CASH_READY = true;
-  window.__CASH = { model, monthly, affParts, bridgeSteps, defaults, get state() { return st; } };
+  window.__CASH = { model, monthly, affParts, bridgeSteps, defaults, short, money, scenarios, get state() { return st; } };
 })();
