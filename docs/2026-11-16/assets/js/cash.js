@@ -123,7 +123,7 @@
       <div class="cf-kicker">Cash forecast · ${D.meta.version.label} reporting package</div>
       <h1 id="cf-title">How much more cash STRSearch can expect, and when</h1>
       <p>Service payments still to collect and affiliate revenue, less the refunds expected along the way. Change any assumption on the left and every number, chart and table updates instantly.</p>
-      <div class="cf-chips"><span class="cf-chip">Data as of ${S.date(C.asof)}</span><span class="cf-chip">${S.int(C.view.engagements)} won engagements reconciled</span></div>
+      <div class="cf-chips"><span class="cf-chip">Data as of ${S.date(C.asof)}</span><span class="cf-chip">${S.int(C.view.engagements)} won deals reconciled</span></div>
     </section>
     <div class="cf-grid">
       <aside class="cf-controls" aria-label="Forecast assumptions">
@@ -132,7 +132,7 @@
           <div class="readout"><b id="o-day">–</b><span id="o-date">–</span></div>
           <div class="range"><div class="range-top"><label for="r-d">Clients still searching, and paused clients who resume</label></div>
             <input type="range" id="r-d" min="${OPT}" max="${DEF.expected_days_max}" step="1" style="--c:var(--wait)"><div class="range-ends"><span>${OPT} days (optimistic)</span><span id="o-dmax"></span></div></div>
-          <p class="hint">${OPT} days = Under Contract tomorrow plus the typical ${U.median} days to closing. Payments spread around the chosen day the way past closings did (middle half ${U.p25}–${U.p75} days).</p>
+          <p class="hint">${OPT} days = Under Contract tomorrow plus the typical ${U.median} days to closing. Payments spread around the chosen day the way past closings did (middle half ${U.p25}–${U.p75} days). The same day times projected refunds, so they move with collections.</p>
           <div class="range"><div class="range-top"><label for="r-max">Slider maximum</label><output id="o-max" for="r-max"></output></div>
             <input type="range" id="r-max" min="${OPT + 3}" max="240" step="1" style="--c:var(--hold)"></div>
         </div>
@@ -146,7 +146,7 @@
           <h3><span class="ic" style="--ic:var(--neg)">${IC.refund}</span>Refund size</h3>
           <div class="range"><div class="range-top"><label for="r-s">Share of the upfront payment returned</label><output id="o-s" for="r-s"></output></div>
             <input type="range" id="r-s" min="0" max="100" step="5" style="--c:var(--neg)"><div class="range-ends"><span>0% · none returned</span><span>100% · all returned</span></div></div>
-          <p class="hint">Applies to future refunds only: paused or Additional Service clients who don’t proceed, and other clients expected to refund. The upfront payment is the first Split Pay installment, or the full Paid In Full price; a refunded client never pays the second installment. Clients already marked Refunded in Jira were paid back in the past and are not in the forecast.</p>
+          <p class="hint">Applies to future refunds only: paused or Additional Service clients who don’t proceed, and other clients expected to refund. The upfront payment is the first Split Pay installment, or the full Paid In Full price; a refunded client never pays the second installment. Clients already marked Refunded in Jira were paid back in the past and are not in the forecast. Refunds still show at 100% paused: clients still searching are refunded at the historical rate for their stage (${pct(NP.p_refund)}), and under-contract clients who don’t close at ${pct(H0.uc_fail_refund)}. The paused slider does not change these.</p>
         </div>
         <div class="ctl">
           <h3><span class="ic" style="--ic:var(--closed)">${IC.partner}</span>Affiliate revenue</h3>
@@ -170,14 +170,14 @@
         ${panel('bridge', 'From what clients still owe to the cash we expect', 'chart-wf', 'Waterfall from the balance still owed on client contracts to net expected cash, read left to right',
           'Read left to right. Red bars reduce the total, the green bar adds to it, and indigo bars are totals. Shaded steps are balances that are not future cash or not expected to be paid. Hover a bar to see what it includes.', 'feature')}
         ${panel('cash', 'Expected cash flow by month', 'chart-cash', 'Expected monthly collections by client group and affiliate revenue above zero, refunds below zero, and the net cash flow line',
-          'Above zero: cash coming in, by client group, plus affiliate revenue. Below zero: refunds paid out. The line is each month’s net. Payments from clients under contract follow past closings; the others spread around the expected days until collection.')}
+          'Each bar is one month’s cash, not a running total. Above zero: cash in, by client group, plus affiliate revenue. Below zero: refunds paid out. The line is the month’s net (cash in minus refunds), not extra cash.')}
         ${panel('ref', 'Where future refunds come from', 'chart-ref', 'Projected refunds by month and by source',
           `Future refunds only: the ${S.int(G.refunded.n)} clients already marked Refunded in Jira were paid back in the past and are not included. Refunds are timed with the same spread as collections.`)}
         ${panel('aff', 'Affiliate revenue by partner', 'chart-aff', 'Expected affiliate revenue for realtor, lender and STR Cribs, split into partner choices already recorded and assumed conversions',
           'Each expected closing counts in proportion to its chance of closing. A recorded preferred partner earns the fee, a recorded other partner, cash purchase or turnkey home earns nothing, and the conversion assumption applies only where no choice is recorded.')}
         ${panel('scen', 'Scenario comparison: when the cash arrives', 'chart-scen', 'Cumulative net cash flow under optimistic, current and pessimistic timing', '')}
         <section class="panel" id="p-groups" aria-labelledby="h-groups">
-          <div class="panel-head"><div class="ph"><h2 id="h-groups">Every won engagement, accounted for</h2><p class="sub">Each of the ${S.int(C.view.engagements)} won engagements sits in exactly one row. “Still owed” is the outstanding contract balance from the reporting layer’s cash forecast view.</p></div></div>
+          <div class="panel-head"><div class="ph"><h2 id="h-groups">Every won deal, accounted for</h2><p class="sub">Each of the ${S.int(C.view.engagements)} won deals sits in exactly one row. “Still owed” is money still owed under contracts, from the reporting layer’s cash forecast view.</p></div></div>
           <div class="tw" id="t-groups"></div>
         </section>
         <section class="panel cf-notes" id="notes" aria-labelledby="h-notes">
@@ -237,25 +237,24 @@
     const sched = C.view.scheduled_counted_collected, fixedDue = G.under_contract.second + G.scheduled.second;
     const nUnres = G.unverified_closing.n + G.unverified_repeat.n + G.unverified_none.n;
     return [
-      { ax: 'Still owed on contracts', n: 'Still owed on client contracts', v: contractual, kind: 'total',
-        tip: `What won clients still owe: the outstanding balance in the cash forecast view (${money(C.view.gross_outstanding)}) plus ${money(sched)} for ${G.scheduled.n} closings scheduled after ${S.date(C.asof)}.` },
-      { ax: 'Already refunded', n: 'Clients already refunded', v: -G.refunded.outstanding,
-        tip: `${S.int(G.refunded.n)} clients marked Refunded in Jira. Their refund was paid back in the past and their unpaid balance will not be collected, so none of it is future cash.` },
+      { ax: 'Still owed on contracts', n: 'Still owed on contracts', v: contractual, kind: 'total',
+        tip: `Money still owed under contracts, including ${money(sched)} for ${G.scheduled.n} closings scheduled after ${S.date(C.asof)}.` },
+      { ax: 'Already refunded', n: 'Already refunded (past)', v: -G.refunded.outstanding,
+        tip: `${S.int(G.refunded.n)} won deals refunded in the past. Already paid back, so not future cash.` },
       { ax: 'Records we can’t verify', n: 'Records we can’t verify', v: -unverified,
-        tip: `${S.int(nUnres)} engagements the data cannot resolve: a post-close status with no closing date, a repeat purchase without its own Jira issue, or no record at all. Kept out of the forecast until their records are found.` },
+        tip: `${S.int(nUnres)} won deals with missing records. Kept out of the forecast until found.` },
       { ax: 'Duplicate deals', n: 'Duplicate deals', v: -G.duplicate.outstanding,
-        tip: `${S.int(G.duplicate.n)} won deals with the same client, won date and value as another deal: counted once.` },
+        tip: `${S.int(G.duplicate.n)} deals that repeat another deal (same client, date and value). Counted once.` },
       { ax: 'Already collected', n: 'Already collected at closing', v: -G.closed.outstanding,
-        tip: `${S.int(G.closed.evidenced)} closings found in brokerage, lender or affiliate records: the second installment was collected at closing.` },
-      { ax: 'Not expected to close', n: 'Clients not expected to close', v: -((fixedDue - M.tot.fixed) + (NP.second - NP.collect)),
-        tip: `Under contract: ${pct(G.under_contract.p_close)} expected to close, from past clients who had waited as long. Still searching: ${pct(NP.p_close)} expected to close, ${pct(NP.p_refund)} to refund and ${pct(NP.p_pause)} to pause or keep searching, like past clients at the same stage.` },
-      { ax: 'Paused, not returning', n: 'Paused clients not returning', v: -(1 - st.p) * PA.second,
-        tip: `${pct(1 - st.p)} of the ${S.int(PA.n)} paused and Additional Service clients are assumed not to proceed, so their second installment is not collected.` },
+        tip: `${S.int(G.closed.evidenced)} closings found in brokerage, lender or affiliate records. Second installment collected.` },
+      { ax: 'Not expected to close', n: 'Not expected to close', v: -((fixedDue - M.tot.fixed) + (NP.second - NP.collect)),
+        tip: `Expected to close: ${pct(G.under_contract.p_close)} under contract, ${pct(NP.p_close)} still searching.` },
+      { ax: 'Paused, not returning', n: 'Paused, not returning', v: -(1 - st.p) * PA.second,
+        tip: `${pct(1 - st.p)} of ${S.int(PA.n)} paused and Additional Service deals assumed not to proceed.` },
       { ax: 'Service collections', n: 'Expected service collections', v: M.tot.service, kind: 'sub', tip: 'Second installments expected to be collected.' },
-      { ax: 'Affiliate revenue', n: 'Affiliate revenue', v: M.tot.aff,
-        tip: 'Realtor, lender and STR Cribs fees on expected closings: recorded preferred partners, plus conversion × revenue per conversion where no choice is recorded.' },
-      { ax: 'Future refunds', n: 'Future refunds', v: M.tot.refund,
-        tip: `Future refunds only: ${pct(st.s)} of the upfront payment of each client expected to refund is paid back.` },
+      { ax: 'Affiliate revenue', n: 'Affiliate revenue', v: M.tot.aff, tip: 'Realtor, lender and STR Cribs fees on expected closings.' },
+      { ax: 'Future refunds paid out', n: 'Future refunds paid out', v: M.tot.refund,
+        tip: `Cash paid back to clients expected to refund: ${pct(st.s)} of their upfront payment.` },
       { ax: 'Net expected cash', n: 'Net expected future cash flow', v: M.tot.net, kind: 'total', tip: 'Service collections + affiliate revenue − future refunds.' },
     ];
   }
@@ -279,7 +278,7 @@
   const wfNode = $('c-bridge');
   const wfChart = chart(wfNode, () => {
     const t = tok(), steps = bridgeSteps(), n = steps.length, W = wfNode.offsetWidth, L = wfLayout(W, steps), vert = L.vert;
-    $('f-bridge').textContent = `Read ${vert ? 'left to right' : 'top to bottom'}. Red bars reduce the total, the green bar adds to it, and indigo bars are totals. Shaded steps are balances that are not future cash or not expected to be paid. ${vert ? 'Hover' : 'Tap'} a bar to see what it includes.`;
+        $('f-bridge').textContent = `Read ${vert ? 'left to right' : 'top to bottom'}. Red reduces the total, green adds to it, indigo is a total. Already refunded = paid back in the past; future refunds = cash still to pay out. “Records we can’t verify” (${S.int(G.unverified_closing.n + G.unverified_repeat.n + G.unverified_none.n)} won deals) = ${S.int(G.unverified_closing.n)} with a post-close status but no closing date, ${S.int(G.unverified_repeat.n)} repeat purchases without their own Jira issue, and ${S.int(G.unverified_none.n)} with no matching record. They stay out of the forecast until found. Shaded steps are not future cash or not expected to pay. ${vert ? 'Hover' : 'Tap'} a bar for detail.`;
     let run = 0;
     const geo = steps.map(s => {
       let lo, hi;
@@ -559,9 +558,9 @@
     dataTable($('t-scen'), 'scen', [
       { k: 'name', label: 'Scenario', cls: 'strong' },
       { k: 'timing', label: 'Collection timing', sv: r => r.d },
-    ].concat(ends.map((d, i) => ({ k: 'e' + i, label: `Cash by ${dShort(d)}`, num: true, html: r => short(r['e' + i]) + delta(r, r['e' + i], r._ref['e' + i]), title: r => money(r['e' + i]) })))
-      .concat([{ k: 'total', label: 'Net expected cash', num: true, fmt: short, title: r => money(r.total) }]),
-    rows, { caption: 'Scenario comparison by month-end', cls: 'scen' });
+    ].concat(ends.map((d, i) => ({ k: 'e' + i, label: `Running total by ${dShort(d)}`, num: true, html: r => short(r['e' + i]) + delta(r, r['e' + i], r._ref['e' + i]), title: r => money(r['e' + i]) })))
+      .concat([{ k: 'total', label: 'Net total', num: true, fmt: short, title: r => money(r.total) }]),
+    rows, { caption: 'Running total of net cash by date', cls: 'scen' });
   }
   function groupsTable() {
     const XU = G.under_contract.expected, XS = G.scheduled.expected;
@@ -584,18 +583,18 @@
       if (!Array.isArray(x)) return x;
       const [k, col, svc, ref, aff, rule] = x, g = G[k], bal = g.outstanding + (k === 'scheduled' ? C.view.scheduled_counted_collected : 0);
       T.n += g.n; T.bal += bal; T.svc += svc; T.ref += ref; T.aff += aff;
-      return { label: g.label, col, n: g.n, bal, svc, ref, aff, rule, _cls: svc || ref || aff ? '' : 'ex' };
+      return { label: k === 'refunded' ? 'Already refunded (past)' : g.label, col, n: g.n, bal, svc, ref, aff, rule, _cls: svc || ref || aff ? '' : 'ex' };
     });
     T.rule = `Net ${short(T.svc + T.ref + T.aff)}`;
     dataTable($('t-groups'), 'groups', [
       { k: 'label', label: 'Group', html: r => (r._total ? 'Total' : sw(r.col || 'var(--line-2)') + r.label) },
-      { k: 'n', label: 'Engagements', num: true, fmt: v => S.int(v) },
+      { k: 'n', label: 'Won deals', num: true, fmt: v => S.int(v) },
       { k: 'bal', label: 'Still owed', num: true, fmt: cellM, title: r => money(r.bal) },
       { k: 'svc', label: 'Service collections', num: true, fmt: cellM, title: r => money(r.svc) },
       { k: 'ref', label: 'Refunds', num: true, fmt: cellM, title: r => money(r.ref) },
       { k: 'aff', label: 'Affiliate revenue', num: true, fmt: cellM, title: r => money(r.aff) },
       { k: 'rule', label: 'How it’s treated', cls: 'rule' },
-    ], rows, { sortable: false, total: T, cls: 'groups', caption: 'Every won engagement and how the forecast treats it' });
+    ], rows, { sortable: false, total: T, cls: 'groups', caption: 'Every won deal and how the forecast treats it' });
   }
 
   /* ------------------------------------------------------------------ chart / table toggles */
@@ -655,9 +654,9 @@
     $('s-aff').textContent = `${short(M.tot.aff)} expected · ${short(chosen)} (${affTot ? pct(chosen / affTot) : '0%'}) from partner choices already recorded in Jira; the rest depends on the conversion assumptions`;
     $('lg-aff').innerHTML = `<span><i style="background:var(--closed)"></i>Partner already chosen</span><span><i class="out" style="background:var(--closed-2);border-color:var(--closed)"></i>Assumed conversions (no choice recorded)</span>`;
     const sc = scenarios(), nets = sc.map(x => x.m.tot.net), same = Math.max(...nets) - Math.min(...nets) < 1;
-    $('s-scen').textContent = same ? `Only timing changes, so every scenario reaches the same ${short(nets[1])}; what differs is how much has arrived by each month-end.` : `Net ranges from ${short(Math.min(...nets))} to ${short(Math.max(...nets))}.`;
+    $('s-scen').textContent = same ? `Only timing changes, so every scenario reaches the same ${short(nets[1])}; what differs is the running total by each date.` : `Net ranges from ${short(Math.min(...nets))} to ${short(Math.max(...nets))}.`;
     $('lg-scen').innerHTML = `<span><i class="ln" style="background:var(--sp-mid)"></i>Optimistic (${OPT} days)</span><span><i class="ln" style="background:var(--acq)"></i>Your setting (${st.d} days)</span><span style="color:var(--hold)"><i class="dash"></i><span style="color:var(--ink-2)">Pessimistic (${st.max} days)</span></span>`;
-    $('f-scen').textContent = `Optimistic: collections centred ${OPT} days out. Pessimistic: the slider maximum (${st.max} days). Everything else follows your current settings.`;
+    $('f-scen').textContent = `Running total by date, not monthly cash. Optimistic: collections centred ${OPT} days out. Pessimistic: the slider maximum (${st.max} days). Everything else follows your current settings.`;
 
     Object.keys(VIEWS).forEach(id => { if (isTable(id)) VIEWS[id].table(); else VIEWS[id].chart().draw(); });
     groupsTable();
@@ -697,14 +696,14 @@
       ${li('Each client counts once: as a past refund, a projected refund or an expected collection. Projected refunds are timed with the same spread as collections.')}
     </ul></div>
     <div class="nb"><h3>How the forecast is reconciled</h3><ul>
-      ${li(`All ${S.int(C.view.engagements)} won engagements sit in exactly one row of the engagement table, and the rows add up to the outstanding balance in the reporting layer’s cash forecast view (${money(C.view.gross_outstanding)}) plus ${money(C.view.scheduled_counted_collected)} for closings scheduled after the data date.`)}
+      ${li(`All ${S.int(C.view.engagements)} won deals sit in exactly one row of the table above, and the rows add up to the money still owed under contracts in the reporting layer’s cash forecast view (${money(C.view.gross_outstanding)}) plus ${money(C.view.scheduled_counted_collected)} for closings scheduled after the data date.`)}
       ${li(`47 won deals had no Jira match. Each was checked against the Jira key typed in Pipedrive, client e-mails in the 12 Nov Jira and Pipedrive extracts, both onboarding-form sheets, and the brokerage and lender closing records: ${R.own_jira} match their own Jira issue (now grouped by its status), ${R.purchase_record} have a closing record, ${R.duplicate} are probable duplicates of another deal, ${R.repeat} are repeat purchases whose client’s only Jira issue tracks the other deal, and ${R.none} have no record anywhere (${R.onboarded} of the 47 completed an onboarding form).`)}
-      ${li(`${R.post_close_no_date} post-close engagements had no closing date. Checking affiliate, brokerage and lender records by property address found ${R.post_close_evidenced} closings; the rest stay unresolved.`)}
+      ${li(`${R.post_close_no_date} post-close won deals had no closing date. Checking affiliate, brokerage and lender records by property address found ${R.post_close_evidenced} closings; the rest stay unresolved.`)}
     </ul></div>
     <div class="nb"><h3>What history shows</h3><ul>
       ${li(`Under Contract to closing takes ${U.median} days at the median (middle half ${U.p25}–${U.p75}) across ${S.int(U.n)} closings; Passed Inspection to closing takes ${H0.pi_to_close.median} days. ${pct(H0.uc_close_rate)} of ${S.int(H0.uc_n)} past under-contract clients closed, and the chance falls the longer a contract runs without closing.`)}
       ${li(`Of ${S.int(MS.n)} confirmed starts with at least a year of history and a known outcome, ${pct(MS.shares.closed)} closed, ${pct(MS.shares.refunded)} refunded, ${pct(MS.shares.paused)} paused and ${pct(MS.shares.hunting)} are still searching. The longer a client goes without a contract, the more those shares shift toward refund and pause, so each client still searching uses the shares for their own number of days.`)}
-      ${li(`Past refunds: ${S.int(H0.processed_refunds.n)} engagements are marked Refunded in Jira, typically ${H0.refund_lag.median} days after the client start (90% within ${Math.round(H0.refund_lag.p90)} days).`)}
+      ${li(`Past refunds: ${S.int(H0.processed_refunds.n)} won deals are marked Refunded in Jira, typically ${H0.refund_lag.median} days after the client start (90% within ${Math.round(H0.refund_lag.p90)} days).`)}
       ${li(`Affiliate history: ${S.int(AF.realized.payments)} recorded affiliate payments since Dec 2024 total ${money(AF.realized.total)} (broker ${money(AF.realized.by_source.Broker.total)}, lender ${money(AF.realized.by_source.Lender.total)}, construction ${money(AF.realized.by_source.Construction.total)}). Median realtor referral fee ${money(AF.realtor.median_fee)} (${S.int(AF.realtor.received)} of ${S.int(AF.realtor.n)} received); median lender amount due ${money(AF.lender.median_due)}; typical STR Cribs fee ${money(AF.cribs.typical_fee)}. No affiliate fee is recorded as received yet for any client still expected to close.`)}
     </ul></div>
     <div class="nb"><h3>Other assumptions</h3><ul>
