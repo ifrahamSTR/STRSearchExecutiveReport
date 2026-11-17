@@ -80,7 +80,7 @@
       <div class="cf-kicker">Cash forecast · ${D.meta.version.label} reporting package</div>
       <h1 id="cf-title">How much more cash STRSearch can expect, and when</h1>
       <p>Future service collections and affiliate revenue, less the refunds expected along the way, under assumptions you control. Every change recalculates instantly.</p>
-      <div class="cf-chips"><span class="cf-chip">Data as of ${S.date(C.asof)}</span><span class="cf-chip warn">Modeled from contracts, not verified receipts</span><span class="cf-chip">${S.int(C.view.engagements)} won engagements reconciled</span></div>
+      <div class="cf-chips"><span class="cf-chip">Data as of ${S.date(C.asof)}</span><span class="cf-chip">${S.int(C.view.engagements)} won engagements reconciled</span></div>
     </section>
     <div class="cf-grid">
       <aside class="cf-controls" aria-label="Forecast assumptions">
@@ -301,7 +301,7 @@
       ['paused', t.sales, M.tot.paused, -st.s * (1 - st.p) * PA.paid, st.p * affValue(PA.aff, st), `${pct(st.p)} proceed and pay the second installment; ${pct(1 - st.p)} are refunded ${pct(st.s)} of their upfront payment, paid back and subtracted (their second installment is not collected)`],
       ['refunded', null, 0, 0, 0, 'Marked Refunded in Jira: refund assumed already paid back (historical); no future collection or outflow'],
       ['closed', null, 0, 0, 0, `Second installment assumed collected at the recorded closing (incl. ${S.int(G.closed.evidenced)} closings found in affiliate or brokerage records)`],
-      ['unverified_closing', null, 0, 0, 0, 'Missing: closing date or payment record. Post-close Jira status but no closing in any source'],
+      ['unverified_closing', null, 0, 0, 0, 'Missing: closing date. Post-close Jira status but no closing in any source'],
       ['unverified_repeat', null, 0, 0, 0, 'Missing: a Jira issue for this purchase. The client’s only issue tracks their other won deal'],
       ['unverified_none', null, 0, 0, 0, `Missing: any Jira, e-mail or purchase record (${S.int(C.resolution.unverified_none_2024)} won in 2024, ${S.int(C.resolution.unverified_none_2026)} in 2026)`],
       ['duplicate', null, 0, 0, 0, 'Same client, won date and value as a Jira-linked deal: not counted twice'],
@@ -349,16 +349,14 @@
       ${item('a', `Affiliates: a recorded preferred realtor, lender or STR Cribs choice earns the fee; a recorded other partner, cash purchase or turnkey home earns nothing; only unrecorded choices use the conversion sliders (defaults ${pct(DEF.affiliates.realtor.conv)} / ${pct(DEF.affiliates.lender.conv)} / ${pct(DEF.affiliates.cribs.conv)}). Revenue per conversion defaults ${money(DEF.affiliates.realtor.rev)} / ${money(DEF.affiliates.lender.rev)} / ${money(DEF.affiliates.cribs.rev)} are business assumptions; the recorded medians above are higher.`)}
     </ul>
     <h3>Data limitations</h3><ul>
-      ${item('l', 'No payment transactions (QuickBooks, Stripe) are in any source: collected and outstanding amounts are contractual models, not receipts.')}
       ${item('l', `Payment type: blanks default to Split Pay and only ${S.int(C.view.payment_recorded)} of ${S.int(C.view.engagements)} won deals carry a recorded type, so outstanding balances may be overstated for clients who paid in full.`)}
-      ${item('l', `Refund amounts are not recorded in any source, so the size of future refunds is set by the refund-size slider. ${money(unverified)} of unresolved and ${money(G.duplicate.outstanding)} of probable-duplicate balances stay outside the forecast until their records are found.`)}
-      ${item('l', `Affiliate payments: the lender tracker records no paid invoices, so whether funded lender commissions were collected is unknown; ${S.int(AF.lender.pipeline_unfunded)} lender files are still unfunded (pipeline).`)}
+      ${item('l', `${money(unverified)} of unresolved and ${money(G.duplicate.outstanding)} of probable-duplicate balances stay outside the forecast until their records are found.`)}
       ${item('l', 'Under Contract is the latest valid contract; earlier fall-throughs are not recorded, so the historical closing probability may be slightly optimistic.')}
     </ul>`;
 
   /* ------------------------------------------------------------------ chrome */
   document.getElementById('snap').textContent = 'data as of ' + S.date(D.meta.asof);
-  document.getElementById('foot-asof').textContent = `Data as of ${S.date(D.meta.asof)} · modeled cash, not receipts`;
+  document.getElementById('foot-asof').textContent = `Data as of ${S.date(D.meta.asof)}`;
   document.getElementById('themeBtn').addEventListener('click', () => {
     const cur = document.documentElement.getAttribute('data-theme') || (matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light');
     const next = cur === 'dark' ? 'light' : 'dark';
