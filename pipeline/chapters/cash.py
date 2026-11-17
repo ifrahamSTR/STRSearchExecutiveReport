@@ -27,6 +27,7 @@ one (preferred = earns, other / cash / turnkey = does not) and the conversion sl
 """
 from __future__ import annotations
 
+import functools
 import hashlib
 import importlib.util
 import re
@@ -73,6 +74,7 @@ def _residual(history: np.ndarray, elapsed: int) -> np.ndarray:
     return np.maximum(tail - elapsed, 1)
 
 
+@functools.lru_cache(maxsize=2)
 def _old_package(explorer):
     """12 Nov Jira and Pipedrive extracts through the Explorer's frozen loader (cache only; nothing is written)."""
     path = explorer / "versions" / "2026-11-12" / "pipeline" / "build.py"
@@ -222,34 +224,81 @@ def resolve(ctx: C.Ctx, e: pd.DataFrame) -> tuple[pd.Series, pd.Series, dict]:
 
 
 # ----------------------------------------------------------------------------- history
+def _carry(at_risk, el, values):
+    """Outcome values for the clients still at risk at day el. When fewer than MIN_TAIL remain, use the last day that still had
+    MIN_TAIL (never the whole cohort: that would put back clients who had already left the group)."""
+    m = at_risk(el)
+    while len(m) < MIN_TAIL and el > 0:
+        el -= 1
+        m = at_risk(el)
+    return values(m), int(len(m)), el
+
+
 def history(ctx: C.Ctx, e: pd.DataFrame) -> dict:
+    """Historical comparison groups (Batch 4C). A past client counts as still searching (or still under contract) at day el only while
+    no exit event has happened by that day and the client has been observed for longer than el:
+      still searching: exit at the earliest of the Under Contract, Passed Inspection or closing date (a closing without a Under Contract
+                       date is still a closing; no date is invented), the refund date, or the date the client entered Paused /
+                       Additional Service (12 Nov extract, latest status)
+      under contract:  closers exit at closing; contracts that failed exit at the earliest of the refund date, the pause-entry date or
+                       the date the client was next seen in another status (12 Nov extract)
+    Outcomes stay mutually exclusive (closed > refunded > paused > still searching). Records whose outcome is unknown (post-close with no
+    closing date, still under contract) stay out of the groups, as before."""
     asof = ctx.asof
     h_uc = e.days_uc_to_close.dropna().values
     h_uc = h_uc[h_uc >= 0].astype(int)
     h_pi = (e.closed - e.pi).dt.days.dropna().values
     h_pi = h_pi[h_pi >= 0].astype(int)
+    j12, _ = _old_package(ctx.explorer)
+    j12 = j12.assign(K=j12["key"].astype(str).str.upper()).drop_duplicates("K").set_index("K")
     co = e[e.confirmed_start].copy()
     ref = co.refunded.fillna(False).astype(bool)
     co["outcome"] = np.select([co.closed.notna(), ref, co.status.isin(["Paused", "Additional Service"]), co.hunting.fillna(False).astype(bool)],
                               ["closed", "refunded", "paused", "hunting"], "unknown")
-    # (a) probability of closing for a client still unclosed e days after going under contract (mature UC records,
-    #     excluding post-close records without a date, whose outcome is unknown)
+    k = co.jira_key.astype("string").str.upper()
+    ls = k.map(j12.latest_status)
+    lsd = pd.to_datetime(k.map(j12.latest_status_date), errors="coerce")
+    paused_since = lsd.where(co.outcome.eq("paused") & ls.isin(["Paused", "Additional Service"]))
+    refund_on = co.refund_date.where(co.outcome.eq("refunded"))
+    seen = (asof - co.start).dt.days
+
+    # (a) probability of closing for a client still unclosed el days after going under contract (mature UC records, outcome known)
     uc = co[co.uc.notna() & ((asof - co.uc).dt.days >= MATURE_UC_DAYS) & (co.outcome != "unknown")]
+    left_other = lsd.where(~ls.isin(["Under Contract", "Passed Inspection"] + POST_CLOSE))           # next seen in another status
+    fail_t = pd.concat([refund_on, paused_since, left_other], axis=1).min(axis=1).sub(co.uc).dt.days
+    uc_exit = uc.days_uc_to_close.where(uc.closed.notna(), fail_t[uc.index])
+    uc_seen = (asof - uc.uc).dt.days
+    uc_at = lambda el: uc[(uc_exit > el) | (uc_exit.isna() & (uc_seen > el))]
     def p_close_uc(el):
-        m = uc[uc.days_uc_to_close.isna() | (uc.days_uc_to_close > el)]
-        return (float(m.closed.notna().mean()) if len(m) >= MIN_TAIL else float(uc.closed.notna().mean())), int(len(m))
+        v, n, _ = _carry(uc_at, el, lambda m: float(m.closed.notna().mean()))
+        return v, n
     fail = uc[uc.closed.isna()]
     uc_fail_refund = float((fail.outcome == "refunded").mean()) if len(fail) else 0.0
-    # (b) outcome shares for clients without a contract after e days (mature cohorts, outcome known)
-    old = co[((asof - co.start).dt.days >= MATURE_START_DAYS) & (co.outcome != "unknown")]
+
+    # (b) outcome shares for clients without a contract after el days (mature cohorts, outcome known)
+    old = co[(seen >= MATURE_START_DAYS) & (co.outcome != "unknown")]
+    evidence = pd.concat([old.days_to_uc, (old.pi - old.start).dt.days, old.days_to_close.where(old.outcome.eq("closed"))], axis=1).min(axis=1)
+    np_exit = pd.concat([evidence, (refund_on - co.start).dt.days[old.index], (paused_since - co.start).dt.days[old.index]], axis=1).min(axis=1)
+    np_at = lambda el: old[(np_exit > el) | (np_exit.isna() & (seen[old.index] > el))]
     def p_noprop(el):
-        m = old[old.days_to_uc.isna() | (old.days_to_uc > el)]
-        if len(m) < MIN_TAIL:
-            m = old
-        return {k: float((m.outcome == k).mean()) for k in ("closed", "refunded", "paused", "hunting")}, int(len(m))
+        v, n, _ = _carry(np_at, el, lambda m: {k: float((m.outcome == k).mean()) for k in ("closed", "refunded", "paused", "hunting")})
+        return v, n
+    curve = lambda f, days: [{"day": d, "n": f(d)[1], **({"p_close": round(f(d)[0], 4)} if isinstance(f(d)[0], float)
+                                                        else {k: round(x, 4) for k, x in f(d)[0].items()})} for d in days]
+    last_np = _carry(np_at, 10_000, lambda m: None)[2]
+    exits = {"closed_no_uc_date": int((old.outcome.eq("closed") & old.days_to_uc.isna()).sum()),
+             "closed_exit_by": {"uc": int((old.outcome.eq("closed") & old.days_to_uc.notna()).sum()),
+                                "inspection": int((old.outcome.eq("closed") & old.days_to_uc.isna() & old.pi.notna()).sum()),
+                                "closing": int((old.outcome.eq("closed") & old.days_to_uc.isna() & old.pi.isna()).sum())},
+             "refunded_dated": int(refund_on[old.index].notna().sum()), "refunded": int(old.outcome.eq("refunded").sum()),
+             "paused_dated": int(paused_since[old.index].notna().sum()), "paused": int(old.outcome.eq("paused").sum()),
+             "uc_failures": int(len(fail)), "uc_failures_dated": int(fail_t[fail.index].notna().sum()),
+             "last_day_np": int(last_np)}
     return {"h_uc": h_uc, "h_pi": h_pi, "p_close_uc": p_close_uc, "uc_fail_refund": uc_fail_refund, "p_noprop": p_noprop,
             "uc_n": int(len(uc)), "uc_rate": float(uc.closed.notna().mean()), "old_n": int(len(old)),
             "old_shares": {k: round(float((old.outcome == k).mean()), 3) for k in ("closed", "refunded", "paused", "hunting")},
+            "curve_np": curve(p_noprop, (0, 30, 60, 90, 120, 180, 270, 365)), "curve_uc": curve(p_close_uc, (0, 15, 30, 45, 60, 75)),
+            "exits": exits,
             "refund_lag": (co[ref & co.refund_date.notna()].refund_date - co[ref & co.refund_date.notna()].start).dt.days}
 
 
@@ -419,6 +468,7 @@ def build(ctx: C.Ctx) -> dict:
                     "pi_to_close": {"n": int(len(H["h_pi"])), "median": float(np.median(H["h_pi"]))},
                     "uc_close_rate": round(H["uc_rate"], 3), "uc_n": H["uc_n"], "uc_fail_refund": round(H["uc_fail_refund"], 3),
                     "mature_starts": {"n": H["old_n"], "shares": H["old_shares"]},
+                    "curves": {"noprop": H["curve_np"], "uc": H["curve_uc"]}, "exits": H["exits"],
                     "refund_lag": {"n": int(len(lag)), "median": float(lag.median()), "p75": float(lag.quantile(.75)), "p90": float(lag.quantile(.9))},
                     "processed_refunds": {"n": groups["refunded"]["n"], "paid": groups["refunded"]["paid"]}},
         "affiliates": affiliate_history,
