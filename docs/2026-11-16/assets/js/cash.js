@@ -110,12 +110,56 @@
     table: '<svg viewBox="0 0 16 16" aria-hidden="true"><rect x="2.5" y="3" width="11" height="10" rx="1.6"/><path d="M2.5 6.6h11M2.5 9.8h11M6.4 6.6V13"/></svg>',
   };
   const toggle = id => `<div class="vt" role="group" aria-label="Show as chart or table"><button type="button" data-for="${id}" data-view="chart" aria-pressed="true">${IC.chart}<span>Chart</span></button><button type="button" data-for="${id}" data-view="table" aria-pressed="false">${IC.table}<span>Table</span></button></div>`;
-  const panel = (id, title, cls, aria, foot, extra) => `
+  const panel = (id, title, cls, aria, foot, extra, kick) => `
         <section class="panel ${extra || ''}" id="p-${id}" aria-labelledby="h-${id}">
-          <div class="panel-head"><div class="ph"><h2 id="h-${id}">${title}</h2><p class="sub" id="s-${id}"></p></div>${toggle(id)}</div>
+          <div class="panel-head"><div class="ph">${kick ? `<div class="kick">${kick}</div>` : ''}<h2 id="h-${id}">${title}</h2><p class="sub" id="s-${id}"></p></div>${id === 'cash' ? `<div class="ph-tools"><button type="button" class="lg-btn" id="b-detail" aria-pressed="false">Split by client group</button>${toggle(id)}</div>` : toggle(id)}</div>
           <div class="pv-chart"><div class="legend-row" id="lg-${id}"></div><div class="chart ${cls}" id="c-${id}" role="img" aria-label="${aria}"></div><p class="empty-note" id="e-${id}"></p><p class="foot" id="f-${id}">${foot}</p></div>
           <div class="pv-table tw" id="t-${id}"></div>
         </section>`;
+  /* client landscape and unresolved records: counts and balances come straight from the model's groups */
+  const RC = C.recent_closed;
+  const nUC = G.under_contract.n + G.scheduled.n, nOpen = G.noprop.n + G.paused.n + nUC;
+  const lc = (c, n, label, sub) => `<div class="lc" style="--c:${c}"><b>${S.int(n)}</b><span>${label}</span><small>${sub}</small></div>`;
+  const LAND = `
+        <section class="panel land" id="p-land" aria-labelledby="h-land">
+          <div class="panel-head"><div class="ph"><div class="kick">1 · Where clients are today</div><h2 id="h-land">Our won deals today</h2>
+            <p class="sub">Snapshot as of ${S.date(C.asof)}. Each is a Won Pipedrive deal, not necessarily a unique client.</p></div></div>
+          <div class="land-grid">
+            <div class="land-open">
+              <div class="land-cap"><b>${S.int(nOpen)}</b> open won deals <span>by where they stand today</span></div>
+              <div class="land-bar" role="img" aria-label="Open won deals: ${G.noprop.n} no property yet, ${G.paused.n} paused or Additional Service, ${nUC} under contract or closing scheduled">
+                <i style="flex:${G.noprop.n};background:var(--wait)"></i><i style="flex:${G.paused.n};background:var(--sales)"></i><i style="flex:${nUC};background:var(--uc)"></i></div>
+              <div class="land-cards">
+                ${lc('var(--wait)', G.noprop.n, 'No property yet', `${pct(G.noprop.n / nOpen)} · ${S.int(NP.hunting)} hunting, ${S.int(NP.not_started)} won but not started`)}
+                ${lc('var(--sales)', G.paused.n, 'Paused / Additional Service', `${pct(G.paused.n / nOpen)} · ${S.int(PA.paused_n)} paused, ${S.int(PA.additional_n)} Additional Service`)}
+                ${lc('var(--uc)', nUC, 'Under Contract / closing scheduled', `${pct(nUC / nOpen)} · ${S.int(G.under_contract.n)} under contract, ${S.int(G.scheduled.n)} closing scheduled`)}
+              </div>
+            </div>
+            <div class="land-recent">
+              <div class="lr-k">Also: recently closed</div>
+              ${lc('var(--closed)', RC.n, 'Closed in the last 30 days', `${S.date(RC.from)} – ${S.date(RC.to)}, from source closing dates. Part of the ${S.int(G.closed.n)} closings recorded to date, not a separate stage.`)}
+              <p class="lr-note">Affiliate payouts for these closings may still be pending. They are not included in the forecast.</p>
+            </div>
+          </div>
+        </section>`;
+  const UNR = [
+    ['unverified_closing', 'Post-close, no closing date', 'Jira shows a post-close status, but no closing date appears in any source, so it is unclear whether the balance has been collected.'],
+    ['unverified_repeat', 'Repeat purchase without its own Jira issue', 'The client’s only Jira issue tracks their other won deal, so this purchase has no progress record.'],
+    ['unverified_none', 'Won deal without matching records', `No Jira issue, e-mail or purchase record was found for the deal (${S.int(R.unverified_none_2024)} won in 2024, ${S.int(R.unverified_none_2026)} in 2026).`],
+  ];
+  const uN = UNR.reduce((a, r) => a + G[r[0]].n, 0), uB = UNR.reduce((a, r) => a + G[r[0]].outstanding, 0);
+  const bal = v => `<td class="n" title="${money(v)}">${short(v)}</td>`;
+  const UNRES = `
+        <details class="panel unres" id="p-unres">
+          <summary><span class="u-t"><span class="kick">4 · What reduces it</span>Unresolved records<small>Set aside: not in the forecast until their records are found</small></span>
+            <span class="u-v"><b>${S.int(uN)}</b> won deals · <b>${short(uB)}</b> still owed</span></summary>
+          <div class="tw"><table class="cf-t unr"><caption class="visually-hidden">Unresolved records kept out of the forecast, and probable duplicates</caption>
+            <thead><tr><th scope="col">Category</th><th scope="col" class="n">Won deals</th><th scope="col" class="n">Balance still owed</th><th scope="col">Why it is excluded</th></tr></thead>
+            <tbody>${UNR.map(([k, lab, why]) => `<tr><td>${lab}</td><td class="n">${S.int(G[k].n)}</td>${bal(G[k].outstanding)}<td class="rule">${why}</td></tr>`).join('')}
+              <tr class="tot"><td>Unresolved total</td><td class="n">${S.int(uN)}</td>${bal(uB)}<td class="rule">Excluded from service collections, affiliate revenue and refunds.</td></tr>
+              <tr class="grp"><th colspan="4" scope="rowgroup">Counted separately</th></tr>
+              <tr><td>Probable duplicates</td><td class="n">${S.int(G.duplicate.n)}</td>${bal(G.duplicate.outstanding)}<td class="rule">Same client, won date and value as another deal. Counted once; not yet reconciled one by one.</td></tr></tbody></table></div>
+        </details>`;
   const main = document.getElementById('main');
   const RY = AF.recorded_year;
   main.innerHTML = `
@@ -166,16 +210,18 @@
         </div>
       </aside>
       <div class="cf-results">
+        ${LAND}
         <div class="kpis" id="kpis" aria-live="polite"></div>
         ${panel('bridge', 'From what clients still owe to the cash we expect', 'chart-wf', 'Waterfall from the balance still owed on client contracts to net expected cash, read left to right',
-          'Read left to right. Red bars reduce the total, the green bar adds to it, and indigo bars are totals. Shaded steps are balances that are not future cash or not expected to be paid. Hover a bar to see what it includes.', 'feature')}
-        ${panel('cash', 'Expected cash flow by month', 'chart-cash', 'Expected monthly collections by client group and affiliate revenue above zero, refunds below zero, and the net cash flow line',
-          'Each bar is one month’s cash, not a running total. Above zero: cash in, by client group, plus affiliate revenue. Below zero: refunds paid out. The line is the month’s net (cash in minus refunds), not extra cash.')}
-        ${panel('ref', 'Where future refunds come from', 'chart-ref', 'Projected refunds by month and by source',
-          `Future refunds only: the ${S.int(G.refunded.n)} clients already marked Refunded in Jira were paid back in the past and are not included. Refunds are timed with the same spread as collections.`)}
+          'Read left to right. Red bars reduce the total, the green bar adds to it, and indigo bars are totals. Shaded steps are balances that are not future cash or not expected to be paid. Hover a bar to see what it includes.', 'feature', '2 · How much we expect')}
         ${panel('aff', 'Affiliate revenue by partner', 'chart-aff', 'Expected affiliate revenue for realtor, lender and STR Cribs, split into partner choices already recorded and assumed conversions',
           'Each expected closing counts in proportion to its chance of closing. A recorded preferred partner earns the fee, a recorded other partner, cash purchase or turnkey home earns nothing, and the conversion assumption applies only where no choice is recorded.')}
+        ${panel('cash', 'Expected cash flow by month', 'chart-cash', 'Expected monthly collections by client group and affiliate revenue above zero, refunds below zero, and the net cash flow line',
+          '', '', '3 · When the cash arrives')}
         ${panel('scen', 'Scenario comparison: when the cash arrives', 'chart-scen', 'Cumulative net cash flow under optimistic, current and pessimistic timing', '')}
+        ${panel('ref', 'Where future refunds come from', 'chart-ref', 'Projected refunds by month and by source',
+          `Future refunds only: the ${S.int(G.refunded.n)} clients already marked Refunded in Jira were paid back in the past and are not included. Refunds are timed with the same spread as collections.`, '', '4 · What reduces it')}
+        ${UNRES}
         <section class="panel" id="p-groups" aria-labelledby="h-groups">
           <div class="panel-head"><div class="ph"><h2 id="h-groups">Every won deal, accounted for</h2><p class="sub">Each of the ${S.int(C.view.engagements)} won deals sits in exactly one row. “Still owed” is money still owed under contracts, from the reporting layer’s cash forecast view.</p></div></div>
           <div class="tw" id="t-groups"></div>
@@ -367,31 +413,52 @@
     { k: 'noprop', name: 'Still searching', color: t.wait },
     { k: 'paused', name: 'Paused / Additional Service, resuming', color: t.sales },
     { k: 'aff', name: 'Affiliate revenue', color: t.closed },
-    { k: 'refund', name: 'Refunds paid out', color: t.neg },
+    { k: 'refund', name: 'Future refunds paid out', color: t.neg },
   ];
   const POS = ['fixed', 'noprop', 'paused', 'aff'];
   const shadow = t => ({ type: 'shadow', shadowStyle: { color: t.grid, opacity: 0.6 } });
   const monthTitle = r => mFull(r.k) + (r.k === mKey(0) ? ' (from ' + dShort(1) + ')' : '');
   const mMid = k => new Date(k + '-15T12:00:00').toLocaleDateString('en-US', { month: 'short', year: 'numeric' });
+  let cashDetail = false;                    // false: service collections as one bar; true: split by client group
+  const cashSeriesDef = t => (cashDetail ? SRC(t) : [
+    { k: 'service', name: 'Service collections', color: t.uc },
+    { k: 'aff', name: 'Affiliate revenue', color: t.closed },
+    { k: 'refund', name: 'Future refunds paid out', color: t.neg },
+  ]);
   const cashChart = chart($('c-cash'), () => {
-    const t = tok(), src = SRC(t), narrow = $('c-cash').offsetWidth < 560;
-    const eps = Math.max(1, ...MM.map(r => r.inflow)) * 0.005, topKey = r => { for (let i = POS.length - 1; i >= 0; i--) if (r[POS[i]] > eps) return POS[i]; return null; };
+    const t = tok(), src = SRC(t), ser = cashSeriesDef(t), pos = ser.map(x => x.k).filter(k => k !== 'refund'), narrow = $('c-cash').offsetWidth < 560;
+    const eps = Math.max(1, ...MM.map(r => r.inflow)) * 0.005, topKey = r => { for (let i = pos.length - 1; i >= 0; i--) if (r[pos[i]] > eps) return pos[i]; return null; };
     return Object.assign(S.base(t), {
-      grid: { left: 8, right: 10, top: 18, bottom: 8, containLabel: true },
+      grid: { left: 8, right: 10, top: 30, bottom: 8, containLabel: true },
       tooltip: tip(t, { trigger: 'axis', axisPointer: shadow(t), formatter: ps => {
         const r = MM[ps[0].dataIndex];
-        return tipBox(t, monthTitle(r), [['Service collections', money(r.service), null, 'b']]
-          .concat(src.slice(0, 3).filter(s => Math.abs(r[s.k]) > 0.5).map(s => [s.name, money(r[s.k]), s.color, 'sub']))
-          .concat([['Affiliate revenue', money(r.aff), t.closed], ['Refunds paid out', money(r.refund), t.neg], ['Net this month', money(r.net), null, 'b'], ['Cumulative net', money(r.cum)]]));
+        return tipBox(t, monthTitle(r), [['Service collections', money(r.service), cashDetail ? null : t.uc, 'b']]
+          .concat(src.slice(0, 3).filter(s => Math.abs(r[s.k]) > 0.5).map(s => [s.name, money(r[s.k]), cashDetail ? s.color : null, 'sub']))
+          .concat([['Affiliate revenue', money(r.aff), t.closed], ['Future refunds paid out', money(r.refund), t.neg], ['Net this month', money(r.net), null, 'b'], ['Running total', money(r.cum)]]));
       } }),
       xAxis: { type: 'category', data: MM.map(r => mLab(r.k)), axisLine: { onZero: true, lineStyle: { color: t.axis } }, axisTick: { show: false }, axisLabel: { color: t.label, fontSize: 12, interval: narrow ? 'auto' : 0 } },
       yAxis: S.valAxis(t, { axisLabel: { color: t.label, fontSize: 12, formatter: v => short(v) } }),
-      series: src.map(s => ({ name: s.name, type: 'bar', stack: 'c', barMaxWidth: 52,
+      series: ser.map(s => ({ name: s.name, type: 'bar', stack: 'c', barMaxWidth: 56,
         data: MM.map(r => ({ value: Math.round(r[s.k]), itemStyle: { borderRadius: s.k === 'refund' ? [0, 0, 4, 4] : topKey(r) === s.k ? [4, 4, 0, 0] : 0 } })),
         itemStyle: { color: s.color, borderColor: t.surface, borderWidth: 1 }, emphasis: { focus: 'series' } }))
-        .concat([{ name: 'Net', type: 'line', data: MM.map(r => Math.round(r.net)), symbol: 'circle', symbolSize: 8, lineStyle: { color: t.ink, width: 2 }, itemStyle: { color: t.ink, borderColor: t.surface, borderWidth: 2 }, z: 5 }]),
+        .concat([{ name: 'Net', type: 'line', data: MM.map(r => Math.round(r.net)), symbol: 'circle', symbolSize: 8, z: 5,
+          lineStyle: { color: t.ink, width: 2 }, itemStyle: { color: t.ink, borderColor: t.surface, borderWidth: 2 },
+          label: { show: true, position: 'top', distance: 9, formatter: p => short(p.value), color: t.ink, fontSize: 12, fontWeight: 700, fontFamily: FAM,
+            backgroundColor: t.surface, borderColor: t.line, borderWidth: 1, borderRadius: 6, padding: [2, 6] } }]),
     });
   });
+  function cashLegend() {
+    const t = tok(), srcs = SRC(t), LGC = ['var(--uc)', 'var(--wait)', 'var(--sales)', 'var(--closed)', 'var(--neg)'];
+    const lgi = (s, i) => `<span><i style="background:${LGC[i]}"></i>${s.name}</span>`;
+    const btn = $('b-detail'); btn.setAttribute('aria-pressed', String(cashDetail)); btn.textContent = cashDetail ? 'Hide client groups' : 'Split by client group';
+    $('lg-cash').innerHTML = (cashDetail
+      ? `<span class="lg-g"><span class="lg-h">Service collections</span>${srcs.slice(0, 3).map(lgi).join('')}</span>${srcs.slice(3).map((s, i) => lgi(s, i + 3)).join('')}`
+      : `<span><i style="background:var(--uc)"></i>Service collections</span><span><i style="background:var(--closed)"></i>Affiliate revenue</span><span><i style="background:var(--neg)"></i>Future refunds paid out</span>`)
+      + `<span><i class="ln" style="background:var(--ink)"></i>Net (cash in minus refunds)</span>`;
+    $('f-cash').textContent = cashDetail
+      ? 'Service collections split by client group. Each bar is one month’s cash, not a running total. The line is the month’s net (cash in minus refunds), not extra cash.'
+      : 'Each bar is one month’s cash, not a running total. Blue and green bars are cash in; red is refunds paid out. The line is the month’s net (cash in minus refunds), not extra cash.';
+  }
 
   /* ------------------------------------------------------------------ refunds by source */
   const RSRC = t => [
@@ -474,7 +541,7 @@
     opt = opt || {};
     const sortable = opt.sortable !== false, so = SORT[id] || (SORT[id] = { k: null, dir: -1 });
     let body = rows.slice();
-    if (sortable && so.k) {
+    if (sortable && so.k && cols.some(x => x.k === so.k)) {
       const c = cols.find(x => x.k === so.k), v = r => (c.sv ? c.sv(r) : r[c.k]);
       body = body.filter(r => !r._group).sort((a, b) => { const va = v(a), vb = v(b); return (va > vb ? 1 : va < vb ? -1 : 0) * so.dir; });
     }
@@ -510,13 +577,14 @@
     ], rows, { sortable: false, cls: 'steps', caption: 'From the balance still owed on contracts to net expected cash, step by step' });
   }
   function cashTable() {
-    const rows = MM.map(r => ({ k: r.k, month: mMid(r.k) + (r.k === mKey(0) ? ' (from ' + dShort(1) + ')' : ''), service: r.service, aff: r.aff, refund: r.refund, net: r.net, cum: r.cum }));
+    const rows = MM.map(r => ({ k: r.k, month: mMid(r.k) + (r.k === mKey(0) ? ' (from ' + dShort(1) + ')' : ''), service: r.service, fixed: r.fixed, noprop: r.noprop, paused: r.paused, aff: r.aff, refund: r.refund, net: r.net, cum: r.cum }));
     const mcol = (k, label, extra) => Object.assign({ k, label, num: true, fmt: cellM, title: r => money(r[k]) }, extra);
+    const grp = cashDetail ? [mcol('fixed', 'Under contract / scheduled', { cls: 'dim', hcls: 'dim' }), mcol('noprop', 'Still searching', { cls: 'dim', hcls: 'dim' }), mcol('paused', 'Paused, resuming', { cls: 'dim', hcls: 'dim' })] : [];
     dataTable($('t-cash'), 'cash', [
       { k: 'month', label: 'Month', sv: r => r.k },
-      mcol('service', 'Service collections'), mcol('aff', 'Affiliate revenue'), mcol('refund', 'Refunds'),
-      mcol('net', 'Net cash', { cls: 'strong' }), mcol('cum', 'Cumulative net cash'),
-    ], rows, { total: { month: 'Total', service: M.tot.service, aff: M.tot.aff, refund: M.tot.refund, net: M.tot.net, cum: M.tot.net }, caption: 'Expected cash flow by month' });
+      mcol('service', 'Service collections')].concat(grp, [mcol('aff', 'Affiliate revenue'), mcol('refund', 'Future refunds'),
+      mcol('net', 'Net cash', { cls: 'strong' }), mcol('cum', 'Running total')]),
+    rows, { total: { month: 'Total', service: M.tot.service, fixed: M.tot.fixed, noprop: M.tot.noprop, paused: M.tot.paused, aff: M.tot.aff, refund: M.tot.refund, net: M.tot.net, cum: M.tot.net }, caption: 'Expected cash flow by month' });
   }
   function refTable() {
     const src = RSRC(tok()), months = refRows();
@@ -613,6 +681,13 @@
     if (table) VIEWS[id].table(); else VIEWS[id].chart().draw();
   }));
 
+  $('p-cash').addEventListener('click', e => {
+    if (!e.target.closest('#b-detail')) return;
+    cashDetail = !cashDetail; cashLegend();
+    if (isTable('cash')) cashTable(); else cashChart.draw();
+    $('b-detail').focus();
+  });
+
   /* ------------------------------------------------------------------ render */
   function render() {
     M = model(st); MM = monthly(M);
@@ -643,8 +718,7 @@
     $('lg-bridge').innerHTML = `<span><i style="background:var(--total)"></i>Total</span><span><i style="background:var(--closed)"></i>Adds cash</span><span><i style="background:var(--neg)"></i>Reduces cash</span><span><i class="band"></i>Shaded: grouped steps</span>`;
     const half = M.cum.findIndex(v => v >= M.tot.net / 2), peak = MM.reduce((a, r) => (r.net > a.net ? r : a), MM[0] || { net: 0, k: mKey(1) });
     $('s-cash').textContent = `Half of the net arrives by ${dLong(Math.max(half, 1))} · biggest month: ${mFull(peak.k)} (${short(peak.net)} net)`;
-    const LGC = ['var(--uc)', 'var(--wait)', 'var(--sales)', 'var(--closed)', 'var(--neg)'], lgi = (s, i) => `<span><i style="background:${LGC[i]}"></i>${s.name}</span>`, srcs = SRC(tok());
-    $('lg-cash').innerHTML = `<span class="lg-g"><span class="lg-h">Service collections</span>${srcs.slice(0, 3).map(lgi).join('')}</span>${srcs.slice(3).map((s, i) => lgi(s, i + 3)).join('')}<span><i class="ln" style="background:var(--ink)"></i>Net</span>`;
+    cashLegend();
     const refShare = M.tot.refund ? M.tot.refPA / M.tot.refund : 0, noRefunds = Math.abs(M.tot.refund) < 0.5;
     $('s-ref').textContent = noRefunds ? 'No future refunds at a 0% refund size' : `${short(M.tot.refund)} in total · ${pct(st.s)} of the upfront payment returned · ${pct(refShare)} from paused and Additional Service clients`;
     $('lg-ref').innerHTML = RSRC(tok()).map(s => `<span><i style="background:${s.css}"></i>${s.name}<b>${cellM(M.tot[s.k])}</b><em>${M.tot.refund ? pct(M.tot[s.k] / M.tot.refund) : ''}</em></span>`).join('');

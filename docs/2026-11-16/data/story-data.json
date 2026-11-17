@@ -2614,6 +2614,14 @@
    "n": 0,
    "outstanding": 0.0
   },
+  "recent_closed": {
+   "n": 50,
+   "from": "2026-10-18",
+   "to": "2026-11-16",
+   "by_group": {
+    "closed": 50
+   }
+  },
   "resolution": {
    "own_jira": 5,
    "duplicate": 7,
@@ -3813,7 +3821,7 @@
   "snapshots": {
    "reporting_layer": "2026-11-16"
   },
-  "built_at": "2026-11-17 06:22",
+  "built_at": "2026-11-17 20:00",
   "chapters": [
    "journey",
    "outcomes",
@@ -4457,6 +4465,19 @@
    "check": "Cash forecast: processed refunds are not in the future cash flow",
    "page": true,
    "explorer": true,
+   "ok": true,
+   "hard": true
+  },
+  {
+   "check": "Cash forecast: closings in the last 30 days are dated inside the window and sit in no more deals than were closed",
+   "page": [
+    true,
+    true
+   ],
+   "explorer": [
+    true,
+    true
+   ],
    "ok": true,
    "hard": true
   }

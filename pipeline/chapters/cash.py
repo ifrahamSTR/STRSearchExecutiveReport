@@ -340,6 +340,12 @@ def build(ctx: C.Ctx) -> dict:
         "recorded_year": {"realtor": round(float(c26.agent_pref.mean()), 3), "lender": round(float(c26.lender_pref.mean()), 3), "cribs": round(float(c26.cribs.mean()), 3)},
         "year_label": str(asof.year), "year_n": int(len(c26)),
     }
+    # ---- client landscape: deals whose source closing date falls in the 30 days ending on the reporting date (inclusive).
+    # Not a pipeline stage: these are a subset of completed closings. Probable duplicates are never counted.
+    win0 = asof - pd.Timedelta(days=30)
+    rec = e[done & (e.closed_raw > win0) & ~e.g.eq("duplicate")]
+    recent_closed = {"n": int(len(rec)), "from": (win0 + pd.Timedelta(days=1)).strftime("%Y-%m-%d"), "to": asof.strftime("%Y-%m-%d"),
+                     "by_group": {k: int(v) for k, v in rec.g.value_counts().items()}}
     lag = H["refund_lag"]
     return {
         "asof": asof.strftime("%Y-%m-%d"), "horizon": HORIZON,
@@ -347,6 +353,7 @@ def build(ctx: C.Ctx) -> dict:
                  "assumed_collected": round(float(view.gross_assumed_cash_collected.sum()), 2), "paid_in_full": int(view.payment_type_normalized.eq("Paid In Full").sum()),
                  "payment_recorded": int(e.payment_recorded.notna().sum()), "scheduled_counted_collected": round(float(e.loc[e.g.eq("scheduled"), "second"].sum()), 2)},
         "groups": groups, "other": {"n": int(len(other)), "outstanding": round(float(other.out.sum()), 2)},
+        "recent_closed": recent_closed,
         "resolution": {**rc, "unverified_none_2026": int((nu.won_date.dt.year == asof.year).sum()), "unverified_none_2024": int((nu.won_date.dt.year == 2024).sum())},
         "fixed": {"svc": [round(v, 2) for v in svc_d[:last + 1]], "refund_base": [round(v, 2) for v in ref_d[:last + 1]],
                   "known": {a: [round(v, 4) for v in known_d[a][:last + 1]] for a in AFFILIATES},

@@ -116,6 +116,9 @@ def checks(ctx: C.Ctx, data: dict) -> list[dict]:
     chk("Cash forecast: expected refund base never exceeds what refunding clients paid", cf["noprop"]["refund_base"] <= cf["noprop"]["paid"] and round(sum(cf["fixed"]["refund_base"])) <= round(g["under_contract"]["paid"] + g["scheduled"]["paid"]), True)
     chk("Cash forecast: timing spread is a distribution", abs(sum(w for _, w in cf["spread"]) - 1) < 1e-4, True)
     chk("Cash forecast: processed refunds are not in the future cash flow", g["refunded"]["n"] > 0 and "refunded" not in ("under_contract", "scheduled", "noprop", "paused"), True)
+    rc = cf["recent_closed"]
+    chk("Cash forecast: closings in the last 30 days are dated inside the window and sit in no more deals than were closed",
+        (rc["n"] == sum(rc["by_group"].values()), 0 < rc["n"] <= g["closed"]["n"] + g["refunded"]["n"] + g["scheduled"]["n"] + g["unverified_closing"]["n"] and rc["to"] == cf["asof"]), (True, True))
     return out
 
 
