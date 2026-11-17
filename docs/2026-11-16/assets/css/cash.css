@@ -106,3 +106,5 @@ details.cf-notes[open] > summary::after { content: "Hide"; }
 .cf-t.scen th { white-space: normal; }
 .two { grid-template-columns: minmax(0, 1fr) minmax(0, 1.15fr); }
 @media (max-width: 1180px) { .two { grid-template-columns: minmax(0, 1fr); } }
+.chart-bridge { height: 410px; }
+.cf-t td:not(:first-child):not(.rule) { white-space: nowrap; }

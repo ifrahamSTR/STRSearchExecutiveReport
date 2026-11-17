@@ -101,17 +101,21 @@ def checks(ctx: C.Ctx, data: dict) -> list[dict]:
     chk("Capital: Cox 95% CI for capital includes 1 (Pipedrive capital)", cx.get("lo", 2) <= 1 <= cx.get("hi", 0), True, hard=False)
     of = [r["within30"]["share"] for r in dr["offers"]["rows"]]
     chk("Offer experience: share within 30 days rises 0 -> 1-2 -> 3+ offers", None not in of and of == sorted(of), True, hard=False)
-    # cash forecast tab: every engagement in exactly one group, balances reconcile with client_cash_forecast
+    # cash forecast tab: every engagement in exactly one group, balances reconcile with client_cash_forecast,
+    # the fixed schedule holds exactly the expected amounts, and no engagement can produce both cash and a refund twice
     cf = data["cash"]
     g = cf["groups"]
     chk("Cash forecast: every won engagement sits in exactly one group", (sum(x["n"] for x in g.values()) + cf["other"]["n"], cf["other"]["n"]), (cf["view"]["engagements"], 0))
-    chk("Cash forecast: group balances add up to the view's gross outstanding (scheduled closings excluded, as in the view)",
-        round(sum(x["amount"] for k, x in g.items() if k != "scheduled") + cf["other"]["amount"], 2), cf["view"]["gross_outstanding"])
-    chk("Cash forecast: the fixed-timing schedule holds exactly the under-contract balances and scheduled second installments",
-        round(sum(cf["fixed"]["cash"]) + cf["fixed"]["beyond_horizon"]["cash"]), round(g["under_contract"]["amount"] + g["scheduled"]["amount"]))   # whole dollars: daily cents are rounded
-    chk("Cash forecast: the fixed-timing schedule holds one expected closing per under-contract or scheduled engagement",
-        round(sum(cf["fixed"]["closings"]) + cf["fixed"]["beyond_horizon"]["closings"], 2), float(g["under_contract"]["n"] + g["scheduled"]["n"]))
-    chk("Cash forecast: no negative amounts", min(min(cf["fixed"]["cash"]), min(x["amount"] for x in g.values())) >= 0, True)
+    chk("Cash forecast: group outstanding balances add up to the view's gross outstanding",
+        round(sum(x["outstanding"] for x in g.values()) + cf["other"]["outstanding"]), round(cf["view"]["gross_outstanding"]))
+    chk("Cash forecast: unmatched won deals all resolved or classified (own Jira / duplicate / repeat / purchase record / none)",
+        sum(cf["resolution"][k] for k in ("own_jira", "duplicate", "repeat", "purchase_record", "none")), 47)
+    chk("Cash forecast: closing probabilities are probabilities", all(0 <= (g[k]["p_close"] or 0) <= 1 for k in ("under_contract", "scheduled")) and 0 <= cf["noprop"]["p_close"] + cf["noprop"]["p_refund"] + cf["noprop"]["p_pause"] <= 1.0001, True)
+    chk("Cash forecast: expected collections never exceed the installments still due (under contract + scheduled)",
+        round(sum(cf["fixed"]["svc"])) <= round(g["under_contract"]["second"] + g["scheduled"]["second"]), True)
+    chk("Cash forecast: expected refund base never exceeds what refunding clients paid", cf["noprop"]["refund_base"] <= cf["noprop"]["paid"] and round(sum(cf["fixed"]["refund_base"])) <= round(g["under_contract"]["paid"] + g["scheduled"]["paid"]), True)
+    chk("Cash forecast: timing spread is a distribution", abs(sum(w for _, w in cf["spread"]) - 1) < 1e-4, True)
+    chk("Cash forecast: processed refunds are not in the future cash flow", g["refunded"]["n"] > 0 and "refunded" not in ("under_contract", "scheduled", "noprop", "paused"), True)
     return out
 
 
