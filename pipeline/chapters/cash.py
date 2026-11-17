@@ -15,13 +15,13 @@ Every won engagement lands in exactly one group:
                       the same number of days (close / refund / pause), timed by the dashboard's expected-days slider
                       with the historical UC -> CLOSED spread around it
   paused              paused or additional service: a slider share proceeds (collect), the rest refunds
-  refunded            refund already processed (Jira status): nothing further; amounts are not recorded
+  refunded            marked Refunded in Jira: refund assumed already paid back (historical); no future flows
   closed              closing recorded on or before the reporting date (incl. dates found in affiliate records):
                       2nd installment assumed collected at closing, as the reporting layer models it
   unverified_*        balances the data cannot resolve (shown with the missing information, not forecast)
   duplicate           same client, same won date and same value as a Jira-linked won deal: not counted twice
-Refund outflows = refunding clients x refundable share (dashboard slider) x amount already paid (first installment for
-Split Pay, the full price for Paid In Full). Affiliate revenue uses each client's recorded partner choice where Jira has
+Projected refunds (future only) = clients assumed to refund x refund-size slider x upfront payment (first installment for
+Split Pay, the full price for Paid In Full); their unpaid second installment is not collected. Affiliate revenue uses each client's recorded partner choice where Jira has
 one (preferred = earns, other / cash / turnkey = does not) and the conversion slider only where it has none.
 """
 from __future__ import annotations
@@ -41,7 +41,7 @@ HORIZON = 420
 EXPECTED_DAYS_MAX = 77                 # agreed default maximum of the expected-days slider (pessimistic case)
 EXPECTED_DAYS = 57                     # default slider position: halfway between optimistic (day 37) and 77
 PAUSED_PROCEED = 0.5
-REFUNDABLE_SHARE = 1.0                 # default: full refund of what was paid (upper bound; no refund terms in the data)
+REFUNDABLE_SHARE = 1.0                 # default refund size for FUTURE refunds: share of the upfront payment returned (slider 0-100%)
 AFFILIATES = {"realtor": {"label": "Realtor", "conv": 0.93, "rev": 4000},
               "lender": {"label": "Lender", "conv": 0.70, "rev": 1400},
               "cribs": {"label": "STR Cribs", "conv": 0.70, "rev": 2500}}

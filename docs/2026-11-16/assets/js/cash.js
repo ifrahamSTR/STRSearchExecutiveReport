@@ -101,9 +101,9 @@
         </div>
         <div class="ctl">
           <h3><i style="background:var(--sales-2);outline:1.5px solid var(--sales)"></i>Refunds</h3>
-          <div class="range"><div class="range-top"><label for="r-s">Refunded share of payments already received</label><output id="o-s" for="r-s"></output></div>
-            <input type="range" id="r-s" min="0" max="100" step="5" style="--c:var(--sales)"><div class="range-ends"><span>0%</span><span>100% (full refund)</span></div></div>
-          <p class="hint">Applies to the first Split Pay installment (or the full Paid In Full price) of every client expected to refund. The data holds no refund amounts or refund terms, so 100% is an upper bound, not a recorded liability.</p>
+          <div class="range"><div class="range-top"><label for="r-s">Refund size: share of the upfront payment returned</label><output id="o-s" for="r-s"></output></div>
+            <input type="range" id="r-s" min="0" max="100" step="5" style="--c:var(--sales)"><div class="range-ends"><span>0% · none returned</span><span>100% · all returned</span></div></div>
+          <p class="hint">Future refunds only: paused or additional-service clients who don’t proceed, and clients expected to refund. Upfront payment = the first Split Pay installment, or the full Paid In Full price. Their unpaid second installment is not collected. Clients already marked Refunded in Jira were refunded in the past and are not part of the forecast.</p>
         </div>
         <div class="ctl">
           <h3><i style="background:var(--closed)"></i>Affiliate revenue</h3>
@@ -133,7 +133,7 @@
           <section class="panel" aria-labelledby="h-bridge">
             <div class="panel-head"><h2 id="h-bridge">From contractual balance to net cash</h2></div>
             <div class="chart chart-bridge" id="c-bridge" role="img" aria-label="Bridge from the outstanding contractual balance to net expected cash flow"></div>
-            <p class="foot">Each dollar is counted once: processed refunds and unresolved records are set aside, then expected non-completion and refunds come off; affiliate revenue is added per expected closing.</p>
+            <p class="foot">Each dollar is counted once: historical refunds and unresolved records are set aside, expected non-completion and projected refunds come off, and affiliate revenue is added per expected closing.</p>
           </section>
           <section class="panel" aria-labelledby="h-scen">
             <div class="panel-head"><h2 id="h-scen">Scenario comparison</h2><p class="sub">Cumulative net cash flow</p></div>
@@ -146,7 +146,7 @@
           <div class="panel-head"><h2 id="h-groups">Every won engagement, reconciled</h2><p class="sub">Each engagement belongs to exactly one row · contractual balance from client_cash_forecast</p></div>
           <div class="tw"><table class="cf-t" id="t-groups"></table></div>
         </section>
-        <details class="cf-notes" id="notes"><summary>Every assumption, reconciliation and data limitation</summary><div class="notes-body" id="notes-body"></div></details>
+        <details class="cf-notes" id="notes"><summary>Assumptions &amp; Methodology</summary><div class="notes-body" id="notes-body"></div></details>
       </div>
     </div>
     <p class="cf-foot">Aggregates only: no client names, ids or individual amounts are published. Sources: the Business Data Explorer’s 16 Nov 2026 foundation, the 12 Nov 2026 Jira, Pipedrive and affiliate-tracking extracts, and both onboarding-form sheets.</p>`;
@@ -179,7 +179,7 @@
     { k: 'noprop', name: 'No property yet', color: t.wait },
     { k: 'paused', name: 'Paused & Additional Service', color: t.sales },
     { k: 'aff', name: 'Affiliate revenue', color: t.closed },
-    { k: 'refund', name: 'Expected refunds', color: t.sales2 },
+    { k: 'refund', name: 'Projected refunds', color: t.sales2 },
   ];
   let M = model(st), MM = monthly(M);
   const tipBox = (t, title, rows, foot) => `<div style="min-width:230px"><b>${title}</b>${rows.map(r => `<div style="display:flex;justify-content:space-between;gap:16px;margin-top:3px"><span><i style="display:inline-block;width:9px;height:9px;border-radius:3px;margin-right:6px;background:${r[2] || 'transparent'}"></i>${r[0]}</span><b>${r[1]}</b></div>`).join('')}${foot ? `<div style="margin-top:6px;color:${t.muted};font-size:12px">${foot}</div>` : ''}</div>`;
@@ -204,7 +204,7 @@
     const fixedDue = G.under_contract.second + G.scheduled.second;
     return [
       { n: 'Outstanding contractual balance', v: contractual, kind: 'total', tip: `Client_cash_forecast outstanding (${money(C.view.gross_outstanding)}) plus ${money(sched)} for ${G.scheduled.n} closings scheduled after ${S.date(C.asof)}, which the view already counts as collected.` },
-      { n: 'Refund already processed', v: -G.refunded.outstanding, tip: `${S.int(G.refunded.n)} engagements with a processed refund (Jira status): their second installment will not be collected.` },
+      { n: 'Already refunded (historical)', v: -G.refunded.outstanding, tip: `${S.int(G.refunded.n)} engagements marked Refunded in Jira: the refund is assumed already paid back, and their unpaid second installment is not collectible. Nothing here enters future cash flow.` },
       { n: 'Unresolved records (not forecast)', v: -unverified, tip: `${S.int(G.unverified_closing.n + G.unverified_repeat.n + G.unverified_none.n)} engagements the data cannot resolve; see the table for the missing information.` },
       { n: 'Probable duplicate deals', v: -G.duplicate.outstanding, tip: `${S.int(G.duplicate.n)} won deals with the same client, won date and value as a Jira-linked deal: not counted twice.` },
       { n: 'Closing found in affiliate records', v: -G.closed.outstanding, tip: `${S.int(G.closed.evidenced)} engagements whose closing is evidenced in brokerage, lender or affiliate records: second installment assumed collected at closing, like every recorded closing.` },
@@ -212,7 +212,7 @@
       { n: 'Paused / AS not proceeding', v: -(1 - st.p) * PA.second, tip: `${pct(1 - st.p)} of ${S.int(PA.n)} paused or additional-service engagements assumed to refund.` },
       { n: 'Expected service collections', v: M.tot.service, kind: 'sub', tip: 'Second installments expected to be collected.' },
       { n: 'Affiliate revenue', v: M.tot.aff, tip: 'Recorded preferred partners plus conversion × revenue where no choice is recorded, for every expected closing.' },
-      { n: 'Expected refunds', v: M.tot.refund, tip: `${pct(st.s)} of payments already received by clients expected to refund.` },
+      { n: 'Projected refunds', v: M.tot.refund, tip: `Future refunds only: ${pct(st.s)} of the upfront payment of clients expected to refund.` },
       { n: 'Net expected cash flow', v: M.tot.net, kind: 'total', tip: 'Service collections + affiliate revenue − refunds.' },
     ];
   }
@@ -225,7 +225,7 @@
       else if (s.v < 0) { run += s.v; base.push(run); val.push(-s.v); }
       else { base.push(run); val.push(s.v); run += s.v; }
     });
-    const color = s => s.kind === 'total' ? t.acq : s.kind === 'sub' ? t.uc : s.n === 'Expected refunds' ? t.sales : s.v < 0 ? t.hold : t.closed;
+    const color = s => s.kind === 'total' ? t.acq : s.kind === 'sub' ? t.uc : s.n === 'Projected refunds' ? t.sales : s.v < 0 ? t.hold : t.closed;
     return Object.assign(S.base(t), {
       grid: { left: 8, right: 64, top: 6, bottom: 4, containLabel: true },
       tooltip: Object.assign(S.base(t).tooltip, { trigger: 'item', formatter: p => { const s = steps[p.dataIndex]; return tipBox(t, s.n, [[s.v < 0 ? 'Less' : 'Amount', money(Math.abs(s.v)), color(s)]], s.tip); } }),
@@ -268,7 +268,7 @@
     $('o-dmax').textContent = st.max + ' days (pessimistic)';
     $('o-max').textContent = st.max + ' days';
     $('o-p').textContent = pct(st.p);
-    $('o-p-hint').textContent = `${S.int(PA.paused_n)} paused and ${S.int(PA.additional_n)} additional-service engagements. Those who proceed pay the second installment (${short(st.p * PA.second)}); those who don’t are expected to refund what they paid (${short((1 - st.p) * PA.paid * st.s)} at the refund setting below).`;
+    $('o-p-hint').textContent = `${S.int(PA.paused_n)} paused and ${S.int(PA.additional_n)} additional-service engagements. Those who proceed pay their second installment (${short(st.p * PA.second)}); those who don’t are refunded ${pct(st.s)} of their upfront payment, which is paid back and subtracted from net cash flow (−${short((1 - st.p) * PA.paid * st.s)}), and their second installment is not collected.`;
     $('o-s').textContent = pct(st.s);
     AFF.forEach(k => {
       $('o-' + k + '-c').textContent = pct(st.aff[k].conv); $('o-' + k + '-r').textContent = money(st.aff[k].rev);
@@ -283,7 +283,7 @@
       { cls: 'hero', l: 'Net expected future cash flow', v: short(M.tot.net), s: `${short(M.tot.service + M.tot.aff)} in, ${short(-M.tot.refund)} out · ${short(M.within(lastMonthEnd(2)))} by ${dLong(lastMonthEnd(2))}` },
       { l: 'Expected service collections', c: 'var(--uc)', v: short(M.tot.service), s: `Second installments, ${pct(M.tot.service / contractual)} of the ${short(contractual)} contractual balance` },
       { l: 'Expected affiliate collections', c: 'var(--closed)', v: short(M.tot.aff), s: 'Realtor, lender and STR Cribs fees on expected closings' },
-      { l: 'Projected refund outflows', c: 'var(--sales)', v: short(M.tot.refund), s: `${pct(st.s)} of what refunding clients paid · estimate, not a recorded liability` },
+      { l: 'Projected refund outflows', c: 'var(--sales)', v: short(M.tot.refund), s: `Future refunds only · ${pct(st.s)} of the upfront payment returned` },
     ].map(k => `<div class="kpi ${k.cls || ''}"><div class="l">${k.c ? `<i style="background:${k.c}"></i>` : ''}${k.l}</div><div class="v">${k.v}</div><div class="s">${k.s}</div></div>`).join('');
     const half = M.cum.findIndex(v => v >= M.tot.net / 2);
     $('s-cash').textContent = `Half of the net by ${dLong(Math.max(half, 1))} · ${short(unverified + G.duplicate.outstanding)} in unresolved or duplicate records is not included`;
@@ -298,8 +298,8 @@
       ['under_contract', t.uc, XU.svc, -st.s * XU.refund_base, affValue(XU.aff, st), `Closing probability ${pct(G.under_contract.p_close)} (past clients who had waited as long); timed by the remaining historical UC → CLOSED durations (${S.int(H0.uc_to_close.n)} closings, median ${H0.uc_to_close.median} days)`],
       ['scheduled', t.uc, XS.svc, -st.s * XS.refund_base, affValue(XS.aff, st), `Collected on the scheduled date (to ${S.date(C.notes.scheduled_dates_to)}) with probability ${pct(G.scheduled.p_close)}; the view already counts these ${short(C.view.scheduled_counted_collected)} as collected`],
       ['noprop', t.wait, M.tot.noprop, -st.s * NP.refund_base, affValue(NP.aff, st), `${S.int(NP.hunting)} hunting + ${S.int(NP.not_started)} won but not started · past clients at the same stage: ${pct(NP.p_close)} closed, ${pct(NP.p_refund)} refunded, ${pct(NP.p_pause)} paused or still searching`],
-      ['paused', t.sales, M.tot.paused, -st.s * (1 - st.p) * PA.paid, st.p * affValue(PA.aff, st), `${pct(st.p)} proceed and pay the second installment; ${pct(1 - st.p)} refund ${pct(st.s)} of what they paid`],
-      ['refunded', null, 0, 0, 0, 'Refund already processed (Jira status); refund amounts are not recorded, so nothing is counted again'],
+      ['paused', t.sales, M.tot.paused, -st.s * (1 - st.p) * PA.paid, st.p * affValue(PA.aff, st), `${pct(st.p)} proceed and pay the second installment; ${pct(1 - st.p)} are refunded ${pct(st.s)} of their upfront payment, paid back and subtracted (their second installment is not collected)`],
+      ['refunded', null, 0, 0, 0, 'Marked Refunded in Jira: refund assumed already paid back (historical); no future collection or outflow'],
       ['closed', null, 0, 0, 0, `Second installment assumed collected at the recorded closing (incl. ${S.int(G.closed.evidenced)} closings found in affiliate or brokerage records)`],
       ['unverified_closing', null, 0, 0, 0, 'Missing: closing date or payment record. Post-close Jira status but no closing in any source'],
       ['unverified_repeat', null, 0, 0, 0, 'Missing: a Jira issue for this purchase. The client’s only issue tracks their other won deal'],
@@ -322,6 +322,14 @@
   const R = C.resolution, MS = H0.mature_starts;
   const item = (tag, html) => `<li><span class="tag ${tag}">${{ h: 'Historical', a: 'Assumption', l: 'Limitation', r: 'Reconciled' }[tag]}</span><span>${html}</span></li>`;
   $('notes-body').innerHTML = `
+    <h3>Refunds</h3><ul>
+      ${item('a', `Clients marked Refunded in Jira (${S.int(G.refunded.n)}) have already been paid back. These are completed, historical refunds: they are not future cash outflows, and their unpaid second installments are not collectible.`)}
+      ${item('a', `Paused and Additional Service clients: by default ${pct(DEF.paused_proceed)} eventually proceed and pay their second installment, and ${pct(1 - DEF.paused_proceed)} are refunded (adjustable). For those refunded, the refunded amount is paid back to the client and subtracted from the forecast as a cash outflow.`)}
+      ${item('a', `Clients without a property are refunded at the historical rate for their stage (${pct(C.noprop.p_refund)} on average); under-contract clients who do not close are refunded at the historical rate (${pct(H0.uc_fail_refund)} of those who did not close).`)}
+      ${item('a', `The refund-size slider (0–100%, default ${pct(DEF.refundable_share)}) sets how much of the previously collected upfront payment is returned, for future refunds only: 0% returns no upfront money, 100% returns all of it. The upfront payment is the first Split Pay installment, or the full price for Paid In Full.`)}
+      ${item('a', `For every client assumed to refund, the remaining unpaid installment is not collected.`)}
+      ${item('a', `Historical refunds, projected refunds and expected collections are kept separate: a client contributes to at most one of them, and projected refunds are timed with the same expected-days spread as collections.`)}
+    </ul>
     <h3>Reconciliation</h3><ul>
       ${item('r', `Every one of the ${S.int(C.view.engagements)} won engagements sits in exactly one row of the table above, and the rows add up to client_cash_forecast’s outstanding balance (${money(C.view.gross_outstanding)}) plus ${money(C.view.scheduled_counted_collected)} for scheduled closings.`)}
       ${item('r', `The 47 won deals without a Jira match were checked against the Jira key typed in Pipedrive, client e-mails in the 12 Nov Jira and Pipedrive extracts, both onboarding-form sheets, and the brokerage and lender closing records: ${R.own_jira} match their own Jira issue (now grouped by its status), ${R.purchase_record} have a closing record, ${R.duplicate} are probable duplicates of a Jira-linked deal, ${R.repeat} are repeat purchases whose client’s only Jira issue tracks the other deal, and ${R.none} have no record anywhere (${R.onboarded} of the 47 did complete an onboarding form).`)}
@@ -330,20 +338,20 @@
     <h3>What the data shows</h3><ul>
       ${item('h', `Under Contract → CLOSED: median ${H0.uc_to_close.median} days (middle half ${H0.uc_to_close.p25}–${H0.uc_to_close.p75}) across ${S.int(H0.uc_to_close.n)} closings; Passed Inspection → CLOSED median ${H0.pi_to_close.median} days. ${pct(H0.uc_close_rate)} of ${S.int(H0.uc_n)} past under-contract clients closed; the chance falls the longer a contract has run without closing. ${pct(H0.uc_fail_refund)} of those who did not close were refunded.`)}
       ${item('h', `Of ${S.int(MS.n)} confirmed starts with a year or more of history and a known outcome, ${pct(MS.shares.closed)} closed, ${pct(MS.shares.refunded)} refunded, ${pct(MS.shares.paused)} paused and ${pct(MS.shares.hunting)} are still searching; for clients still without a contract after N days the shares shift toward refund and pause, and each hunting client uses the shares for their own number of days.`)}
-      ${item('h', `Processed refunds: ${S.int(H0.processed_refunds.n)} engagements (Jira status), typically ${H0.refund_lag.median} days after the client start (90% within ${Math.round(H0.refund_lag.p90)} days). They are history, not future cash; amounts are not recorded (they had paid ${money(H0.processed_refunds.paid)} at most).`)}
+      ${item('h', `Historical refunds: ${S.int(H0.processed_refunds.n)} engagements are marked Refunded in Jira, typically ${H0.refund_lag.median} days after the client start (90% within ${Math.round(H0.refund_lag.p90)} days).`)}
       ${item('h', `Affiliate history: ${S.int(AF.realized.payments)} recorded affiliate payments since ${'Dec 2024'} total ${money(AF.realized.total)} (broker ${money(AF.realized.by_source.Broker.total)}, lender ${money(AF.realized.by_source.Lender.total)}, construction ${money(AF.realized.by_source.Construction.total)}). Median realtor referral fee ${money(AF.realtor.median_fee)} (${S.int(AF.realtor.received)} of ${S.int(AF.realtor.n)} received); median lender amount due ${money(AF.lender.median_due)}; typical STR Cribs fee ${money(AF.cribs.typical_fee)}. No affiliate fee is recorded as already received for any client still expected to close (realtor ${AF.future_clients_already_paid.realtor}, lender ${AF.future_clients_already_paid.lender}).`)}
     </ul>
     <h3>Assumptions (adjustable unless noted)</h3><ul>
       ${item('a', 'Payment rules from client_cash_forecast: Paid In Full is collected at the win; Split Pay collects 50% at the win and 50% at property closing. Only second installments are future collections.')}
       ${item('a', `Expected days until collection (default ${DEF.expected_days}, from ${OPT} to an adjustable maximum of ${DEF.expected_days_max}): applies to clients without a property and to paused clients who resume. Collections and their refunds spread around that day with the historical UC → CLOSED variation rather than landing on one date.`)}
       ${item('a', `Paused + Additional Service: default ${pct(DEF.paused_proceed)} proceed (second installment collected), the rest refund. The slider moves both the collections and the refunds.`)}
-      ${item('a', `Refund size: default ${pct(DEF.refundable_share)} of what a refunding client paid (first installment for Split Pay, full price for Paid In Full), the upper bound while refund terms are unknown. Refunds are timed with the same expected-days spread.`)}
+
       ${item('a', `Affiliates: a recorded preferred realtor, lender or STR Cribs choice earns the fee; a recorded other partner, cash purchase or turnkey home earns nothing; only unrecorded choices use the conversion sliders (defaults ${pct(DEF.affiliates.realtor.conv)} / ${pct(DEF.affiliates.lender.conv)} / ${pct(DEF.affiliates.cribs.conv)}). Revenue per conversion defaults ${money(DEF.affiliates.realtor.rev)} / ${money(DEF.affiliates.lender.rev)} / ${money(DEF.affiliates.cribs.rev)} are business assumptions; the recorded medians above are higher.`)}
     </ul>
-    <h3>Genuine limitations</h3><ul>
+    <h3>Data limitations</h3><ul>
       ${item('l', 'No payment transactions (QuickBooks, Stripe) are in any source: collected and outstanding amounts are contractual models, not receipts.')}
       ${item('l', `Payment type: blanks default to Split Pay and only ${S.int(C.view.payment_recorded)} of ${S.int(C.view.engagements)} won deals carry a recorded type, so outstanding balances may be overstated for clients who paid in full.`)}
-      ${item('l', `Refund amounts, refund dates as cash movements, and refund terms are not recorded anywhere (Pipedrive’s refund date field is empty; Jira holds only a status). The refund slider is therefore an assumption; ${money(unverified)} of unresolved and ${money(G.duplicate.outstanding)} of probable-duplicate balances stay outside the forecast until their records are found.`)}
+      ${item('l', `Refund amounts are not recorded in any source, so the size of future refunds is set by the refund-size slider. ${money(unverified)} of unresolved and ${money(G.duplicate.outstanding)} of probable-duplicate balances stay outside the forecast until their records are found.`)}
       ${item('l', `Affiliate payments: the lender tracker records no paid invoices, so whether funded lender commissions were collected is unknown; ${S.int(AF.lender.pipeline_unfunded)} lender files are still unfunded (pipeline).`)}
       ${item('l', 'Under Contract is the latest valid contract; earlier fall-throughs are not recorded, so the historical closing probability may be slightly optimistic.')}
     </ul>`;
