@@ -148,18 +148,19 @@
     ['unverified_repeat', 'Repeat purchase without its own Jira issue', 'The client’s only Jira issue tracks their other won deal, so this purchase has no progress record.'],
     ['unverified_none', 'Won deal without matching records', `No Jira issue, e-mail or purchase record was found for the deal (${S.int(R.unverified_none_2024)} won in 2024, ${S.int(R.unverified_none_2026)} in 2026).`],
   ];
+  const dupB = G.second_deal_review.outstanding;
   const uN = UNR.reduce((a, r) => a + G[r[0]].n, 0), uB = UNR.reduce((a, r) => a + G[r[0]].outstanding, 0);
   const bal = v => `<td class="n" title="${money(v)}">${short(v)}</td>`;
   const UNRES = `
         <details class="panel unres" id="p-unres">
           <summary><span class="u-t"><span class="kick">4 · What reduces it</span>Unresolved records<small>Set aside: not in the forecast until their records are found</small></span>
             <span class="u-v"><b>${S.int(uN)}</b> won deals · <b>${short(uB)}</b> still owed</span></summary>
-          <div class="tw"><table class="cf-t unr"><caption class="visually-hidden">Unresolved records kept out of the forecast, and probable duplicates</caption>
+          <div class="tw"><table class="cf-t unr"><caption class="visually-hidden">Unresolved records kept out of the forecast, and second deals under review</caption>
             <thead><tr><th scope="col">Category</th><th scope="col" class="n">Won deals</th><th scope="col" class="n">Balance still owed</th><th scope="col">Why it is excluded</th></tr></thead>
             <tbody>${UNR.map(([k, lab, why]) => `<tr><td>${lab}</td><td class="n">${S.int(G[k].n)}</td>${bal(G[k].outstanding)}<td class="rule">${why}</td></tr>`).join('')}
               <tr class="tot"><td>Unresolved total</td><td class="n">${S.int(uN)}</td>${bal(uB)}<td class="rule">Excluded from service collections, affiliate revenue and refunds.</td></tr>
               <tr class="grp"><th colspan="4" scope="rowgroup">Counted separately</th></tr>
-              <tr><td>Probable duplicates</td><td class="n">${S.int(G.duplicate.n)}</td>${bal(G.duplicate.outstanding)}<td class="rule">Same client, won date and value as another deal. Counted once; not yet reconciled one by one.</td></tr></tbody></table></div>
+              <tr><td>Second deals under review</td><td class="n">${S.int(G.second_deal_review.n)}</td>${bal(G.second_deal_review.outstanding)}<td class="rule">Same client, won date and value as another deal, won within seconds of it and recorded as a second deal, with no engagement of their own yet. Either a second search not yet started or a record entered twice; excluded until reviewed.</td></tr></tbody></table></div>
         </details>`;
   const main = document.getElementById('main');
   const RY = AF.recorded_year;
@@ -293,8 +294,8 @@
         tip: `${S.int(G.refunded.n)} won deals refunded in the past. Already paid back, so not future cash.` },
       { ax: 'Records we can’t verify', n: 'Records we can’t verify', v: -unverified,
         tip: `${S.int(nUnres)} won deals with missing records. Kept out of the forecast until found.` },
-      { ax: 'Duplicate deals', n: 'Duplicate deals', v: -G.duplicate.outstanding,
-        tip: `${S.int(G.duplicate.n)} deals that repeat another deal (same client, date and value). Counted once.` },
+      { ax: 'Second deals under review', n: 'Second deals under review', v: -dupB,
+        tip: `${S.int(G.second_deal_review.n)} second deals (same client, value and win moment as another deal). Kept out of the forecast until reviewed.` },
       { ax: 'Already collected', n: 'Already collected at closing', v: -G.closed.outstanding,
         tip: `${S.int(G.closed.evidenced)} closings found in brokerage, lender or affiliate records. Second installment collected.` },
       { ax: 'Not expected to close', n: 'Not expected to close', v: -((fixedDue - M.tot.fixed) + (NP.second - NP.collect)),
@@ -648,7 +649,7 @@
       ['unverified_closing', null, 0, 0, 0, 'Missing: closing date. Post-close Jira status but no closing in any source'],
       ['unverified_repeat', null, 0, 0, 0, 'Missing: a Jira issue for this purchase. The client’s only issue tracks their other won deal'],
       ['unverified_none', null, 0, 0, 0, `Missing: any Jira, e-mail or purchase record (${S.int(R.unverified_none_2024)} won in 2024, ${S.int(R.unverified_none_2026)} in 2026)`],
-      ['duplicate', null, 0, 0, 0, 'Same client, won date and value as a Jira-linked deal: counted once'],
+      ['second_deal_review', null, 0, 0, 0, 'Same client, won date and value as another deal, recorded as a second deal, with no engagement of its own: kept out of the forecast and flagged for review'],
     ];
     const T = { label: 'Total', n: 0, bal: 0, svc: 0, ref: 0, aff: 0 };
     const rows = spec.map(x => {
@@ -759,7 +760,7 @@
       card(`${U.median} days`, 'Typical Under Contract to closing', `Middle half ${U.p25}–${U.p75} days, across ${S.int(U.n)} closings.`),
       card('50 / 50', 'Split Pay', 'Half at the win, half at closing. Paid In Full is collected at the win, so only second installments are future cash.'),
       card(S.int(G.refunded.n), 'Clients already refunded', 'Paid back in the past: not future outflows, and their unpaid balance is not collected.'),
-      card(short(unverified + G.duplicate.outstanding), 'Set aside, not forecast', 'Unresolved or duplicate records stay out of the forecast until their records are found.'),
+      card(short(unverified + dupB), 'Set aside, not forecast', 'Unresolved records and second deals under review stay out of the forecast until resolved.'),
     ].join('');
   }
 
@@ -777,7 +778,7 @@
     </ul></div>
     <div class="nb"><h3>How the forecast is reconciled</h3><ul>
       ${li(`All ${S.int(C.view.engagements)} won deals sit in exactly one row of the table above, and the rows add up to the money still owed under contracts in the reporting layer’s cash forecast view (${money(C.view.gross_outstanding)}) plus ${money(C.view.scheduled_counted_collected)} for closings scheduled after the data date.`)}
-      ${li(`47 won deals had no Jira match. Each was checked against the Jira key typed in Pipedrive, client e-mails in the 12 Nov Jira and Pipedrive extracts, both onboarding-form sheets, and the brokerage and lender closing records: ${R.own_jira} match their own Jira issue (now grouped by its status), ${R.purchase_record} have a closing record, ${R.duplicate} are probable duplicates of another deal, ${R.repeat} are repeat purchases whose client’s only Jira issue tracks the other deal, and ${R.none} have no record anywhere (${R.onboarded} of the 47 completed an onboarding form).`)}
+      ${li(`47 won deals had no Jira match. Each was checked against the Jira key typed in Pipedrive (and, for second deals, Jira’s own deal-id field in the 12 Nov extract), client e-mails in the 12 Nov Jira and Pipedrive extracts, both onboarding-form sheets, and the brokerage and lender closing records: ${R.own_jira} match their own Jira issue (now grouped by its status), ${R.purchase_record} have a closing record, ${R.separate_purchase} is a separate purchase with its own Jira issue (now grouped by that status), ${R.second_deal_review} are second deals for a client who already has one (same value, won within seconds, recorded as a second deal) with no engagement of their own, so they stay out of the forecast under review, ${R.repeat} are repeat purchases whose client’s only Jira issue tracks the other deal, and ${R.none} have no record anywhere (${R.onboarded} of the 47 completed an onboarding form).`)}
       ${li(`${R.post_close_no_date} post-close won deals had no closing date. Checking affiliate, brokerage and lender records by property address found ${R.post_close_evidenced} closings; the rest stay unresolved.`)}
     </ul></div>
     <div class="nb"><h3>What history shows</h3><ul>
@@ -794,7 +795,7 @@
     </ul></div>
     <div class="nb"><h3>Data limitations</h3><ul>
       ${li(`Payment type: blanks default to Split Pay, and only ${S.int(C.view.payment_recorded)} of ${S.int(C.view.engagements)} won deals have a recorded type, so balances may be overstated for clients who paid in full.`)}
-      ${li(`${money(unverified)} of unresolved and ${money(G.duplicate.outstanding)} of probable-duplicate balances stay outside the forecast until their records are found.`)}
+      ${li(`${money(unverified)} of unresolved and ${money(dupB)} of second-deal balances under review stay outside the forecast.`)}
       ${li('Under Contract is the latest valid contract; earlier fall-throughs aren’t recorded, so the historical closing rate may be slightly optimistic.')}
     </ul></div>`;
 

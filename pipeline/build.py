@@ -108,8 +108,10 @@ def checks(ctx: C.Ctx, data: dict) -> list[dict]:
     chk("Cash forecast: every won engagement sits in exactly one group", (sum(x["n"] for x in g.values()) + cf["other"]["n"], cf["other"]["n"]), (cf["view"]["engagements"], 0))
     chk("Cash forecast: group outstanding balances add up to the view's gross outstanding",
         round(sum(x["outstanding"] for x in g.values()) + cf["other"]["outstanding"]), round(cf["view"]["gross_outstanding"]))
-    chk("Cash forecast: unmatched won deals all resolved or classified (own Jira / duplicate / repeat / purchase record / none)",
-        sum(cf["resolution"][k] for k in ("own_jira", "duplicate", "repeat", "purchase_record", "none")), 47)
+    chk("Cash forecast: unmatched won deals all resolved or classified (own Jira / separate purchase / second deal under review / repeat / purchase record / none)",
+        sum(cf["resolution"][k] for k in ("own_jira", "separate_purchase", "second_deal_review", "repeat", "purchase_record", "none")), 47)
+    chk("Cash forecast: the seven same-client, same-day, same-value second deals are each classified (separate purchase / under review)",
+        cf["resolution"]["separate_purchase"] + cf["resolution"]["second_deal_review"], 7)
     chk("Cash forecast: closing probabilities are probabilities", all(0 <= (g[k]["p_close"] or 0) <= 1 for k in ("under_contract", "scheduled")) and 0 <= cf["noprop"]["p_close"] + cf["noprop"]["p_refund"] + cf["noprop"]["p_pause"] <= 1.0001, True)
     chk("Cash forecast: expected collections never exceed the installments still due (under contract + scheduled)",
         round(sum(cf["fixed"]["svc"])) <= round(g["under_contract"]["second"] + g["scheduled"]["second"]), True)

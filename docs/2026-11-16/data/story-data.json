@@ -2553,11 +2553,11 @@
     "label": "No property yet"
    },
    "paused": {
-    "n": 112,
-    "split": 110,
-    "outstanding": 921150.0,
-    "second": 921150.0,
-    "paid": 966950.0,
+    "n": 113,
+    "split": 111,
+    "outstanding": 927900.0,
+    "second": 927900.0,
+    "paid": 973700.0,
     "label": "Paused / Additional Service"
    },
    "refunded": {
@@ -2601,13 +2601,13 @@
     "paid": 163200.0,
     "label": "No Jira or purchase record"
    },
-   "duplicate": {
-    "n": 7,
-    "split": 7,
-    "outstanding": 51750.0,
-    "second": 51750.0,
-    "paid": 51750.0,
-    "label": "Probable duplicate deal"
+   "second_deal_review": {
+    "n": 6,
+    "split": 6,
+    "outstanding": 45000.0,
+    "second": 45000.0,
+    "paid": 45000.0,
+    "label": "Second deal under review"
    }
   },
   "other": {
@@ -2624,7 +2624,8 @@
   },
   "resolution": {
    "own_jira": 5,
-   "duplicate": 7,
+   "separate_purchase": 1,
+   "second_deal_review": 6,
    "repeat": 9,
    "purchase_record": 2,
    "none": 24,
@@ -3435,24 +3436,24 @@
    "not_started": 10
   },
   "paused": {
-   "n": 112,
-   "second": 921150.0,
-   "paid": 966950.0,
+   "n": 113,
+   "second": 927900.0,
+   "paid": 973700.0,
    "aff": {
     "realtor": {
      "known": 22.0,
-     "unknown": 84.0
+     "unknown": 85.0
     },
     "lender": {
      "known": 17.0,
-     "unknown": 91.0
+     "unknown": 92.0
     },
     "cribs": {
      "known": 16.0,
-     "unknown": 94.0
+     "unknown": 95.0
     }
    },
-   "paused_n": 107,
+   "paused_n": 108,
    "additional_n": 5
   },
   "spread": [
@@ -3821,7 +3822,7 @@
   "snapshots": {
    "reporting_layer": "2026-11-16"
   },
-  "built_at": "2026-11-17 20:00",
+  "built_at": "2026-11-17 20:40",
   "chapters": [
    "journey",
    "outcomes",
@@ -4427,9 +4428,16 @@
    "hard": true
   },
   {
-   "check": "Cash forecast: unmatched won deals all resolved or classified (own Jira / duplicate / repeat / purchase record / none)",
+   "check": "Cash forecast: unmatched won deals all resolved or classified (own Jira / separate purchase / second deal under review / repeat / purchase record / none)",
    "page": 47,
    "explorer": 47,
+   "ok": true,
+   "hard": true
+  },
+  {
+   "check": "Cash forecast: the seven same-client, same-day, same-value second deals are each classified (separate purchase / under review)",
+   "page": 7,
+   "explorer": 7,
    "ok": true,
    "hard": true
   },

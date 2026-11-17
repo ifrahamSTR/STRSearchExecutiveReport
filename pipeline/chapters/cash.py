@@ -19,7 +19,8 @@ Every won engagement lands in exactly one group:
   closed              closing recorded on or before the reporting date (incl. dates found in affiliate records):
                       2nd installment assumed collected at closing, as the reporting layer models it
   unverified_*        balances the data cannot resolve (shown with the missing information, not forecast)
-  duplicate           same client, same won date and same value as a Jira-linked won deal: not counted twice
+  second_deal_review  same client, won date and value as a Jira-linked won deal, but no engagement of its own and no payment record: a second
+                      search not yet started or a record entered twice. Excluded (conservative) and flagged for review
 Projected refunds (future only) = clients assumed to refund x refund-size slider x upfront payment (first installment for
 Split Pay, the full price for Paid In Full); their unpaid second installment is not collected. Affiliate revenue uses each client's recorded partner choice where Jira has
 one (preferred = earns, other / cash / turnkey = does not) and the conversion slider only where it has none.
@@ -92,6 +93,32 @@ def _sheet(base, file, sheet):
         return pd.read_excel(base / R12 / file, sheet_name=sheet)
 
 
+# ----------------------------------------------------------------------------- same-client, same-day, same-value second deals
+_SECOND_DEAL = re.compile(r"(#\s*\d|\bdeal\s*\d|\b2nd\b|\bsecond\b|\(\s*2\s*\))", re.I)
+
+
+def _second_deal_verdict(did, d12i, key_of_deal, j12k):
+    """What is a second won deal that shares a Jira-linked deal's client, won date and value?
+    Matching client, date and value is NOT proof of a duplicate: a client who buys two searches together produces exactly this
+    (13 of the 14 same-client pairs won within a minute are named as a second deal, e.g. "Deal 2", and in 6 of them both deals have their own
+    Jira issue). The evidence that settles a case is an engagement of its own:
+      separate : the deal's Pipedrive 'JIRA Issue ID' exists in the 12 Nov Jira extract, or a Jira issue names this deal in PD_Deal_ID.
+                 It is a second purchase; its balance is forecast by that issue's status.
+      review   : no engagement of its own and no payment records to settle it (a second search not yet started, or a record entered twice).
+                 Stays excluded from the forecast (the conservative treatment) and is flagged for review.
+    No case is called a confirmed duplicate without positive evidence of a single purchase, and none has it.
+    Returns (verdict, Jira key or None, reason)."""
+    d = d12i.loc[did]
+    typed = d.get("JIRA Issue ID")
+    key = str(typed).strip().upper() if pd.notna(typed) and str(typed).strip() else None
+    if key not in j12k.index:
+        key = key_of_deal.get(int(did))
+    if key is not None and key in j12k.index:
+        return "separate", key, "has its own Jira issue (Pipedrive key / Jira deal id) under a different e-mail"
+    named = bool(_SECOND_DEAL.search(str(d.get("Deal_Name"))))
+    return "review", None, ("recorded as a second deal" if named else "same name as the other deal, no second-deal label") + "; no engagement of its own yet"
+
+
 # ----------------------------------------------------------------------------- evidence for uncertain engagements
 def resolve(ctx: C.Ctx, e: pd.DataFrame) -> tuple[pd.Series, pd.Series, dict]:
     """Resolve won deals without a Jira match and post-close records without a closing date.
@@ -125,7 +152,11 @@ def resolve(ctx: C.Ctx, e: pd.DataFrame) -> tuple[pd.Series, pd.Series, dict]:
     status = pd.Series(e.status.values, index=e.index, dtype="object")
     evidence = pd.Series("Jira match (reporting layer)", index=e.index, dtype="object")
     linked = e[e.has_jira].set_index("jira_key")
-    counts = {"own_jira": 0, "duplicate": 0, "repeat": 0, "purchase_record": 0, "none": 0, "onboarded": 0}
+    counts = {"own_jira": 0, "separate_purchase": 0, "second_deal_review": 0, "repeat": 0, "purchase_record": 0, "none": 0, "onboarded": 0}
+    d12i = d12.set_index("Deal_ID")
+    j12k = j12.set_index(j12["key"].astype(str).str.upper())
+    pdid = pd.to_numeric(j12["PD_Deal_ID"], errors="coerce")
+    key_of_deal = {int(v): k for v, k in zip(pdid, j12["key"].astype(str).str.upper()) if pd.notna(v)}
     for i, r in e[~e.has_jira].iterrows():
         hsh = deal_hash.get(int(r.id))
         keys = sorted(key_by_hash.get(hsh, set())) if hsh else []
@@ -145,8 +176,13 @@ def resolve(ctx: C.Ctx, e: pd.DataFrame) -> tuple[pd.Series, pd.Series, dict]:
         elif shared:
             o = linked.loc[shared[0]]
             if r.won_date == o.won_date and r.value == o.value:
-                status[i], evidence[i] = "DUPLICATE", "same client, won date and value as a Jira-linked won deal"
-                counts["duplicate"] += 1
+                verdict, k, why = _second_deal_verdict(int(r.id), d12i, key_of_deal, j12k)
+                if verdict == "separate":
+                    status[i], evidence[i] = str(j12k.loc[k, "Issue_Status"]), "separate purchase: " + why
+                    counts["separate_purchase"] += 1
+                else:
+                    status[i], evidence[i] = "SECOND_DEAL_REVIEW", "second deal under review: " + why
+                    counts["second_deal_review"] += 1
             else:
                 status[i], evidence[i] = "UNRESOLVED_REPEAT", "repeat purchase: the client's only Jira issue tracks their other won deal"
                 counts["repeat"] += 1
@@ -218,11 +254,11 @@ def build(ctx: C.Ctx) -> dict:
     done = e.closed_raw.notna() & (e.closed_raw <= asof)
     rs = e.rstatus
     e["g"] = np.select(
-        [rs.eq("DUPLICATE"), rs.eq("UNRESOLVED_REPEAT"), rs.eq("UNRESOLVED_NONE"), rs.eq("UNRESOLVED_CLOSING"), rs.eq("CLOSED_EVIDENCED"),
+        [rs.eq("SECOND_DEAL_REVIEW"), rs.eq("UNRESOLVED_REPEAT"), rs.eq("UNRESOLVED_NONE"), rs.eq("UNRESOLVED_CLOSING"), rs.eq("CLOSED_EVIDENCED"),
          rs.eq("Refunded"), sched, done, rs.isin(POST_CLOSE), rs.isin(["Under Contract", "Passed Inspection"]),
          rs.isin(["Paused", "Additional Service"]), hunt | rs.isin(["Client Start", "2 Weeks", "4 Weeks", "6 Weeks", "8 Weeks"]),
          (e.has_jira & ~signed) | rs.isin(["New Clients", "Onboarding Completed", "Services Declined"])],
-        ["duplicate", "unverified_repeat", "unverified_none", "unverified_closing", "closed", "refunded", "scheduled", "closed",
+        ["second_deal_review", "unverified_repeat", "unverified_none", "unverified_closing", "closed", "refunded", "scheduled", "closed",
          "unverified_closing", "under_contract", "paused", "noprop", "noprop"], default="other")
     split = e.cash_payment_type_normalized.eq("Split Pay")
     e["second"] = np.where(split, e.cash_second_installment_amount.fillna(0.0), 0.0)               # still due at closing
@@ -307,7 +343,7 @@ def build(ctx: C.Ctx) -> dict:
                 "second": round(float(x.second.sum()), 2), "paid": round(float(x.paid.sum()), 2)}
     labels = {"under_contract": "Under contract", "scheduled": "Closing scheduled", "noprop": "No property yet", "paused": "Paused / Additional Service",
               "refunded": "Refund already processed", "closed": "Closed (closing recorded)", "unverified_closing": "Post-close, closing unrecorded",
-              "unverified_repeat": "Repeat purchase without its own Jira issue", "unverified_none": "No Jira or purchase record", "duplicate": "Probable duplicate deal"}
+              "unverified_repeat": "Repeat purchase without its own Jira issue", "unverified_none": "No Jira or purchase record", "second_deal_review": "Second deal under review"}
     groups = {g: {**tot(g), "label": lab} for g, lab in labels.items()}
     for g in ("under_contract", "scheduled"):
         groups[g]["p_close"] = round(float(np.mean(p_used[g])), 4) if p_used[g] else None
@@ -341,9 +377,9 @@ def build(ctx: C.Ctx) -> dict:
         "year_label": str(asof.year), "year_n": int(len(c26)),
     }
     # ---- client landscape: deals whose source closing date falls in the 30 days ending on the reporting date (inclusive).
-    # Not a pipeline stage: these are a subset of completed closings. Probable duplicates are never counted.
+    # Not a pipeline stage: these are a subset of completed closings. Second deals under review are never counted.
     win0 = asof - pd.Timedelta(days=30)
-    rec = e[done & (e.closed_raw > win0) & ~e.g.eq("duplicate")]
+    rec = e[done & (e.closed_raw > win0) & ~e.g.eq("second_deal_review")]
     recent_closed = {"n": int(len(rec)), "from": (win0 + pd.Timedelta(days=1)).strftime("%Y-%m-%d"), "to": asof.strftime("%Y-%m-%d"),
                      "by_group": {k: int(v) for k, v in rec.g.value_counts().items()}}
     lag = H["refund_lag"]
