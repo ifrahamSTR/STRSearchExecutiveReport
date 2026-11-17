@@ -2575,7 +2575,17 @@
     "second": 3831425.0,
     "paid": 3945275.0,
     "label": "Closed (closing recorded)",
-    "evidenced": 5
+    "evidenced": 5,
+    "evidenced_by": {
+     "address": {
+      "n": 3,
+      "outstanding": 23200.0
+     },
+     "name": {
+      "n": 2,
+      "outstanding": 12500.0
+     }
+    }
    },
    "unverified_closing": {
     "n": 20,
@@ -2583,7 +2593,8 @@
     "outstanding": 144000.0,
     "second": 144000.0,
     "paid": 144000.0,
-    "label": "Post-close, closing unrecorded"
+    "label": "Post-close, closing unrecorded",
+    "won_before_year": 19
    },
    "unverified_repeat": {
     "n": 9,
@@ -2591,23 +2602,26 @@
     "outstanding": 61250.0,
     "second": 61250.0,
     "paid": 61250.0,
-    "label": "Repeat purchase without its own Jira issue"
+    "label": "Repeat purchase without its own Jira issue",
+    "won_before_year": 2
    },
    "unverified_none": {
-    "n": 24,
-    "split": 24,
-    "outstanding": 163200.0,
-    "second": 163200.0,
-    "paid": 163200.0,
-    "label": "No Jira or purchase record"
+    "n": 23,
+    "split": 23,
+    "outstanding": 153200.0,
+    "second": 153200.0,
+    "paid": 153200.0,
+    "label": "No Jira or purchase record",
+    "won_before_year": 18
    },
    "second_deal_review": {
-    "n": 6,
-    "split": 6,
-    "outstanding": 45000.0,
-    "second": 45000.0,
-    "paid": 45000.0,
-    "label": "Second deal under review"
+    "n": 7,
+    "split": 7,
+    "outstanding": 55000.0,
+    "second": 55000.0,
+    "paid": 55000.0,
+    "label": "Second deal under review",
+    "won_before_year": 6
    }
   },
   "other": {
@@ -2625,14 +2639,14 @@
   "resolution": {
    "own_jira": 5,
    "separate_purchase": 1,
-   "second_deal_review": 6,
+   "second_deal_review": 7,
    "repeat": 9,
    "purchase_record": 2,
-   "none": 24,
+   "none": 23,
    "onboarded": 19,
    "post_close_no_date": 22,
    "post_close_evidenced": 3,
-   "unverified_none_2026": 6,
+   "unverified_none_2026": 5,
    "unverified_none_2024": 13
   },
   "fixed": {
@@ -3822,7 +3836,7 @@
   "snapshots": {
    "reporting_layer": "2026-11-16"
   },
-  "built_at": "2026-11-17 20:40",
+  "built_at": "2026-11-18 01:10",
   "chapters": [
    "journey",
    "outcomes",
@@ -4435,9 +4449,9 @@
    "hard": true
   },
   {
-   "check": "Cash forecast: the seven same-client, same-day, same-value second deals are each classified (separate purchase / under review)",
-   "page": 7,
-   "explorer": 7,
+   "check": "Cash forecast: the eight same-client, same-day, same-value second deals (seven matched by e-mail, one by the Jira key typed in Pipedrive) are each classified (separate purchase / under review)",
+   "page": 8,
+   "explorer": 8,
    "ok": true,
    "hard": true
   },

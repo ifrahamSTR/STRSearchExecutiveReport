@@ -155,6 +155,7 @@ def resolve(ctx: C.Ctx, e: pd.DataFrame) -> tuple[pd.Series, pd.Series, dict]:
     counts = {"own_jira": 0, "separate_purchase": 0, "second_deal_review": 0, "repeat": 0, "purchase_record": 0, "none": 0, "onboarded": 0}
     d12i = d12.set_index("Deal_ID")
     j12k = j12.set_index(j12["key"].astype(str).str.upper())
+    typed_key = {int(i): str(k).strip().upper() for i, k in zip(d12["Deal_ID"], d12["JIRA Issue ID"]) if pd.notna(k) and str(k).strip()}   # Jira key typed in Pipedrive
     pdid = pd.to_numeric(j12["PD_Deal_ID"], errors="coerce")
     key_of_deal = {int(v): k for v, k in zip(pdid, j12["key"].astype(str).str.upper()) if pd.notna(v)}
     for i, r in e[~e.has_jira].iterrows():
@@ -189,6 +190,17 @@ def resolve(ctx: C.Ctx, e: pd.DataFrame) -> tuple[pd.Series, pd.Series, dict]:
         elif name_hit(deal_name.get(int(r.id)), names["brokerage"]) or name_hit(deal_name.get(int(r.id)), names["lender"]):
             status[i], evidence[i] = "CLOSED_EVIDENCED", "client found in brokerage or lender closing records"
             counts["purchase_record"] += 1
+        elif typed_key.get(int(r.id)) in linked.index:
+            # no e-mail match, but the Jira key typed in Pipedrive names the issue that tracks another won deal: the same checks as for
+            # an e-mail match apply (same won date and value = second deal under review; otherwise a repeat purchase). Only deals that
+            # would otherwise be unresolved reach this branch, so no closing evidence is overridden.
+            o = linked.loc[typed_key[int(r.id)]]
+            if r.won_date == o.won_date and r.value == o.value:
+                status[i], evidence[i] = "SECOND_DEAL_REVIEW", "second deal under review: the Jira key typed in Pipedrive names the other deal's issue (same won date and value); no engagement of its own yet"
+                counts["second_deal_review"] += 1
+            else:
+                status[i], evidence[i] = "UNRESOLVED_REPEAT", "repeat purchase: the Jira key typed in Pipedrive names the issue that tracks the client's other won deal"
+                counts["repeat"] += 1
         else:
             status[i], evidence[i] = "UNRESOLVED_NONE", "no Jira issue, e-mail, or purchase record found"
             counts["none"] += 1
@@ -350,6 +362,14 @@ def build(ctx: C.Ctx) -> dict:
         groups[g]["expected"] = {"svc": round(exp[g]["svc"], 2), "refund_base": round(exp[g]["refund_base"], 2),
                                  "aff": {a: {k: round(v, 4) for k, v in x.items()} for a, x in exp[g]["aff"].items()}}
     groups["closed"]["evidenced"] = int(e.rstatus.eq("CLOSED_EVIDENCED").sum())
+    # how the deals classed as closed without a recorded closing date were matched (aggregates only): the second installment of these is
+    # assumed collected at closing under the Split Pay rule, like every other closing, but no closing date is recorded for them
+    ev = e[e.rstatus.eq("CLOSED_EVIDENCED")]
+    evk = np.select([ev.evidence.str.contains("property address"), ev.evidence.str.contains("brokerage or lender"), ev.evidence.str.contains("own Jira issue")], ["address", "name", "own_jira"], "other")
+    groups["closed"]["evidenced_by"] = {k: {"n": int((evk == k).sum()), "outstanding": round(float(ev.out[evk == k].sum()), 2)} for k in ("address", "name", "own_jira") if (evk == k).any()}
+    # the deals set aside: how many were won before the reporting year (a count only)
+    for g in ("unverified_closing", "unverified_repeat", "unverified_none", "second_deal_review"):
+        groups[g]["won_before_year"] = int((e.loc[e.g.eq(g), "won_date"].dt.year < asof.year).sum())
     other = e[e.g.eq("other")]
     nu = e[e.g.eq("unverified_none")]
 
