@@ -2,9 +2,11 @@
    revenue and refunds, recomputed in the browser from aggregates built by pipeline/chapters/cash.py.
    - fixed timing:  under-contract clients and scheduled closings, weighted by the historical probability of closing
                     for clients who had waited as long, timed by the remaining historical UC -> CLOSED durations
-   - slider timing: clients without a property (historical close / refund / pause shares) and paused or
-                    additional-service clients who resume, spread around the expected days until collection with the
-                    historical UC -> CLOSED variation (a modeling assumption, not a validated pattern)
+   - history timing: clients without a property (historical close / refund / pause shares): expected collections and
+                    affiliate closings over the remaining days to closing of past clients still searching after as many
+                    days; their refunds over the remaining days of past refunds (closings and refunds timed separately)
+   - slider timing: paused or additional-service clients who resume or are refunded, spread around the expected days until
+                    collection with the historical UC -> CLOSED variation (a modeling assumption, not a validated pattern)
    - refunds:       every approved refund returns 100% of the upfront payment (business rule, not a control)
    - paused:        three outcomes that always add up to 100%: resume and close (collect + affiliate), full refund
                     (upfront payment returned), remain paused (no cash in or out in the forecast period)
@@ -42,8 +44,8 @@
 
   /* ------------------------------------------------------------------ state: paused outcomes are whole percentages that always add up to 100 */
   const defaults = () => {
-    const res = Math.round(DEF.paused_proceed * 100);
-    return { d: DEF.expected_days, max: DEF.expected_days_max, pa: { resume: res, refund: 100 - res, remain: 0 }, h: true,
+    const P0 = DEF.paused_defaults;
+    return { d: DEF.expected_days, max: DEF.expected_days_max, pa: { resume: P0.resume, refund: P0.refund, remain: P0.remain }, h: true,
       aff: Object.fromEntries(AFF.map(k => [k, { conv: DEF.affiliates[k].conv, rev: DEF.affiliates[k].rev }])) };
   };
   let st = defaults();
@@ -75,10 +77,15 @@
   };
   // the published timing weights are rounded to six decimals and add up to 0.999999; scaled to add up to exactly 1 so that every total and split reconciles to the cent
   const SPW = (() => { const t = C.spread.reduce((a, x) => a + x[1], 0); return C.spread.map(([o, w]) => [o, w / t]); })();
+  // clients still searching: their own historical timing, published by day (closings and refunds timed separately); each array is
+  // scaled so that its total equals the published amount to the cent (the published days are rounded)
+  const NT = NP.timing, sumA = a => a.reduce((x, y) => x + y, 0), per = (v, a) => (sumA(a) ? v / sumA(a) : 0);
+  const NTK = { svc: per(NP.collect, NT.svc), ref: per(NP.refund_base, NT.refund_base),
+    known: Object.fromEntries(AFF.map(k => [k, per(NP.aff[k].known, NT.known[k])])), unknown: Object.fromEntries(AFF.map(k => [k, per(NP.aff[k].unknown, NT.unknown[k])])) };
   const affValue = (parts, s) => AFF.reduce((a, k) => a + s.aff[k].rev * (parts[k].known + s.aff[k].conv * parts[k].unknown), 0);
   function model(s) {
     const spread = SPW.map(([o, w]) => [Math.max(1, s.d + o), w]);
-    let H = Math.max(F.svc.length - 1, ...spread.map(x => x[0]));
+    let H = Math.max(F.svc.length - 1, NT.svc.length - 1, ...spread.map(x => x[0]));
     H = Math.max(H, ...AFF.map(k => recvDay(k, H)));                       // horizon covers the last modeled payout
     const z = () => new Array(H + 1).fill(0);
     const fixed = z(), noprop = z(), paused = z(), aff = z(), refund = z();
@@ -91,15 +98,17 @@
       refUC[d] -= REFUND_SHARE * F.refund_base[d];
       AFF.forEach(k => { affBy[k][d] += s.aff[k].rev * (F.known[k][d] + s.aff[k].conv * F.unknown[k][d]); });
     });
-    const npAff = affValue(NP.aff, s), paAff = pr * affValue(PA.aff, s);
     const hv = s.h === false ? 0 : 1;          // simulation switch: refunds projected for clients still searching (1 = on)
-    const kAff = Object.fromEntries(AFF.map(k => [k, s.aff[k].rev * (NP.aff[k].known + s.aff[k].conv * NP.aff[k].unknown + pr * (PA.aff[k].known + s.aff[k].conv * PA.aff[k].unknown))]));
-    spread.forEach(([d, w]) => {
-      noprop[d] += NP.collect * w;
+    NT.svc.forEach((v, d) => {                 // clients still searching: historical timing (not the expected-days setting)
+      noprop[d] += v * NTK.svc;
+      const r = REFUND_SHARE * hv * NT.refund_base[d] * NTK.ref;
+      refund[d] -= r; refNP[d] -= r;
+      AFF.forEach(k => { affBy[k][d] += s.aff[k].rev * (NT.known[k][d] * NTK.known[k] + s.aff[k].conv * NT.unknown[k][d] * NTK.unknown[k]); });
+    });
+    const kAff = Object.fromEntries(AFF.map(k => [k, s.aff[k].rev * pr * (PA.aff[k].known + s.aff[k].conv * PA.aff[k].unknown)]));
+    spread.forEach(([d, w]) => {               // paused clients who resume or are refunded: spread around the expected-days setting
       paused[d] += pr * PA.second * w;
-      aff[d] += (npAff + paAff) * w;
-      refund[d] -= REFUND_SHARE * (hv * NP.refund_base + pf * PA.paid) * w;
-      refNP[d] -= REFUND_SHARE * hv * NP.refund_base * w;
+      refund[d] -= REFUND_SHARE * pf * PA.paid * w;
       refPA[d] -= REFUND_SHARE * pf * PA.paid * w;
       AFF.forEach(k => { affBy[k][d] += kAff[k] * w; });
     });
@@ -158,7 +167,7 @@
   const contractual = Object.values(G).reduce((a, g) => a + g.outstanding, 0) + C.view.scheduled_counted_collected + C.other.outstanding;
   const unverified = G.unverified_closing.outstanding + G.unverified_repeat.outstanding + G.unverified_none.outstanding;
   const active = G.under_contract.second + G.scheduled.second + G.noprop.second + G.paused.second;      // owed by clients still in progress
-  const U = H0.uc_to_close;
+  const U = H0.uc_to_close, TM = NP.timing.meta;
 
   /* ------------------------------------------------------------------ labels: recorded / inferred / scenario */
   const BASIS = {
@@ -260,9 +269,9 @@
         <div class="ctl">
           <h3><span class="ic" style="--ic:var(--wait)">${IC.clock}</span>Expected days until collection</h3>
           <div class="readout"><b id="o-day">–</b><span id="o-date">–</span></div>
-          <div class="range"><div class="range-top"><label for="r-d">Clients still searching, and paused clients who resume</label></div>
+          <div class="range"><div class="range-top"><label for="r-d">Paused clients who resume or are refunded</label></div>
             <input type="range" id="r-d" min="${OPT}" max="${DEF.expected_days_max}" step="1" style="--c:var(--wait)"><div class="range-ends"><span>${OPT} days (earliest)</span><span id="o-dmax"></span></div></div>
-          <p class="hint">${OPT} days = Under Contract tomorrow plus the typical ${U.median} days to closing. Payments spread around the chosen day the way past closings did (middle half ${U.p25}–${U.p75} days). Projected refunds move with it.</p>
+          <p class="hint">${OPT} days = Under Contract tomorrow plus the typical ${U.median} days to closing. Paused payments and refunds spread around the chosen day the way past closings did (middle half ${U.p25}–${U.p75} days). Clients still searching follow their own historical timing and do not move with this setting.</p>
           <div class="range"><div class="range-top"><label for="r-max">Slider maximum</label><output id="o-max" for="r-max"></output></div>
             <input type="range" id="r-max" min="${OPT + 3}" max="240" step="1" style="--c:var(--hold)"></div>
           ${exBlock('c-days', 'What this changes', '', 'mini')}
@@ -300,7 +309,7 @@
           <h3><span class="ic" style="--ic:var(--acq)">${IC.scen}</span>Timing presets</h3>
           <div class="presets"><button class="btn" data-preset="opt" type="button">Earliest</button><button class="btn" data-preset="bal" type="button">Middle</button><button class="btn" data-preset="pes" type="button">Latest</button>
             <button class="btn reset" id="b-reset" type="button">Reset every assumption</button></div>
-          <p class="hint">The presets move only the expected days until collection. They change when cash arrives, never how much is collected.</p>
+          <p class="hint">The presets move only the expected days until collection for paused clients. They change when cash arrives, never how much is collected.</p>
         </div>
       </aside>
       <div class="cf-results">
@@ -317,7 +326,7 @@
           '', 'Supporting analysis · affiliate revenue', exBlock('aff', 'How each partner’s revenue is calculated', 'Recorded partner choices, modeled conversions and expected payout dates'))}
         ${panel('scen', 'Timing comparison: same total, different timing', 'chart-scen', 'Cumulative net cash flow with earlier, current and later collection timing', '', '', 'Supporting analysis · timing')}
         ${panel('ref', 'Where future refunds come from', 'chart-ref', 'Projected refunds by month and by source',
-          `Future refunds only: the ${S.int(G.refunded.n)} clients already marked Refunded in Jira were paid back in the past and are not included. Every refund returns 100% of the upfront payment. Refunds are timed with the same spread as collections.`, '', 'Supporting analysis · refunds', exBlock('ref', 'How future refunds are calculated', 'Who is expected to refund, and why past refunds are not included'))}
+          `Future refunds only: the ${S.int(G.refunded.n)} clients already marked Refunded in Jira were paid back in the past and are not included. Every refund returns 100% of the upfront payment. Refunds from clients still searching follow the timing of past refunds; paused refunds follow the expected-days setting; failed contracts follow their contract timing.`, '', 'Supporting analysis · refunds', exBlock('ref', 'How future refunds are calculated', 'Who is expected to refund, and why past refunds are not included'))}
         ${UNRES}
         <section class="panel" id="p-groups" aria-labelledby="h-groups">
           <div class="panel-head"><div class="ph"><h2 id="h-groups">Every won deal, accounted for</h2><p class="sub">Each of the ${S.int(C.view.engagements)} won deals sits in exactly one row. “Still owed” is money still owed under contracts, from the reporting layer’s cash forecast view.</p></div></div>
@@ -578,7 +587,7 @@
           .concat(src.slice(0, 3).filter(s => Math.abs(r[s.k]) > 0.5).map(s => [s.name, money(r[s.k]), cashDetail ? s.color : null, 'sub']))
           .concat([['Affiliate revenue', money(r.aff), t.closed], ['Future refunds paid out', money(r.refund), t.neg], ['Net this month', money(r.net), null, 'b'], ['Running total', money(r.cum)]]));
       } }),
-      xAxis: { type: 'category', data: MM.map(r => mLab(r.k)), axisLine: { onZero: true, lineStyle: { color: t.axis } }, axisTick: { show: false }, axisLabel: { color: t.label, fontSize: 12, interval: narrow ? 'auto' : 0 } },
+      xAxis: { type: 'category', data: MM.map(r => mLab(r.k)), axisLine: { onZero: true, lineStyle: { color: t.axis } }, axisTick: { show: false }, axisLabel: { color: t.label, fontSize: 12, interval: narrow ? 'auto' : 0, formatter: v => (MM.length > 12 ? v.replace(' ', '\n') : v), lineHeight: 15 } },
       yAxis: S.valAxis(t, { axisLabel: { color: t.label, fontSize: 12, formatter: v => short(v) } }),
       series: ser.map(s => ({ name: s.name, type: 'bar', stack: 'c', barMaxWidth: 56,
         data: MM.map(r => ({ value: Math.round(r[s.k]), itemStyle: { borderRadius: s.k === 'refund' ? [0, 0, 4, 4] : topKey(r) === s.k ? [4, 4, 0, 0] : 0 } })),
@@ -623,7 +632,7 @@
         const r = rows[ps[0].dataIndex];
         return tipBox(t, monthTitle(r), src.filter(s => Math.abs(r[s.k]) > 0.5).map(s => [s.name, money(r[s.k]), s.color]).concat([['Refunds this month', money(r.refund), null, 'b']]));
       } }),
-      xAxis: { type: 'category', data: rows.map(r => mLab(r.k)), axisLine: { onZero: false, lineStyle: { color: t.axis } }, axisTick: { show: false }, axisLabel: { color: t.label, fontSize: 12 } },
+      xAxis: { type: 'category', data: rows.map(r => mLab(r.k)), axisLine: { onZero: false, lineStyle: { color: t.axis } }, axisTick: { show: false }, axisLabel: { color: t.label, fontSize: 12, formatter: v => (rows.length > 12 ? v.replace(' ', '\n') : v), lineHeight: 15 } },
       yAxis: S.valAxis(t, { max: 0, axisLabel: { color: t.label, fontSize: 12, formatter: v => short(v) } }),
       series: src.map(s => ({ name: s.name, type: 'bar', stack: 'r', barMaxWidth: 52,
         data: rows.map(r => ({ value: Math.round(r[s.k]), itemStyle: { borderRadius: botKey(r) === s.k ? [0, 0, 4, 4] : 0 } })),
@@ -786,7 +795,7 @@
       { _group: 'In the forecast' },
       ['under_contract', 'var(--uc)', XU.svc, -REFUND_SHARE * XU.refund_base, affValue(XU.aff, st), `${pct(G.under_contract.p_close)} expected to close, from past clients who had waited as long; timed by the remaining historical Under Contract → closing times (${S.int(U.n)} closings, median ${U.median} days)`],
       ['scheduled', 'var(--uc)', XS.svc, -REFUND_SHARE * XS.refund_base, affValue(XS.aff, st), `${pct(G.scheduled.p_close)} expected to close on the scheduled date (all by ${S.date(C.notes.scheduled_dates_to)}); the cash forecast view already counts these ${short(C.view.scheduled_counted_collected)} as collected`],
-      ['noprop', 'var(--wait)', M.tot.noprop, -(st.h ? REFUND_SHARE * NP.refund_base : 0), affValue(NP.aff, st), `${S.int(NP.hunting)} searching + ${S.int(NP.not_started)} won but not started; like past clients at the same stage: ${pct(NP.p_close)} close, ${st.h ? `${pct(NP.p_refund)} refund` : 'refunds switched off'}, ${pct(NP.p_pause)} pause or keep searching`],
+      ['noprop', 'var(--wait)', M.tot.noprop, -(st.h ? REFUND_SHARE * NP.refund_base : 0), affValue(NP.aff, st), `${S.int(NP.hunting)} searching + ${S.int(NP.not_started)} won but not started; like past clients at the same stage: ${pct(NP.p_close)} close, ${st.h ? `${pct(NP.p_refund)} refund` : 'refunds switched off'}, ${pct(NP.p_pause)} pause or keep searching; timed by past clients’ remaining days to closing (refunds by past refund timing)`],
       ['paused', 'var(--sales)', M.tot.paused, M.tot.refPA, pv.resume.aff, `${pct(pv.r)} resume and close and pay the second installment; ${pct(pv.f)} are refunded 100% of their upfront payment and never pay it; ${pct(pv.z)} remain paused (no cash in or out)`],
       { _group: 'Set aside: not future cash' },
       ['refunded', null, 0, 0, 0, 'Refund already paid back (historical): nothing more to collect or refund'],
@@ -904,15 +913,16 @@
       <ul>
         <li><b>Paused outcome shares</b> move only the paused group: from all refunded to all resuming, its net swings between ${amt(pv.range.refund)} and ${amt(pv.range.resume)}.</li>
         <li><b>Conversion and fee settings</b> move only affiliate revenue. <b>The Hunting switch</b> moves only the ${amt(REFUND_SHARE * NP.refund_base)} refund projected for clients still searching (${st.h ? 'included' : 'excluded'} now).</li>
-        <li><b>Expected days</b> and the timing presets change only when cash arrives. The total stays ${amt(net)}.</li></ul>`;
+        <li><b>Expected days</b> and the timing presets change only when paused clients’ cash arrives. The total stays ${amt(net)}.</li></ul>`;
   };
   XR.bridge = () => `<div class="acc-list">${bridgeSteps().map((s, i) => acc('b' + i, s.n, '', val(s.v, s.kind), s.basis, s.x())).join('')}</div>`;
   const TIMING_NOTE = () => {
     const peak = MM.reduce((a, r) => (r.net > a.net ? r : a), MM[0] || { net: 0, k: mKey(1) });
-    return `<b>Timing note.</b> Collections from clients still searching and from paused clients who resume (with their affiliate fees and refunds) are spread around the expected-days setting (${st.d} days, centred on ${dLong(st.d)}). That spread is a modeling assumption and has not been validated against history; the timing method is being reviewed. The largest month in this scenario is ${mFull(peak.k)} (${short(peak.net)} net): read it as an artefact of the setting, not a pattern from past clients. Month-by-month amounts are indicative; the totals do not depend on them.`;
+    const qtr = (+peak.k.slice(5) - 1) % 3 === 0 && peak.realtor > 0.5 ? ` Realtor fees for ${qOf(peak.k)} closings (${short(peak.realtor)}) are placed in that month by the modeled quarterly payout.` : '';
+    return `<b>Timing note.</b> Clients still searching are timed from history: each client’s expected collection follows how long past clients still searching after as many days took to close (${S.int(TM.closers)} past closings), and their projected refunds follow past refund timing (${S.int(TM.refunds)} dated refunds); about ${pct(TM.collect_share.jan)} of their collections fall by 31 Jan ${+C.asof.slice(0, 4) + 1}. Paused clients who resume or are refunded are still spread around the expected-days setting (${st.d} days, centred on ${dLong(st.d)}): an assumption, not a pattern from past clients. The largest month in this scenario is ${mFull(peak.k)} (${short(peak.net)} net).${qtr} Month-by-month amounts are estimates; the totals do not depend on them.`;
   };
   const qOf = k => { const [y, m] = k.split('-').map(Number), q = ((Math.floor((m - 1) / 3) + 3) % 4) + 1; return `Q${q} ${m === 1 ? y - 1 : y}`; };
-  XR.cash = () => `<p>Open a month to see what is in its bar. Cash moves between months with the expected-days setting and the partner payout dates; the totals do not change.</p><div class="acc-list">${MM.map(r => {
+  XR.cash = () => `<p>Open a month to see what is in its bar. Paused clients’ cash moves between months with the expected-days setting, and affiliate cash with the partner payout dates; the totals do not change.</p><div class="acc-list">${MM.map(r => {
     const part = (l, v, items) => (Math.abs(v) < 0.5 ? '' : `${l}: ${amt(v)}${items ? ` (${items})` : ''}`);
     const list = a => a.filter(Boolean).join(', ');
     const rows = [];
@@ -932,7 +942,7 @@
     const rows = [
       ['px-resume', 'Resume and close', pct(pv.r), val(pv.resume.net), ['sce'], [
         ['What it means', `About ${S.int(pv.resume.n)} of the ${S.int(PA.n)} paused deals restart, find a property and close. They pay the second installment at closing and earn the usual affiliate fees.`],
-        ['How it is calculated', `${pct(pv.r)} × ${amt(PA.second)} outstanding = ${amt(pv.resume.svc)} collected, plus ${pct(pv.r)} × ${amt(pv.full)} potential affiliate revenue = ${amt(pv.resume.aff)}. Timing: spread around the expected-days setting (${st.d} days), like clients still searching.`],
+        ['How it is calculated', `${pct(pv.r)} × ${amt(PA.second)} outstanding = ${amt(pv.resume.svc)} collected, plus ${pct(pv.r)} × ${amt(pv.full)} potential affiliate revenue = ${amt(pv.resume.aff)}. Timing: spread around the expected-days setting (${st.d} days).`],
         ['Effect on expected cash', `Adds ${amt(pv.resume.net)}. This is the only outcome that brings in new cash.`]]],
       ['px-refund', 'Full refund', pct(pv.f), val(pv.refund.net), ['sce'], [
         ['What it means', `About ${S.int(pv.refund.n)} deals ask for their money back and receive 100% of what they paid upfront. Their second installment is never collected and they earn no affiliate fees.`],
@@ -990,8 +1000,8 @@
       ['What happens next', 'Each deal is identified in an internal reconciliation list (not published). When a record shows the client is active, the deal joins its stage and is forecast like the others.']]))).join('')}</div>`;
   };
   XR['c-days'] = () => {
-    const np = GN.np.net, pa = GN.pa.net;
-    return `<p><b>Changes:</b> when cash arrives for clients still searching and for paused clients who resume: their collections, affiliate fees and refunds.</p><p><b>Does not change:</b> any total (net stays ${amt(M.tot.net)}), contracts in progress or the partner payout rules.</p><p><b>Right now:</b> ${amt(M.within(lastMonthEnd(2)))} of net cash arrives by ${dShort(lastMonthEnd(2))} and ${amt(M.within(lastMonthEnd(3)))} by ${dShort(lastMonthEnd(3))}. The affected groups are worth ${amt(np)} (still searching) and ${amt(pa)} (paused) in net cash.</p>`;
+    const pa = GN.pa.net;
+    return `<p><b>Changes:</b> when cash arrives for paused clients who resume or are refunded: their collections, affiliate fees and refunds.</p><p><b>Does not change:</b> any total (net stays ${amt(M.tot.net)}), clients still searching (timed from past clients’ journeys), contracts in progress or the partner payout rules.</p><p><b>Right now:</b> ${amt(M.within(lastMonthEnd(2)))} of net cash arrives by ${dShort(lastMonthEnd(2))} and ${amt(M.within(lastMonthEnd(3)))} by ${dShort(lastMonthEnd(3))}. The paused group is worth ${amt(pa)} in net cash.</p>`;
   };
   XR['c-paused'] = () => {
     const pv = pausedView(st);
@@ -1047,7 +1057,7 @@
     const sc = scenarios(), nets = sc.map(x => x.m.tot.net);
     $('s-scen').textContent = `Only timing changes, so every line reaches the same ${short(nets[1])}; what differs is the running total by each date.`;
     $('lg-scen').innerHTML = `<span><i class="ln" style="background:var(--sp-mid)"></i>Earlier collections (${OPT} days)</span><span><i class="ln" style="background:var(--acq)"></i>Your timing (${st.d} days)</span><span style="color:var(--hold)"><i class="dash"></i><span style="color:var(--ink-2)">Later collections (${st.max} days)</span></span>`;
-    $('f-scen').textContent = `Running total by date, not monthly cash. These lines move only the expected days until collection (earlier: ${OPT} days; later: the slider maximum, ${st.max} days); collection amounts, chances and refunds are identical, so every line ends at the same total. Everything else follows your current settings.`;
+    $('f-scen').textContent = `Running total by date, not monthly cash. These lines move only the expected days until collection for paused clients (earlier: ${OPT} days; later: the slider maximum, ${st.max} days); collection amounts, chances and refunds are identical, so every line ends at the same total. Clients still searching and contracts in progress keep their historical timing in all three lines; everything else follows your current settings.`;
 
     Object.keys(VIEWS).forEach(id => { if (isTable(id)) VIEWS[id].table(); else VIEWS[id].chart().draw(); });
     renderPaused();
@@ -1061,7 +1071,7 @@
   function glance(P, pv) {
     const card = (v, l, s) => `<div class="ag-i"><b>${v}</b><span>${l}</span><small>${s}</small></div>`;
     $('ag-you').innerHTML = [
-      card(`${st.d} days`, 'Expected days until collection', `For clients still searching and paused clients who resume; payments spread around ${dLong(st.d)} like past closings.`),
+      card(`${st.d} days`, 'Expected days until collection', `For paused clients who resume or are refunded; payments spread around ${dLong(st.d)} like past closings. Clients still searching follow historical timing.`),
       `<div class="ag-i"><span>Paused clients: outcomes</span><ul class="ag-l"><li><i>Resume and close</i><b>${pct(pv.r)}</b></li><li><i>Full refund</i><b>${pct(pv.f)}</b></li><li><i>Remain paused</i><b>${pct(pv.z)}</b></li></ul><small>Always 100% in total. Remaining paused creates no cash in or out.</small></div>`,
       card(st.h ? 'On' : 'Off', 'Refunds from clients still searching', st.h ? `Simulation using the historical ${pct(NP.p_refund)} refund rate.` : 'Simulation switched off: none projected.'),
       `<div class="ag-i"><span>Affiliate assumptions</span><ul class="ag-l">${AFF.map(k => `<li><i>${P[k].label}</i><b>${pct(P[k].conv)} · ${money(P[k].rev)}</b></li>`).join('')}</ul><small>Conversion where no partner choice is recorded · revenue per conversion</small></div>`,
@@ -1085,10 +1095,10 @@
     <div class="nb"><h3>Refund rules</h3><ul>
       ${li(`Clients already marked Refunded in Jira (${S.int(G.refunded.n)}) were paid back in the past. They are not future cash outflows, and their unpaid second installments will not be collected.`)}
       ${li('Every approved refund returns 100% of the amount paid upfront (the first Split Pay installment, or the full price for Paid In Full). This is a fixed business rule, not a control.')}
-      ${li(`Paused and Additional Service clients have three possible outcomes that always add up to 100%: resume and close (pay the second installment and earn affiliate fees), full refund (the upfront payment is returned and the second installment is never collected) or remain paused (no cash in or out during the forecast period). The starting scenario is ${DEF.paused_proceed * 100}% resume, ${100 - DEF.paused_proceed * 100}% refund and 0% remain paused; the shares are assumptions, not measured rates.`)}
+      ${li(`Paused and Additional Service clients have three possible outcomes that always add up to 100%: resume and close (pay the second installment and earn affiliate fees), full refund (the upfront payment is returned and the second installment is never collected) or remain paused (no cash in or out during the forecast period). The starting scenario is ${DEF.paused_defaults.resume}% resume, ${DEF.paused_defaults.refund}% refund and ${DEF.paused_defaults.remain}% remain paused; the shares are assumptions, not measured rates.`)}
       ${li(`With the “clients still searching” switch on (default), they are refunded at the historical rate for their stage (${pct(NP.p_refund)} on average); the switch is a simulation setting and changes no historical data. Under-contract clients who don’t close are refunded at the historical rate (${pct(H0.uc_fail_refund)} of past clients who didn’t close).`)}
       ${li('A client who is refunded never pays their remaining installment.')}
-      ${li('Each client counts once in expectation: as a past refund, a projected refund or an expected collection. Projected refunds are timed with the same spread as collections.')}
+      ${li('Each client counts once in expectation: as a past refund, a projected refund or an expected collection. Projected refunds are timed separately from collections: clients still searching by past refund timing, paused clients by the expected-days setting.')}
     </ul></div>
     <div class="nb"><h3>How the forecast is reconciled</h3><ul>
       ${li(`All ${S.int(C.view.engagements)} won deals sit in exactly one row of the table above, and the rows add up to the money still owed under contracts in the reporting layer’s cash forecast view (${money(C.view.gross_outstanding)}) plus ${money(C.view.scheduled_counted_collected)} for closings scheduled after the data date.`)}
@@ -1104,13 +1114,14 @@
     </ul></div>
     <div class="nb"><h3>Other assumptions</h3><ul>
       ${li('Payment rules from the cash forecast view: Paid In Full is collected at the win; Split Pay collects half at the win and half at closing. Only second installments are future collections.')}
-      ${li(`Expected days until collection (default ${DEF.expected_days}; from ${OPT} up to an adjustable maximum of ${DEF.expected_days_max}) applies to clients still searching and to paused clients who resume. Their collections, affiliate fees and refunds spread around that day like past Under Contract → closing times, rather than landing on one date.`)}
+      ${li(`Expected days until collection (default ${DEF.expected_days}; from ${OPT} up to an adjustable maximum of ${DEF.expected_days_max}) applies to paused clients who resume or are refunded. Their collections, affiliate fees and refunds spread around that day like past Under Contract → closing times, rather than landing on one date.`)}
+      ${li(`Clients still searching are timed from history. Each client’s expected collection and affiliate fees are spread over the remaining days to closing of past clients who were still searching after as many days (${S.int(TM.closers)} closings from starts with at least a year of history; median ${TM.close_median} days from start to closing). The ${S.int(TM.closers_after_year)} closings more than a year after the start are weighted up for past clients not yet observed that long; beyond day ${S.int(TM.close_last_day)} fewer than 10 past closings remain, so the remaining days at that day are used. Their projected refunds follow the ${S.int(TM.refunds)} dated past refunds made after the client’s current day (median ${TM.refund_median} days after the start; beyond day ${S.int(TM.refund_last_day)}, the ${S.int(TM.refunds_after_last_day)} latest refunds). Amounts and chances are unchanged: only the months move.`)}
       ${li('Affiliate payout dates are modeled, not confirmed: realtor fees are distributed quarterly, in the month after the closing’s calendar quarter ends (Q4 2026 closings in January 2027); lender fees arrive in the month after closing; STR Cribs is provisionally the month after closing. Cash is placed on the 15th of the payout month. Eligibility, conversions, fees and totals do not change; only when the cash arrives.')}
       ${li(`Affiliates: a recorded preferred realtor, lender or STR Cribs choice earns the fee; a recorded other partner, cash purchase or turnkey home earns nothing. Only clients with no recorded choice use the conversion sliders (defaults ${pct(DEF.affiliates.realtor.conv)} / ${pct(DEF.affiliates.lender.conv)} / ${pct(DEF.affiliates.cribs.conv)}). Revenue per conversion defaults (${money(DEF.affiliates.realtor.rev)} / ${money(DEF.affiliates.lender.rev)} / ${money(DEF.affiliates.cribs.rev)}) are weighted-average planning assumptions; recorded medians are shown for context only.`)}
     </ul></div>
     <div class="nb"><h3>Data limitations</h3><ul>
-      ${li('Timing: the spread of collections, affiliate fees and refunds for clients still searching and for paused clients who resume follows the expected-days setting. It has not been validated against history, and the timing method is being reviewed, so the month-by-month pattern (the size of January 2027 in particular) is indicative.')}
-      ${li('Closing and refund chances for clients still searching come from the history of past clients at the same stage. How that comparison group is built is being reviewed, so treat those rates as indicative.')}
+      ${li('Timing: clients still searching follow past clients’ journeys (closings from 2024–2025 starts; refunds mostly from 2026 starts, whose long delays cannot be seen yet, so their refunds may be timed slightly early). Paused clients follow the expected-days setting, an assumption not validated against history. Realtor fees are placed in the month after each calendar quarter, so January, April, July and October carry more affiliate cash. Month-by-month amounts are estimates.')}
+      ${li('Closing and refund chances for clients still searching come from past clients at the same stage and time searching (2024–2025 starts). The newest clients have refunded faster, so their refund chance may be understated.')}
       ${li(`Payment type: blanks default to Split Pay, and only ${S.int(C.view.payment_recorded)} of ${S.int(C.view.engagements)} won deals have a recorded type, so balances may be overstated for clients who paid in full.`)}
       ${li(`${money(unverified)} of unresolved and ${money(dupB)} of second-deal balances under review stay outside the forecast.`)}
       ${li('Under Contract is the latest valid contract; earlier fall-throughs are only partly recorded, so the historical closing rate may be slightly optimistic.')}

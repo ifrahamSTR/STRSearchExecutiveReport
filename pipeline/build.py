@@ -116,6 +116,10 @@ def checks(ctx: C.Ctx, data: dict) -> list[dict]:
     chk("Cash forecast: every past refund, pause and failed contract leaves its comparison group on a recorded date (no closer without an Under Contract date stays in the group)",
         ex["refunded_dated"] == ex["refunded"] and ex["paused_dated"] == ex["paused"] and ex["uc_failures_dated"] == ex["uc_failures"]
         and ex["closed_exit_by"]["inspection"] + ex["closed_exit_by"]["closing"] == ex["closed_no_uc_date"] and all(c["n"] >= 10 for c in cf["history"]["curves"]["uc"]), True)
+    nt = cf["noprop"]["timing"]
+    chk("Cash forecast: still-searching timing arrays hold exactly the expected collections, refunds and affiliate closings, all after today",
+        abs(sum(nt["svc"]) - cf["noprop"]["collect"]) < 0.05 and abs(sum(nt["refund_base"]) - cf["noprop"]["refund_base"]) < 0.05 and nt["svc"][0] == 0 and nt["refund_base"][0] == 0
+        and all(abs(sum(nt[t][a]) - cf["noprop"]["aff"][a][t]) < 1e-3 for a in nt["known"] for t in ("known", "unknown")), True)
     chk("Cash forecast: closing probabilities are probabilities", all(0 <= (g[k]["p_close"] or 0) <= 1 for k in ("under_contract", "scheduled")) and 0 <= cf["noprop"]["p_close"] + cf["noprop"]["p_refund"] + cf["noprop"]["p_pause"] <= 1.0001, True)
     chk("Cash forecast: expected collections never exceed the installments still due (under contract + scheduled)",
         round(sum(cf["fixed"]["svc"])) <= round(g["under_contract"]["second"] + g["scheduled"]["second"]), True)

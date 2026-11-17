@@ -12,9 +12,10 @@ Every won engagement lands in exactly one group:
                       who has waited as long (UC -> CLOSED), timed by the remaining historical durations
   scheduled           closing dated after the reporting date: same closing probability, collected on that date
   noprop              hunting or won-but-not-started: historical outcome shares for clients without a contract after
-                      the same number of days (close / refund / pause), timed by the dashboard's expected-days slider
-                      with the historical UC -> CLOSED spread around it
-  paused              paused or additional service: a slider share proceeds (collect), the rest refunds
+                      the same number of days (close / refund / pause); closings timed by the remaining days to closing of
+                      past clients still searching after as many days, refunds by the remaining days of past refunds (Batch 4D)
+  paused              paused or additional service: three slider shares (resume and close / full refund / remain paused),
+                      timed by the dashboard's expected-days slider with the historical UC -> CLOSED spread around it
   refunded            marked Refunded in Jira: refund assumed already paid back (historical); no future flows
   closed              closing recorded on or before the reporting date (incl. dates found in affiliate records):
                       2nd installment assumed collected at closing, as the reporting layer models it
@@ -42,7 +43,8 @@ import core as C
 HORIZON = 420
 EXPECTED_DAYS_MAX = 77                 # agreed default maximum of the expected-days slider (pessimistic case)
 EXPECTED_DAYS = 57                     # default slider position: halfway between optimistic (day 37) and 77
-PAUSED_PROCEED = 0.5
+PAUSED_PROCEED = 0.10                  # default paused outcome shares (Batch 4D): resume and close / full refund / remain paused
+PAUSED_DEFAULTS = {"resume": 10, "refund": 40, "remain": 50}
 REFUNDABLE_SHARE = 1.0                 # default refund size for FUTURE refunds: share of the upfront payment returned (slider 0-100%)
 AFFILIATES = {"realtor": {"label": "Realtor", "conv": 0.93, "rev": 4000},
               "lender": {"label": "Lender", "conv": 0.70, "rev": 1400},
@@ -283,6 +285,34 @@ def history(ctx: C.Ctx, e: pd.DataFrame) -> dict:
     def p_noprop(el):
         v, n, _ = _carry(np_at, el, lambda m: {k: float((m.outcome == k).mean()) for k in ("closed", "refunded", "paused", "hunting")})
         return v, n
+    # (c) timing for clients still searching (Batch 4D): days from today until the closing or the refund, from past clients
+    #     closings: the same comparison group as (b); remaining days = closing day - el for the past closers still in the group at el.
+    #               Closings more than a year after the start are seen only for past clients observed that long, so each closing at
+    #               day t is weighted by 1 / (share of the group observed for at least t days). Fewer than MIN_TAIL closers left:
+    #               the last day with MIN_TAIL is used (its remaining days), as for the outcome shares.
+    #     refunds:  every dated refund (outcome refunded) after a confirmed start (refunds come early, so recent starts show them); remaining days =
+    #               refund day - el for the refunds made after day el. Fewer than MIN_TAIL later refunds: the last day with MIN_TAIL.
+    seen_old = seen[old.index].values
+    g_obs = lambda t: float((seen_old >= t).mean())
+    closers = old[old.outcome.eq("closed")]
+    def close_timing(el):
+        e2 = el
+        while e2 > 0:
+            m = np_at(e2)
+            if len(m) >= MIN_TAIL and m.outcome.eq("closed").sum() >= MIN_TAIL:
+                break
+            e2 -= 1
+        c = np_at(e2)
+        t = c.loc[c.outcome.eq("closed"), "days_to_close"].values.astype(int)
+        w = np.array([1.0 / g_obs(x) for x in t])
+        return np.maximum(t - e2, 1), w / w.sum(), e2
+    rlag = (refund_on - co.start).dt.days.dropna().values.astype(int)          # outcome refunded (a client who also closed counts as a closing)
+    def refund_timing(el):
+        e2 = el
+        while e2 > 0 and (rlag > e2).sum() < MIN_TAIL:
+            e2 -= 1
+        t = rlag[rlag > e2]
+        return np.maximum(t - e2, 1), np.full(len(t), 1.0 / len(t)), e2
     curve = lambda f, days: [{"day": d, "n": f(d)[1], **({"p_close": round(f(d)[0], 4)} if isinstance(f(d)[0], float)
                                                         else {k: round(x, 4) for k, x in f(d)[0].items()})} for d in days]
     last_np = _carry(np_at, 10_000, lambda m: None)[2]
@@ -294,11 +324,15 @@ def history(ctx: C.Ctx, e: pd.DataFrame) -> dict:
              "paused_dated": int(paused_since[old.index].notna().sum()), "paused": int(old.outcome.eq("paused").sum()),
              "uc_failures": int(len(fail)), "uc_failures_dated": int(fail_t[fail.index].notna().sum()),
              "last_day_np": int(last_np)}
+    timing = {"closers": int(len(closers)), "closers_after_year": int((closers.days_to_close > 365).sum()), "close_median": float(closers.days_to_close.median()),
+              "close_p25": float(closers.days_to_close.quantile(.25)), "close_p75": float(closers.days_to_close.quantile(.75)), "close_max": int(closers.days_to_close.max()),
+              "close_last_day": int(close_timing(10_000)[2]), "refunds": int(len(rlag)), "refund_median": float(np.median(rlag)),
+              "refund_last_day": int(refund_timing(10_000)[2]), "refunds_after_last_day": int((rlag > refund_timing(10_000)[2]).sum())}
     return {"h_uc": h_uc, "h_pi": h_pi, "p_close_uc": p_close_uc, "uc_fail_refund": uc_fail_refund, "p_noprop": p_noprop,
             "uc_n": int(len(uc)), "uc_rate": float(uc.closed.notna().mean()), "old_n": int(len(old)),
             "old_shares": {k: round(float((old.outcome == k).mean()), 3) for k in ("closed", "refunded", "paused", "hunting")},
             "curve_np": curve(p_noprop, (0, 30, 60, 90, 120, 180, 270, 365)), "curve_uc": curve(p_close_uc, (0, 15, 30, 45, 60, 75)),
-            "exits": exits,
+            "exits": exits, "close_timing": close_timing, "refund_timing": refund_timing, "timing": timing,
             "refund_lag": (co[ref & co.refund_date.notna()].refund_date - co[ref & co.refund_date.notna()].start).dt.days}
 
 
@@ -385,10 +419,38 @@ def build(ctx: C.Ctx) -> dict:
     pr = pd.Series({i: s["refunded"] for i, s in shares.items()}, dtype=float).reindex(e.index).fillna(0.0)
     pp = pd.Series({i: s["paused"] + s["hunting"] for i, s in shares.items()}, dtype=float).reindex(e.index).fillna(0.0)
     pam = e.g.eq("paused")
+    # timing for clients still searching (Batch 4D): each client's expected collection, affiliate closings and refund spread over
+    # their own remaining-days distributions (closings and refunds timed separately); amounts are unchanged, only the days
+    tl = 4 * HORIZON
+    t_svc, t_ref = np.zeros(tl), np.zeros(tl)
+    t_known, t_unk = {a: np.zeros(tl) for a in AFFILIATES}, {a: np.zeros(tl) for a in AFFILIATES}
+    carried = {"close": 0, "refund": 0}
+    for i in e[npm].index:
+        el_i = int(el_start[i])
+        dc, wc, c2 = H["close_timing"](el_i)
+        dr, wr, r2 = H["refund_timing"](el_i)
+        carried["close"] += int(c2 < el_i)
+        carried["refund"] += int(r2 < el_i)
+        np.add.at(t_svc, dc, pc[i] * e.at[i, "second"] * wc)
+        np.add.at(t_ref, dr, pr[i] * e.at[i, "paid"] * wr)
+        for a in AFFILIATES:
+            x = el.at[i, a]
+            np.add.at((t_known if x == x else t_unk)[a], dc, pc[i] * wc * (x if x == x else 1.0))
+    t_last = int(np.nonzero(t_svc + t_ref + sum(t_known.values()) + sum(t_unk.values()))[0].max())
+    cum = np.cumsum(t_svc) / t_svc.sum()
+    ends = {"dec": int((pd.Timestamp(asof.year, 12, 31) - asof).days), "jan": int((pd.Timestamp(asof.year + 1, 1, 31) - asof).days),
+            "jun": int((pd.Timestamp(asof.year + 1, 6, 30) - asof).days)}
+    noprop_timing = {"svc": [round(v, 4) for v in t_svc[:t_last + 1]], "refund_base": [round(v, 4) for v in t_ref[:t_last + 1]],
+                     "known": {a: [round(v, 6) for v in t_known[a][:t_last + 1]] for a in AFFILIATES},
+                     "unknown": {a: [round(v, 6) for v in t_unk[a][:t_last + 1]] for a in AFFILIATES},
+                     "meta": {**H["timing"], "carried_close": carried["close"], "carried_refund": carried["refund"], "last_day": t_last,
+                              "collect_share": {k: round(float(cum[d]), 4) for k, d in ends.items()},
+                              "refund_share": {k: round(float(np.cumsum(t_ref)[d] / t_ref.sum()), 4) for k, d in ends.items()} if t_ref.sum() else {}}}
     noprop = {"n": int(npm.sum()), "second": round(float(e.loc[npm, "second"].sum()), 2), "paid": round(float(e.loc[npm, "paid"].sum()), 2),
               "collect": round(float((pc * e.second)[npm].sum()), 2), "refund_base": round(float((pr * e.paid)[npm].sum()), 2),
               "p_close": round(float(pc[npm].mean()), 4), "p_refund": round(float(pr[npm].mean()), 4), "p_pause": round(float(pp[npm].mean()), 4),
-              "aff": aff_parts(npm, pc), "hunting": int((npm & hunt).sum()), "not_started": int((npm & ~hunt).sum())}
+              "aff": aff_parts(npm, pc), "hunting": int((npm & hunt).sum()), "not_started": int((npm & ~hunt).sum()),
+              "timing": noprop_timing}
     paused = {"n": int(pam.sum()), "second": round(float(e.loc[pam, "second"].sum()), 2), "paid": round(float(e.loc[pam, "paid"].sum()), 2),
               "aff": aff_parts(pam, pd.Series(1.0, index=e.index)),
               "paused_n": int((pam & e.rstatus.eq("Paused")).sum()), "additional_n": int((pam & e.rstatus.eq("Additional Service")).sum())}
@@ -473,6 +535,6 @@ def build(ctx: C.Ctx) -> dict:
                     "processed_refunds": {"n": groups["refunded"]["n"], "paid": groups["refunded"]["paid"]}},
         "affiliates": affiliate_history,
         "defaults": {"expected_days": EXPECTED_DAYS, "expected_days_max": EXPECTED_DAYS_MAX, "optimistic_days": int(1 + med),
-                     "paused_proceed": PAUSED_PROCEED, "refundable_share": REFUNDABLE_SHARE, "affiliates": AFFILIATES},
+                     "paused_proceed": PAUSED_PROCEED, "paused_defaults": PAUSED_DEFAULTS, "refundable_share": REFUNDABLE_SHARE, "affiliates": AFFILIATES},
         "notes": {"zero_value_wins": int((e.value == 0).sum()), "scheduled_dates_to": e.loc[e.g.eq("scheduled"), "closed_raw"].max().strftime("%Y-%m-%d") if e.g.eq("scheduled").any() else None},
     }
