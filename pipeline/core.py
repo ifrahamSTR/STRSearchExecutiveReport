@@ -54,6 +54,13 @@ def load(explorer: Path, reports: Path | None, use_cache: bool) -> Ctx:
     f = F.load(reports, use_cache, cache_dir=explorer / ".cache")
     if f.recon_failures:
         raise SystemExit("Explorer reconciliation failed: " + "; ".join(r["check"] for r in f.recon_failures))
+    return from_foundation(f, explorer, D)
+
+
+def from_foundation(f, explorer: Path, D=None) -> Ctx:
+    """Ctx from an already-loaded Explorer foundation (used by load() and by the Explorer's own build to reuse the
+    chapter modules without loading the reporting layer twice)."""
+    D = D or sys.modules["definitions"]
     asof = f.asof
     j = f.jira.copy()
     j["carson_signed"], j["carson_active"], j["carson_inactive"] = j.signed, j.active, j.inactive   # names the chapter code uses

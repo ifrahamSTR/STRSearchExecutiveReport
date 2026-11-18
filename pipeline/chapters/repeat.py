@@ -60,7 +60,9 @@ def _jira_side(ctx, j12):
     }
 
 
-def _pipedrive_side(ctx, j12, jira_pid):
+def deal_people(ctx, j12, jira_pid):
+    """Won engagements with their resolved status (cash.resolve) and a client id linking deals that share an e-mail, a Jira
+    issue or that issue's client (jira_pid: Jira key -> client id from records.people)."""
     e = ctx.f.eng.copy()
     status, evidence, rc = cash.resolve(ctx, e)
     _, d12 = cash._old_package(ctx.explorer)
@@ -87,7 +89,12 @@ def _pipedrive_side(ctx, j12, jira_pid):
             if k in jira_pid.index:
                 union("k" + k, "p" + jira_pid[k])
     e["pid"] = [find("d%d" % i) for i in e.id]
-    e["rs"] = status
+    e["rs"], e["evidence"] = status, evidence
+    return e, rc
+
+
+def _pipedrive_side(ctx, j12, jira_pid):
+    e, rc = deal_people(ctx, j12, jira_pid)
     n = e.groupby("pid").size()
     rep = e[e.pid.map(n) >= 2]
     rr, sd = e[e.rs == "UNRESOLVED_REPEAT"], e[e.rs == "SECOND_DEAL_REVIEW"]
@@ -106,6 +113,13 @@ def _pipedrive_side(ctx, j12, jira_pid):
     }
 
 
+def cribs_stages():
+    """Cribs tracker (Cribs_Data): the most advanced Cribs deal stage at each property address (cash._addr key)."""
+    tr = cash._sheet(C.ROOT.parent, CRIBS_FILE, CRIBS_SHEET)
+    return tr.assign(ak=tr.Address.map(cash._addr), rk=tr["Deal Stage"].map(STAGE_RANK)).dropna(subset=["ak"]) \
+        .sort_values("rk").drop_duplicates("ak", keep="last").set_index("ak")["Deal Stage"]
+
+
 def _cribs(ctx, s):
     """Designer choice on each completed purchase of clients with two or more purchases, in purchase order."""
     raw = ctx.f.frames["jira"].assign(key=lambda f: f["key"].astype(str).str.upper()).set_index("key")
@@ -117,10 +131,7 @@ def _cribs(ctx, s):
     d["k"] = d.groupby("pid").cumcount() + 1
     d["np"] = d.pid.map(d.groupby("pid").size())
     r = d[d.np >= 2].copy()
-    tr = cash._sheet(C.ROOT.parent, CRIBS_FILE, CRIBS_SHEET)
-    best = tr.assign(ak=tr.Address.map(cash._addr), rk=tr["Deal Stage"].map(STAGE_RANK)).dropna(subset=["ak"]) \
-        .sort_values("rk").drop_duplicates("ak", keep="last").set_index("ak")["Deal Stage"]
-    r["tracker"] = r.addr.map(best)
+    r["tracker"] = r.addr.map(cribs_stages())
     first, later = r[r.k == 1], r[r.k > 1]
     keys = ["cribs", "other", "turnkey", "unknown"]
     per = r.groupby("pid").apply(lambda g: pd.Series({"first": g.designer.iloc[0], "later_cribs": bool((g.designer.iloc[1:] == "cribs").any()),

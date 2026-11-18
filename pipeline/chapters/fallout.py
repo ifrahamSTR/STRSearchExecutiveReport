@@ -36,7 +36,9 @@ def _addr(s):
     return None if s is None or pd.isna(s) else (re.sub(r"[^a-z0-9]", "", str(s).lower()) or None)
 
 
-def build(ctx: C.Ctx) -> dict:
+def classify(ctx: C.Ctx) -> pd.DataFrame:
+    """One row per signed-up Jira issue (index = key): stage, evidence flags and the fall-through group (NA when the client is
+    not known to have gone under contract). build() aggregates it; the Explorer exports the group per record."""
     j12 = R.jira12(ctx.explorer)
     s = ctx.signed.set_index("key")
     x = s.join(j12, how="left")
@@ -57,7 +59,14 @@ def build(ctx: C.Ctx) -> dict:
     grp[returned] = "returned"
     grp[ended] = "ended"
     grp[fell & known] = "documented"
-    k = x[known]
+    return x.assign(stage=st, done=done, fell=fell, ucn=ucn, ucrec=ucrec, known=known, ended=ended, returned=returned, second=second, grp=grp)
+
+
+def build(ctx: C.Ctx) -> dict:
+    j12 = R.jira12(ctx.explorer)
+    x = classify(ctx)
+    st, done, fell, ucn, ucrec, known = x.stage, x.done, x.fell, x.ucn, x.ucrec, x.known
+    ended, returned, second, grp = x.ended, x.returned, x.second, x.grp
     n_known = int(known.sum())
 
     def by_stage(m):

@@ -94,6 +94,7 @@ def load_form(path) -> pd.DataFrame:
     return pd.DataFrame({
         "ts": pd.to_datetime(raw.ts, errors="coerce"), "h1": raw.email.map(_h), "h2": raw.email2.map(_h),
         "form_deal": pd.to_numeric(raw.form_deal, errors="coerce"), "cap": raw.capital.map(_cap_upper),
+        "cap_label": raw.capital.astype("string").str.strip(),
         "liquid": raw.liquid.map(lambda v: _starts(v, ("All", "all"), ("Most", "most"), default="some")),
         "budget": raw.budget.map(lambda v: _starts(v, ("Strict", "strict"), ("Some", "some"), default="flexible")),
         "property": [("turnkey" if str(a).startswith("Turnkey") else "light" if str(r).startswith("Light") else "value_add")
@@ -150,7 +151,7 @@ def match(co: pd.DataFrame, form: pd.DataFrame, hashes: dict) -> tuple[pd.DataFr
         pick = before.sort_values("ts").index[-1] if len(before) else None
         via_deal_only += int(pick is not None and pick not in by_mail)
         picked.append(pick)
-    cols = ["ts", "cap", "liquid", "budget", "property", "markets", "offers", "airbnb"]
+    cols = ["ts", "cap", "liquid", "budget", "property", "markets", "offers", "airbnb"] + (["cap_label"] if "cap_label" in form else [])
     out = pd.DataFrame({col: [form.at[i, col] if i is not None else None for i in picked] for col in cols}, index=co.index)
     out["matched"] = [i is not None for i in picked]
     return out, {"via_deal_only": via_deal_only, "rejected_conflicts": rejected, "only_after_uc": after_uc}

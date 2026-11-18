@@ -337,10 +337,10 @@ def history(ctx: C.Ctx, e: pd.DataFrame) -> dict:
 
 
 # ----------------------------------------------------------------------------- build
-def build(ctx: C.Ctx) -> dict:
+def assign_groups(ctx: C.Ctx) -> tuple[pd.DataFrame, dict]:
+    """Every won engagement with its resolved status, evidence label and forecast group (as build() uses them)."""
     asof = ctx.asof
     e = ctx.f.eng.copy()
-    jj = ctx.f.jira.set_index("key")
     status, evidence, rc = resolve(ctx, e)
     e["rstatus"], e["evidence"] = status, evidence
     hunt = e.hunting.fillna(False).astype(bool)
@@ -355,6 +355,15 @@ def build(ctx: C.Ctx) -> dict:
          (e.has_jira & ~signed) | rs.isin(["New Clients", "Onboarding Completed", "Services Declined"])],
         ["second_deal_review", "unverified_repeat", "unverified_none", "unverified_closing", "closed", "refunded", "scheduled", "closed",
          "unverified_closing", "under_contract", "paused", "noprop", "noprop"], default="other")
+    return e, rc
+
+
+def build(ctx: C.Ctx) -> dict:
+    asof = ctx.asof
+    jj = ctx.f.jira.set_index("key")
+    e, rc = assign_groups(ctx)
+    hunt = e.hunting.fillna(False).astype(bool)
+    done = e.closed_raw.notna() & (e.closed_raw <= asof)
     split = e.cash_payment_type_normalized.eq("Split Pay")
     e["second"] = np.where(split, e.cash_second_installment_amount.fillna(0.0), 0.0)               # still due at closing
     e["paid"] = e.cash_assumed_initial_cash_collected.fillna(0.0)                                   # received at the win
