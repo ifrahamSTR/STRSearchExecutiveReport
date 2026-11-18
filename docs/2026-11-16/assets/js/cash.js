@@ -42,7 +42,8 @@
   const amt = v => `<b title="${money(v)}">${short(v)}</b>`;           // an amount in running text; hover shows the exact figure
   const amtS = v => `<b title="${money(v)}">${signed(v)}</b>`;
   const css = n => getComputedStyle(document.documentElement).getPropertyValue(n).trim();
-  const tok = () => Object.assign(S.tok(), { neg: css('--neg'), total: css('--total'), band: css('--wf-band') });
+  const tok = () => Object.assign(S.tok(), { neg: css('--neg'), total: css('--total'), band: css('--wf-band'), realtor: css('--aff-realtor'), lender: css('--aff-lender'), cribs: css('--aff-cribs') });
+  const hexA = (h, a) => { const n = parseInt(h.replace('#', ''), 16); return `rgba(${n >> 16},${(n >> 8) & 255},${n & 255},${a})`; };
 
   /* ------------------------------------------------------------------ state: paused + Additional Service = one whole-percent "% expected to close" */
   const defaults = () => ({ d: DEF.expected_days, max: DEF.expected_days_max, pc: DEF.paused_close, h: true,
@@ -322,7 +323,7 @@
           <h3><span class="ic" style="--ic:var(--closed)">${IC.partner}</span>Affiliate revenue</h3>
           <p class="hint">Conversion applies only where Jira has no recorded partner choice. A recorded preferred partner earns the fee; a recorded other partner, cash purchase or turnkey home earns nothing. Cash arrives on modeled payout dates (realtor: the month after the quarter ends; lender and STR Cribs: the month after closing). The same rules apply to the ${S.int(CP.n)} purchases completed since ${S.date(CP.from)} whose fees are not shown as paid.</p>
           ${AFF.map(k => `<div class="aff" data-aff="${k}">
-            <div class="aff-head"><b>${DEF.affiliates[k].label}</b><span id="o-${k}-val"></span></div>
+            <div class="aff-head"><b><i class="aff-sw" style="background:var(--aff-${k})"></i>${DEF.affiliates[k].label}</b><span id="o-${k}-val"></span></div>
             <div class="range"><div class="range-top"><label for="r-${k}-c">Conversion when no choice is recorded</label><output id="o-${k}-c"></output></div><input type="range" id="r-${k}-c" min="0" max="100" step="1" style="--c:var(--closed)"></div>
             <div class="range"><div class="range-top"><label for="r-${k}-r">Revenue per conversion</label><output id="o-${k}-r"></output></div><input type="range" id="r-${k}-r" min="0" max="10000" step="100" style="--c:var(--closed)"></div>
             <div class="hist" id="h-${k}"></div>
@@ -586,7 +587,9 @@
     { k: 'fixed', name: 'Under contract or scheduled', color: t.uc },
     { k: 'noprop', name: 'Still searching', color: t.wait },
     { k: 'paused', name: 'Paused / Additional Service, resuming', color: t.sales },
-    { k: 'aff', name: 'Affiliate revenue', color: t.closed },
+    { k: 'realtor', name: 'Realtor fees', color: t.realtor },
+    { k: 'lender', name: 'Lender fees', color: t.lender },
+    { k: 'cribs', name: 'STR Cribs fees', color: t.cribs },
     { k: 'refund', name: 'Future refunds paid out', color: t.neg },
   ];
   const shadow = t => ({ type: 'shadow', shadowStyle: { color: t.grid, opacity: 0.6 } });
@@ -596,7 +599,9 @@
   let cashDetail = false;                    // false: service collections as one bar; true: split by client group
   const cashSeriesDef = t => (cashDetail ? SRC(t) : [
     { k: 'service', name: 'Service collections', color: t.uc },
-    { k: 'aff', name: 'Affiliate revenue', color: t.closed },
+    { k: 'realtor', name: 'Realtor fees', color: t.realtor },
+    { k: 'lender', name: 'Lender fees', color: t.lender },
+    { k: 'cribs', name: 'STR Cribs fees', color: t.cribs },
     { k: 'refund', name: 'Future refunds paid out', color: t.neg },
   ]);
   const cashChart = chart($('c-cash'), () => {
@@ -608,7 +613,8 @@
         const r = MV[ps[0].dataIndex];
         return tipBox(t, monthTitle(r), [['Service collections', money(r.service), cashDetail ? null : t.uc, 'b']]
           .concat(src.slice(0, 3).filter(s => Math.abs(r[s.k]) > 0.5).map(s => [s.name, money(r[s.k]), cashDetail ? s.color : null, 'sub']))
-          .concat([['Affiliate revenue', money(r.aff), t.closed]], r.affDone > 0.5 ? [['Completed purchases', money(r.affDone), null, 'sub'], ['Forecast closings', money(r.affFc), null, 'sub']] : [],
+          .concat([['Affiliate revenue', money(r.aff), null, 'b']], AFF.filter(k => r[k] > 0.5).map(k => [DEF.affiliates[k].label, money(r[k]), t[k], 'sub']),
+            r.affDone > 0.5 ? [[r.affFc < 0.5 ? 'All from completed purchases' : `Of which completed purchases`, money(r.affDone), null, 'sub']] : [],
             [['Future refunds paid out', money(r.refund), t.neg], [r.later ? 'Net in these months' : 'Net this month', money(r.net), null, 'b'], ['Running total', money(r.cum)]]),
           r.later ? 'Summarised as one block: past clients this far out are few, so the month of each payment is uncertain. The amounts are in the total.' : '');
       } }),
@@ -626,16 +632,16 @@
     });
   });
   function cashLegend() {
-    const t = tok(), srcs = SRC(t), LGC = ['var(--uc)', 'var(--wait)', 'var(--sales)', 'var(--closed)', 'var(--neg)'];
+    const t = tok(), srcs = SRC(t), LGC = ['var(--uc)', 'var(--wait)', 'var(--sales)', 'var(--aff-realtor)', 'var(--aff-lender)', 'var(--aff-cribs)', 'var(--neg)'];
     const lgi = (s, i) => `<span><i style="background:${LGC[i]}"></i>${s.name}</span>`;
     const btn = $('b-detail'); btn.setAttribute('aria-pressed', String(cashDetail)); btn.textContent = cashDetail ? 'Hide client groups' : 'Split by client group';
     $('lg-cash').innerHTML = (cashDetail
-      ? `<span class="lg-g"><span class="lg-h">Service collections</span>${srcs.slice(0, 3).map(lgi).join('')}</span>${srcs.slice(3).map((s, i) => lgi(s, i + 3)).join('')}`
-      : `<span><i style="background:var(--uc)"></i>Service collections</span><span><i style="background:var(--closed)"></i>Affiliate revenue</span><span><i style="background:var(--neg)"></i>Future refunds paid out</span>`)
+      ? `<span class="lg-g"><span class="lg-h">Service collections</span>${srcs.slice(0, 3).map(lgi).join('')}</span><span class="lg-g"><span class="lg-h">Affiliate revenue</span>${srcs.slice(3, 6).map((s, i) => lgi(s, i + 3)).join('')}</span>${lgi(srcs[6], 6)}`
+      : `<span><i style="background:var(--uc)"></i>Service collections</span><span class="lg-g"><span class="lg-h">Affiliate revenue</span>${srcs.slice(3, 6).map((s, i) => lgi(s, i + 3)).join('')}</span><span><i style="background:var(--neg)"></i>Future refunds paid out</span>`)
       + `<span><i class="ln" style="background:var(--ink)"></i>Net (cash in minus refunds)</span>`;
     $('f-cash').textContent = cashDetail
       ? `Service collections split by client group. Each bar is one month’s cash, not a running total. The line is the month’s net (cash in minus refunds), not extra cash. Affiliate fees appear on their modeled payout dates. The striped bar sums every month after ${mFull(SHOW_K)}.`
-      : `Each bar is one month’s cash, not a running total. Blue and green bars are cash in; red is refunds paid out. The line is the month’s net (cash in minus refunds), not extra cash. Affiliate fees appear on their modeled payout dates. The striped bar sums every month after ${mFull(SHOW_K)}.`;
+      : `Each bar is one month’s cash, not a running total. Blue is service collections and the three greens are affiliate fees (darkest realtor, then lender, lightest STR Cribs); red is refunds paid out. The line is the month’s net (cash in minus refunds), not extra cash. Affiliate fees appear on their modeled payout dates. The striped bar sums every month after ${mFull(SHOW_K)}.`;
   }
 
   /* ------------------------------------------------------------------ refunds by source */
@@ -678,21 +684,23 @@
       tooltip: tip(t, { trigger: 'axis', axisPointer: shadow(t), formatter: ps => {
         const k = AFF[ps[0].dataIndex], p = P[k];
         return tipBox(t, p.label, [
-          ['Completed purchases, not yet received', money(p.done), t.acq], [`${S.d1(p.doneN)} completed closings since ${S.date(CP.from)} × ${money(p.rev)}${p.donePaid ? ` (${S.int(p.donePaid)} already received, not counted)` : ''}`, '', null, 'sub'],
-          ['Forecast: recorded partner choices', money(p.chosen), t.closed], [`${S.d1(p.known)} expected closings × ${money(p.rev)}`, '', null, 'sub'],
-          ['Forecast: modeled conversions', money(p.assumed), t.closed2], [`${pct(p.conv)} of ${S.d1(p.unk)} with no recorded choice × ${money(p.rev)}`, '', null, 'sub'],
+          ['Completed purchases, not yet received', money(p.done), t[k]], [`${S.d1(p.doneN)} completed closings since ${S.date(CP.from)} × ${money(p.rev)}${p.donePaid ? ` (${S.int(p.donePaid)} already received, not counted)` : ''}`, '', null, 'sub'],
+          ['Forecast: recorded partner choices', money(p.chosen), hexA(t[k], 0.62)], [`${S.d1(p.known)} expected closings × ${money(p.rev)}`, '', null, 'sub'],
+          ['Forecast: modeled conversions', money(p.assumed), hexA(t[k], 0.22)], [`${pct(p.conv)} of ${S.d1(p.unk)} with no recorded choice × ${money(p.rev)}`, '', null, 'sub'],
           ['Expected revenue', money(p.total), null, 'b'], [`Modeled receipt by ${dShort(lastMonthEnd(2))}`, money(affRecv(k, lastMonthEnd(2)))], [`${TIMING[k]}, on the 15th`, '', null, 'sub']]);
       } }),
       yAxis: { type: 'category', inverse: true, data: AFF.map(k => P[k].label), axisTick: { show: false }, axisLine: { show: false }, axisLabel: { color: t.ink, fontSize: 13, fontWeight: 600, margin: 12 } },
       xAxis: { type: 'value', min: 0, max: mx * 1.02, show: false },
       series: [
-        { name: 'Completed purchases, not yet received', type: 'bar', stack: 'a', barWidth: 28, data: AFF.map(k => Math.round(P[k].done)),
-          itemStyle: { color: t.acq, borderColor: t.surface, borderWidth: 1 }, emphasis: { focus: 'series' } },
+        { name: 'Completed purchases, not yet received', type: 'bar', stack: 'a', barWidth: 28,
+          data: AFF.map(k => ({ value: Math.round(P[k].done), itemStyle: { color: t[k] } })),
+          itemStyle: { borderColor: t.surface, borderWidth: 1 }, emphasis: { focus: 'series' } },
         { name: 'From recorded partner choices', type: 'bar', stack: 'a', barWidth: 28,
-          data: AFF.map(k => ({ value: Math.round(P[k].chosen), itemStyle: { borderRadius: P[k].assumed < 0.5 ? [0, 4, 4, 0] : 0 } })),
-          itemStyle: { color: t.closed, borderColor: t.surface, borderWidth: 1 }, emphasis: { focus: 'series' } },
-        { name: 'From modeled conversions', type: 'bar', stack: 'a', barWidth: 28, data: AFF.map(k => Math.round(P[k].assumed)),
-          itemStyle: { color: t.closed2, borderColor: t.closed, borderWidth: 1.5, borderRadius: [0, 4, 4, 0] }, emphasis: { focus: 'series' },
+          data: AFF.map(k => ({ value: Math.round(P[k].chosen), itemStyle: { color: hexA(t[k], 0.62), borderRadius: P[k].assumed < 0.5 ? [0, 4, 4, 0] : 0 } })),
+          itemStyle: { borderColor: t.surface, borderWidth: 1 }, emphasis: { focus: 'series' } },
+        { name: 'From modeled conversions', type: 'bar', stack: 'a', barWidth: 28,
+          data: AFF.map(k => ({ value: Math.round(P[k].assumed), itemStyle: { color: hexA(t[k], 0.22), borderColor: t[k], borderWidth: 1.5, borderRadius: [0, 4, 4, 0] } })),
+          emphasis: { focus: 'series' },
           label: { show: true, position: 'right', distance: 8, color: t.ink, fontSize: 13.5, fontWeight: 700, formatter: p => short(P[AFF[p.dataIndex]].total) } },
       ],
     });
@@ -795,7 +803,7 @@
     const P = affParts(st), tot = AFF.reduce((a, k) => a + P[k].total, 0);
     const rows = AFF.map(k => Object.assign({ k, share: tot ? P[k].total / tot : 0 }, P[k]));
     dataTable($('t-aff'), 'aff', [
-      { k: 'label', label: 'Partner', html: r => (r._total ? 'Total' : `${sw('var(--closed)')}${r.label}<small>Completed: ${S.int(r.doneN)} fees not yet received · forecast: ${S.int(r.known)} expected closings already chose this partner, ${S.int(r.unk)} with no recorded choice</small>`) },
+      { k: 'label', label: 'Partner', html: r => (r._total ? 'Total' : `${sw('var(--aff-' + r.k + ')')}${r.label}<small>Completed: ${S.int(r.doneN)} fees not yet received · forecast: ${S.int(r.known)} expected closings already chose this partner, ${S.int(r.unk)} with no recorded choice</small>`) },
       { k: 'done', label: 'Completed purchases', num: true, fmt: cellM, title: r => money(r.done) },
       { k: 'conv', label: 'Conversion (no choice recorded)', num: true, fmt: (v, r) => (r._total ? '' : pct(v)) },
       { k: 'paying', label: 'Expected paying closings (forecast)', num: true, fmt: v => (v == null ? '' : S.int(v)) },
@@ -1106,7 +1114,7 @@
     $('p-ref').classList.toggle('is-empty', noRefunds);
     $('e-ref').textContent = noRefunds ? 'No upfront money is returned in this scenario, so there are no future refunds to show.' : '';
     $('s-aff').textContent = `${short(M.tot.aff)} expected (${short(AFF.reduce((a, k) => a + affRecv(k, lastMonthEnd(2)), 0))} received by ${dShort(lastMonthEnd(2))} on modeled payout dates) · ${short(M.tot.affDone)} from purchases already completed, ${short(chosen)} from forecast closings with a recorded partner choice, the rest modeled from conversion settings`;
-    $('lg-aff').innerHTML = `<span><i style="background:var(--acq)"></i>Completed purchases, fee not yet received</span><span><i style="background:var(--closed)"></i>Forecast: recorded partner choices</span><span><i class="out" style="background:var(--closed-2);border-color:var(--closed)"></i>Forecast: modeled conversions (no choice recorded)</span>`;
+    $('lg-aff').innerHTML = `<span class="lg-g"><span class="lg-h">Partner</span>${AFF.map(k => `<span><i style="background:var(--aff-${k})"></i>${DEF.affiliates[k].label}</span>`).join('')}</span><span class="lg-g"><span class="lg-h">Bar</span><span><i style="background:var(--ink-2)"></i>Completed purchases, fee not yet received</span><span><i style="background:var(--ink-2);opacity:.55"></i>Forecast: recorded choices</span><span><i class="out" style="background:transparent;border-color:var(--ink-2)"></i>Forecast: modeled conversions</span></span>`;
     const sc = scenarios(), nets = sc.map(x => x.m.tot.net);
     $('s-scen').textContent = `Only timing changes, so every line reaches the same ${short(nets[1])}; what differs is the running total by each date.`;
     $('lg-scen').innerHTML = `<span><i class="ln" style="background:var(--sp-mid)"></i>Earlier collections (${OPT} days)</span><span><i class="ln" style="background:var(--acq)"></i>Your timing (${st.d} days)</span><span style="color:var(--hold)"><i class="dash"></i><span style="color:var(--ink-2)">Later collections (${st.max} days)</span></span>`;

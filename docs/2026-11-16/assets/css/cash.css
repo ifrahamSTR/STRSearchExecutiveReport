@@ -3,9 +3,9 @@
    light #4f5fc0 total / #0f8a6f adds (= --closed) / #d6403a reduces, on #ffffff: all checks pass;
    dark  #7389e0 / #1b9a7c / #e66a45, on #131c19: CVD 7.8 (protan), legal because every bar is direct-labelled with its sign.
    Monthly stack (blue, amber, plum, green + red refunds below zero) passes adjacency checks in both themes. */
-:root { --neg: #d6403a; --total: #4f5fc0; --wf-band: #f1f5f3; }
-@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) { --neg: #e66a45; --total: #7389e0; --wf-band: #18231f; } }
-:root[data-theme="dark"] { --neg: #e66a45; --total: #7389e0; --wf-band: #18231f; }
+:root { --neg: #d6403a; --total: #4f5fc0; --wf-band: #f1f5f3; --aff-realtor: #0a6e58; --aff-lender: #1fa384; --aff-cribs: #6dc8ac; }
+@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) { --neg: #e66a45; --total: #7389e0; --wf-band: #18231f; --aff-realtor: #17896f; --aff-lender: #35b898; --aff-cribs: #86d6bd; } }
+:root[data-theme="dark"] { --neg: #e66a45; --total: #7389e0; --wf-band: #18231f; --aff-realtor: #17896f; --aff-lender: #35b898; --aff-cribs: #86d6bd; }
 
 /* a dashboard needs more width than the presentation's reading column */
 .cash-page { --stage: 1280px; }
@@ -358,3 +358,5 @@ table.px-m td .bx { margin-left: 4px; vertical-align: 1px; }
 table.px-m tr.mid td { border-top: 1px dashed var(--line-2); font-weight: 600; }
 /* monthly table: the later block */
 table.dt tr.later td { background: var(--wf-band); }
+
+.aff-sw { display: inline-block; width: 9px; height: 9px; border-radius: 3px; margin-right: 7px; vertical-align: 0; }
