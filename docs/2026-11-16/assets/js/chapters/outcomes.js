@@ -183,8 +183,8 @@
   /* 2.3 where the others stand: paused, refunded, under contract */
   function others(main, D, ch, of) {
     const s = D.outcomes.status, p = s.paused, r = s.refunded, u = s.under_contract, w = D.outcomes.waiting.stages, st = { rf: 'days' };
-    const cg = D.cash.groups.paused, pd = D.cash.defaults.paused_defaults, br = D.reconcile.cash_bridge;
-    const pausedRefund = cg.paid * pd.refund / 100, money = v => '$' + (Math.abs(v) / 1e6).toFixed(2) + 'M';
+    const cg = D.cash.groups.paused, pc = D.cash.defaults.paused_close, br = D.reconcile.cash_bridge;
+    const pausedRefund = cg.paid * (100 - pc) / 100, money = v => '$' + (Math.abs(v) / 1e6).toFixed(2) + 'M';
     const recent = r.by_month.filter(m => m.month >= '2026-01'), peak = r.by_month.reduce((a, m) => (m.n > a.n ? m : a), { n: -1 });
     const fullMon = k => new Date(k + '-15T12:00:00').toLocaleDateString('en-GB', { month: 'long', year: 'numeric' });
     const body = S.scene(main, { ch, step: 3, of, label: 'Where the others stand',
@@ -203,7 +203,7 @@
             <div class="chart h-duo" id="refundDays" role="img" aria-label="Refunded clients by days from start to refund: ${r.bands.map(b => `${band(b)} ${b.n}`).join(', ')}."></div>
             <div class="chart h-duo" id="refundMonths" hidden role="img" aria-label="Refunds by month: ${recent.map(m => `${S.monShort(m.month)} ${m.n}`).join(', ')}."></div></div>
         </div>
-        <p class="call"><span class="call-h">Cash link</span>Paused clients have paid <b>${money(cg.paid)}</b> up front. At the Cash Forecast's default (${pd.resume}% resume, ${pd.refund}% refunded, ${pd.remain}% stay paused), <b>${money(pausedRefund)}</b> of the <b>${money(br.refunds)}</b> projected refunds come from them: the paused group is the largest single swing in forecast cash. The Cash Forecast tab models these flows.</p></div>
+        <p class="call"><span class="call-h">Cash link</span>Paused clients have paid <b>${money(cg.paid)}</b> up front. At the Cash Forecast's default (${pc}% of paused and Additional Service deals close, the other ${100 - pc}% are refunded in full), <b>${money(pausedRefund)}</b> of the <b>${money(br.refunds)}</b> projected refunds come from them: the paused group is the largest single swing in forecast cash. The Cash Forecast tab models these flows.</p></div>
         <div class="pv-table tw" id="othTable"></div>
       </div>
       ${S.ui.ex('How is this number built?', [

@@ -14,15 +14,17 @@ Every won engagement lands in exactly one group:
   noprop              hunting or won-but-not-started: historical outcome shares for clients without a contract after
                       the same number of days (close / refund / pause); closings timed by the remaining days to closing of
                       past clients still searching after as many days, refunds by the remaining days of past refunds (Batch 4D)
-  paused              paused or additional service: three slider shares (resume and close / full refund / remain paused),
-                      timed by the dashboard's expected-days slider with the historical UC -> CLOSED spread around it
+  paused              paused or additional service: one "% expected to close" slider (default from PAUSED_CLOSE_PTS); the rest
+                      receive a full refund of the upfront payment; timed by the dashboard's expected-days slider with the
+                      historical UC -> CLOSED spread around it
+  completed (Q4)      completed closings since COMPLETED_FROM: affiliate fees not shown as paid, on their payout dates
   refunded            marked Refunded in Jira: refund assumed already paid back (historical); no future flows
   closed              closing recorded on or before the reporting date (incl. dates found in affiliate records):
                       2nd installment assumed collected at closing, as the reporting layer models it
   unverified_*        balances the data cannot resolve (shown with the missing information, not forecast)
   second_deal_review  same client, won date and value as a Jira-linked won deal, but no engagement of its own and no payment record: a second
                       search not yet started or a record entered twice. Excluded (conservative) and flagged for review
-Projected refunds (future only) = clients assumed to refund x refund-size slider x upfront payment (first installment for
+Projected refunds (future only) = clients assumed to refund x 100% of the upfront payment (first installment for
 Split Pay, the full price for Paid In Full); their unpaid second installment is not collected. Affiliate revenue uses each client's recorded partner choice where Jira has
 one (preferred = earns, other / cash / turnkey = does not) and the conversion slider only where it has none.
 """
@@ -43,9 +45,14 @@ import core as C
 HORIZON = 420
 EXPECTED_DAYS_MAX = 77                 # agreed default maximum of the expected-days slider (pessimistic case)
 EXPECTED_DAYS = 57                     # default slider position: halfway between optimistic (day 37) and 77
-PAUSED_PROCEED = 0.10                  # default paused outcome shares (Batch 4D): resume and close / full refund / remain paused
-PAUSED_DEFAULTS = {"resume": 10, "refund": 40, "remain": 50}
-REFUNDABLE_SHARE = 1.0                 # default refund size for FUTURE refunds: share of the upfront payment returned (slider 0-100%)
+# Paused + Additional Service (Batch 5, 18 Nov 2026): one "% expected to close" slider; the rest receive a full refund of the
+# upfront payment. Default: points of the whole Paused group expected to close, from the Paused deals with an ended contract or a
+# documented fall-through and from the others (55% of Paused), with every Additional Service deal expected to close (about 57%).
+PAUSED_CLOSE_PTS = {"fell_through": 25, "other": 30}
+REFUNDABLE_SHARE = 1.0                 # a future refund returns 100% of the upfront payment (business rule)
+COMPLETED_FROM = "2026-10-01"          # completed closings whose affiliate fees are still due under the payout dates (Q4 2026 to date)
+SHOW_TO = "2027-05-31"                 # the monthly view shows the months to this date; later cash is summarised as one block
+TIMING_CHECK_AT = ["2026-02-16", "2026-03-16", "2026-04-16", "2026-05-16"]   # past dates for the timing back-test (six months each)
 AFFILIATES = {"realtor": {"label": "Realtor", "conv": 0.93, "rev": 4000},
               "lender": {"label": "Lender", "conv": 0.70, "rev": 1400},
               "cribs": {"label": "STR Cribs", "conv": 0.70, "rev": 2500}}
@@ -124,9 +131,10 @@ def _second_deal_verdict(did, d12i, key_of_deal, j12k):
 
 
 # ----------------------------------------------------------------------------- evidence for uncertain engagements
-def resolve(ctx: C.Ctx, e: pd.DataFrame) -> tuple[pd.Series, pd.Series, dict]:
+def resolve(ctx: C.Ctx, e: pd.DataFrame, with_keys: bool = False):
     """Resolve won deals without a Jira match and post-close records without a closing date.
-    Returns (resolved status per engagement, evidence label per engagement, summary counts)."""
+    Returns (resolved status per engagement, evidence label per engagement, summary counts); with_keys=True adds the Jira issue
+    each engagement resolves to (its own linked issue, or the issue found by e-mail / as a separate purchase; None otherwise)."""
     base = C.ROOT.parent
     j12, d12 = _old_package(ctx.explorer)
     jira16 = ctx.f.jira.set_index("key")
@@ -155,6 +163,7 @@ def resolve(ctx: C.Ctx, e: pd.DataFrame) -> tuple[pd.Series, pd.Series, dict]:
 
     status = pd.Series(e.status.values, index=e.index, dtype="object")
     evidence = pd.Series("Jira match (reporting layer)", index=e.index, dtype="object")
+    rkey = pd.Series(e.jira_key.where(e.has_jira).astype("object").values, index=e.index, dtype="object")
     linked = e[e.has_jira].set_index("jira_key")
     counts = {"own_jira": 0, "separate_purchase": 0, "second_deal_review": 0, "repeat": 0, "purchase_record": 0, "none": 0, "onboarded": 0}
     d12i = d12.set_index("Deal_ID")
@@ -177,6 +186,7 @@ def resolve(ctx: C.Ctx, e: pd.DataFrame) -> tuple[pd.Series, pd.Series, dict]:
                 status[i], evidence[i] = "CLOSED_EVIDENCED", "closing recorded on its own Jira issue (matched by e-mail)"
             else:
                 status[i], evidence[i] = jira16.status[k], "e-mail matches its own Jira issue (12 Nov extract)"
+            rkey[i] = k
             counts["own_jira"] += 1
         elif shared:
             o = linked.loc[shared[0]]
@@ -184,6 +194,7 @@ def resolve(ctx: C.Ctx, e: pd.DataFrame) -> tuple[pd.Series, pd.Series, dict]:
                 verdict, k, why = _second_deal_verdict(int(r.id), d12i, key_of_deal, j12k)
                 if verdict == "separate":
                     status[i], evidence[i] = str(j12k.loc[k, "Issue_Status"]), "separate purchase: " + why
+                    rkey[i] = k
                     counts["separate_purchase"] += 1
                 else:
                     status[i], evidence[i] = "SECOND_DEAL_REVIEW", "second deal under review: " + why
@@ -222,7 +233,7 @@ def resolve(ctx: C.Ctx, e: pd.DataFrame) -> tuple[pd.Series, pd.Series, dict]:
             counts["post_close_evidenced"] += 1
         else:
             status[i], evidence[i] = "UNRESOLVED_CLOSING", "post-close status, but no closing date or purchase record"
-    return status, evidence, counts
+    return (status, evidence, counts, rkey) if with_keys else (status, evidence, counts)
 
 
 # ----------------------------------------------------------------------------- history
@@ -341,8 +352,8 @@ def assign_groups(ctx: C.Ctx) -> tuple[pd.DataFrame, dict]:
     """Every won engagement with its resolved status, evidence label and forecast group (as build() uses them)."""
     asof = ctx.asof
     e = ctx.f.eng.copy()
-    status, evidence, rc = resolve(ctx, e)
-    e["rstatus"], e["evidence"] = status, evidence
+    status, evidence, rc, rkey = resolve(ctx, e, with_keys=True)
+    e["rstatus"], e["evidence"], e["rkey"] = status, evidence, rkey
     hunt = e.hunting.fillna(False).astype(bool)
     signed = e.signed.fillna(False).astype(bool)
     sched = e.closed_raw.notna() & (e.closed_raw > asof)
@@ -356,6 +367,165 @@ def assign_groups(ctx: C.Ctx) -> tuple[pd.DataFrame, dict]:
         ["second_deal_review", "unverified_repeat", "unverified_none", "unverified_closing", "closed", "refunded", "scheduled", "closed",
          "unverified_closing", "under_contract", "paused", "noprop", "noprop"], default="other")
     return e, rc
+
+
+WAIT_BANDS = [(0, 30), (31, 60), (61, 90), (91, 180), (181, 100_000)]
+
+
+def _wait_bands(per_client: list) -> list:
+    """Clients still searching by days searched so far: how much longer comparable past clients took (medians), how many past
+    closings and refunds each median rests on, and how much of the expected collections lands after the monthly view."""
+    d = pd.DataFrame(per_client)
+    out = []
+    for lo, hi in WAIT_BANDS:
+        g = d[d.el.between(lo, hi)]
+        if not len(g):
+            continue
+        out.append({"from": lo, "to": hi if hi < 100_000 else None, "n": int(len(g)),
+                    "close_med": float(g.close_med.median()), "closers_min": int(g.closers.min()), "closers_max": int(g.closers.max()),
+                    "close_carried": int(g.close_carried.sum()), "refund_med": float(g.refund_med.median()), "refunds_min": int(g.refunds.min()),
+                    "refund_carried": int(g.refund_carried.sum()), "collect": round(float(g.collect.sum()), 2),
+                    "collect_later": round(float(g.collect_later.sum()), 2), "after_year_w": round(float((g.after_year_w * g.collect).sum() / g.collect.sum()), 4) if g.collect.sum() else 0.0})
+    return out
+
+
+def timing_check(ctx: C.Ctx, e: pd.DataFrame, H: dict) -> dict:
+    """Back-test of the still-searching timing (Batch 5). At each past date T, the clients still searching then (confirmed start, no
+    contract, inspection, closing, refund or pause yet) are timed two ways and compared with what happened in the next six months:
+      spread:  the forecast's method (each client's chance of closing spread over the remaining days of comparable past closers)
+      median:  the simpler method (the whole chance placed at the median remaining days of the same comparable closers)
+    Refunds the same way. Months are 30.44-day steps from T. The comparison groups are today's, so this checks the shape of the
+    timing, not the level. Aggregates only."""
+    asof = ctx.asof
+    j12, _ = _old_package(ctx.explorer)
+    j12 = j12.assign(K=j12["key"].astype(str).str.upper()).drop_duplicates("K").set_index("K")
+    co = e[e.confirmed_start].copy()
+    ref = co.refunded.fillna(False).astype(bool)
+    k = co.jira_key.astype("string").str.upper()
+    lsd = pd.to_datetime(k.map(j12.latest_status_date), errors="coerce")
+    ls = k.map(j12.latest_status)
+    paused = co.status.isin(["Paused", "Additional Service"])
+    paused_since = lsd.where(paused & ls.isin(["Paused", "Additional Service"]))
+    left = pd.concat([co.uc, co.pi, co.closed, co.refund_date.where(ref), paused_since], axis=1).min(axis=1)
+    M = 6
+    acc = {x: np.zeros(M) for x in ("actual_close", "spread_close", "median_close", "actual_refund", "spread_refund", "median_refund")}
+    clients = 0
+    for T in pd.to_datetime(TIMING_CHECK_AT):
+        at = co[(co.start < T) & (left.isna() | (left >= T)) & ~(paused & paused_since.isna())]
+        clients += len(at)
+        for i, r in at.iterrows():
+            el = int((T - r.start).days)
+            sh = H["p_noprop"](el)[0]
+            for kind, f, p in (("close", H["close_timing"], sh["closed"]), ("refund", H["refund_timing"], sh["refunded"])):
+                dd, w, _ = f(el)
+                mi = (dd // 30.44).astype(int)
+                acc[f"spread_{kind}"] += np.bincount(mi[mi < M], weights=(p * w)[mi < M], minlength=M)[:M]
+                o = np.argsort(dd, kind="stable")
+                med = int(dd[o][np.searchsorted(np.cumsum(w[o]), 0.5)])
+                if med // 30.44 < M:
+                    acc[f"median_{kind}"][int(med // 30.44)] += p
+            if pd.notna(r.closed):
+                m = int((r.closed - T).days // 30.44)
+                if 0 <= m < M:
+                    acc["actual_close"][m] += 1
+            elif ref[i] and pd.notna(r.refund_date):
+                m = int((r.refund_date - T).days // 30.44)
+                if 0 <= m < M:
+                    acc["actual_refund"][m] += 1
+
+    def mae(a, p):
+        return round(float(np.abs(a / a.sum() - p / p.sum()).mean() * 100), 1) if a.sum() and p.sum() else None
+    peak = lambda p: round(float(p.max() / p.sum()), 4) if p.sum() else None
+    out = {"dates": TIMING_CHECK_AT, "months": M, "clients": int(clients)}
+    for kind in ("close", "refund"):
+        a, sp, md = acc[f"actual_{kind}"], acc[f"spread_{kind}"], acc[f"median_{kind}"]
+        out[kind] = {"actual": [int(x) for x in a], "spread": [round(float(x), 1) for x in sp], "median": [round(float(x), 1) for x in md],
+                     "mae_spread": mae(a, sp), "mae_median": mae(a, md), "peak_actual": peak(a), "peak_spread": peak(sp), "peak_median": peak(md)}
+    return out
+
+
+def _paused(ctx: C.Ctx, e: pd.DataFrame, pam: pd.Series, aff_parts) -> dict:
+    """Paused + Additional Service (Batch 5): amounts, the payment rules behind them, the default % expected to close and its
+    derivation, and the reconciliation from won_clients_master's Paused filter to the forecast group."""
+    from chapters import fallout     # imported here: fallout -> records -> cash
+    pz = e[pam]
+    is_p = pz.rstatus.eq("Paused")
+    fo = fallout.classify(ctx)
+    ft_grp = fo.grp.isin(["documented", "ended"])
+    ft_keys = set(fo.index[ft_grp])
+    ft = is_p & pz.rkey.astype("string").str.upper().isin(ft_keys).fillna(False).astype(bool)
+    n_p, n_a = int(is_p.sum()), int((~is_p).sum())
+    p_paused = (PAUSED_CLOSE_PTS["fell_through"] + PAUSED_CLOSE_PTS["other"]) / 100
+    combined = (p_paused * n_p + 1.0 * n_a) / len(pz)
+    jp = fo.stage.eq("paused")
+    rec = pz.payment_recorded.notna()
+    pif = pz.cash_payment_type_normalized.eq("Paid In Full")
+    pay = {"recorded": int(rec.sum()), "recorded_split": int((rec & ~pif).sum()), "recorded_pif": int((rec & pif).sum()),
+           "assumed_split": int((~rec & ~pif).sum()), "assumed_pif": int((~rec & pif).sum()), "pif": int(pif.sum()),
+           "pif_paid": round(float(pz.paid[pif].sum()), 2), "paid_recorded_type": round(float(pz.paid[rec].sum()), 2),
+           "paid_assumed_type": round(float(pz.paid[~rec].sum()), 2), "second_assumed_type": round(float(pz.second[~rec].sum()), 2)}
+    # won_clients_master's Paused filter (issue_status = Paused) -> the forecast group
+    m = ctx.f.frames["master"]
+    mp = m[m.issue_status.eq("Paused")]
+    mid = set(mp.deal_id.astype(int))
+    eid = e.id.astype(int)
+    out_ = e[eid.isin(mid) & ~pam]
+    new = pz[~pz.id.astype(int).isin(mid)]
+    add_as = new[new.rstatus.eq("Additional Service") & new.has_jira]
+    recov = new[~new.has_jira]
+    via = np.where(recov.evidence.str.startswith("separate purchase"), "separate_purchase", np.where(recov.evidence.str.startswith("e-mail"), "own_jira", "other"))
+    other = new[~new.index.isin(add_as.index) & ~new.index.isin(recov.index)]
+    val = lambda x: round(float(x.value.sum()), 2)
+    master = {"filter": "won_clients_master: issue_status = Paused", "n": int(len(mp)), "booked": round(float(mp.deal_value.sum()), 2),
+              "moved_out": {"n": int(len(out_)), "booked": val(out_), "to": {k: int(v) for k, v in out_.g.value_counts().items()},
+                            "closed_recorded": int((out_.g.eq("closed") & out_.closed_raw.notna()).sum())},
+              "additional": {"n": int(len(add_as)), "booked": val(add_as)},
+              "recovered": {"n": int(len(recov)), "booked": val(recov), "by": {k: int((via == k).sum()) for k in ("own_jira", "separate_purchase", "other") if (via == k).any()}},
+              "other": {"n": int(len(other)), "booked": val(other)}}
+    return {"n": int(len(pz)), "second": round(float(pz.second.sum()), 2), "paid": round(float(pz.paid.sum()), 2), "booked": val(pz),
+            "aff": aff_parts(pam, pd.Series(1.0, index=e.index)), "paused_n": n_p, "additional_n": n_a,
+            "payment": pay, "master": master,
+            "fell_through": {"deals": int(ft.sum()), "paused_deals": n_p, "jira_paused": int(jp.sum()), "jira_fell_through": int((jp & ft_grp).sum()),
+                             "documented": int((jp & fo.grp.eq("documented")).sum()), "ended": int((jp & fo.grp.eq("ended")).sum())},
+            "default": {"pts": PAUSED_CLOSE_PTS, "paused_close": p_paused, "additional_close": 1.0, "combined": round(combined, 4), "pct": int(round(100 * combined))}}
+
+
+def completed_affiliates(ctx: C.Ctx, e: pd.DataFrame, el: pd.DataFrame) -> dict:
+    """Affiliate fees on completed purchases that are still due under the payout dates (Batch 5): closings from COMPLETED_FROM to the
+    reporting date. Realtor fees for Q4 closings are paid in January; lender and STR Cribs fees the month after closing, so October's
+    (due 15 Nov) are placed in November. A fee counts unless the trackers show it was paid: a brokerage 'Date Received' (Affiliates_Historical
+    by Jira key, or the brokerage tracker by property address) for the realtor, an 'Invoice Paid' date for the lender (never filled); the
+    STR Cribs tracker has no payment field. Eligibility and fees follow the forecast's rules (recorded partner choice, else the conversion
+    setting; revenue per conversion from the controls). One row per Jira issue: each fee counts once, and no completed closing is a forecast one."""
+    asof, base = ctx.asof, C.ROOT.parent
+    c0 = pd.Timestamp(COMPLETED_FROM)
+    d = e[e.g.eq("closed") & e.closed_raw.notna() & (e.closed_raw >= c0) & (e.closed_raw <= asof)]
+    hist = _sheet(base, "DIM - JIRA Client Data.xlsx", "Affiliates_Historical")
+    hist = hist.assign(K=hist["key"].astype(str).str.upper()).drop_duplicates("K").set_index("K")
+    brk = _sheet(base, "Brokerage Affiliate Tracking.xlsx", "Brokerage_Data")
+    lend = _sheet(base, "Lending Affiliate Tracking.xlsx", "Lender_Data")
+    brk_rcv = set(brk.loc[brk["Date Received"].notna(), "Full address"].map(_addr).dropna()) | set(brk.loc[brk["Date Received"].notna(), "Property"].map(_addr).dropna())
+    lend_paid = set(lend.loc[lend["Invoice Paid"].notna(), "Subject Property Address"].map(_addr).dropna())
+    raw = ctx.f.frames["jira"].set_index(ctx.f.frames["jira"]["key"].astype(str).str.upper())
+    key = d.jira_key.astype(str).str.upper()
+    addr = key.map(lambda k: _addr(raw["address_under_contract"].get(k)))
+    hk = key.map(lambda k: hist.loc[k] if k in hist.index else None)
+    paid = pd.DataFrame({
+        "realtor": [bool((h is not None and pd.notna(h["Date Received"])) or (a in brk_rcv)) for h, a in zip(hk, addr)],
+        "lender": [bool((h is not None and pd.notna(h["Invoice Paid"])) or (a in lend_paid)) for h, a in zip(hk, addr)],
+        "cribs": [False] * len(d)}, index=d.index)
+    rows = []
+    for mk, g in d.groupby(d.closed_raw.dt.strftime("%Y-%m")):
+        r = {"month": mk, "n": int(len(g)), "first_day": int((pd.Timestamp(mk + "-01") - asof).days), "aff": {}}
+        for a in AFFILIATES:
+            x, pdx = el.loc[g.index, a], paid.loc[g.index, a]
+            r["aff"][a] = {"known": int(((x == 1) & ~pdx).sum()), "unknown": int((x.isna() & ~pdx).sum()), "paid": int((pdx & (x != 0)).sum()),
+                           "paid_chosen": int(((x == 1) & pdx).sum()), "not": int((x == 0).sum())}
+        rows.append(r)
+    return {"from": COMPLETED_FROM, "to": asof.strftime("%Y-%m-%d"), "n": int(len(d)), "unique_keys": int(key.nunique()),
+            "in_forecast": int(key.isin(e.loc[e.g.isin(["under_contract", "scheduled", "noprop", "paused"]), "jira_key"].astype(str).str.upper()).sum()),
+            "months": rows,
+            "rules": {"realtor": "Date Received in the brokerage records", "lender": "Invoice Paid (never filled in the lender tracker)", "cribs": "no payment field"}}
 
 
 def build(ctx: C.Ctx) -> dict:
@@ -434,12 +604,19 @@ def build(ctx: C.Ctx) -> dict:
     t_svc, t_ref = np.zeros(tl), np.zeros(tl)
     t_known, t_unk = {a: np.zeros(tl) for a in AFFILIATES}, {a: np.zeros(tl) for a in AFFILIATES}
     carried = {"close": 0, "refund": 0}
+    show_to = int((pd.Timestamp(SHOW_TO) - asof).days)
+    per_client = []                            # timing evidence per client still searching (aggregated below; nothing per client is published)
     for i in e[npm].index:
         el_i = int(el_start[i])
         dc, wc, c2 = H["close_timing"](el_i)
         dr, wr, r2 = H["refund_timing"](el_i)
         carried["close"] += int(c2 < el_i)
         carried["refund"] += int(r2 < el_i)
+        o = np.argsort(dc, kind="stable")
+        per_client.append({"el": el_i, "close_med": int(dc[o][np.searchsorted(np.cumsum(wc[o]), 0.5)]), "closers": int(len(dc)), "close_carried": c2 < el_i,
+                           "refund_med": float(np.median(dr)), "refunds": int(len(dr)), "refund_carried": r2 < el_i,
+                           "collect": float(pc[i] * e.at[i, "second"]), "collect_later": float(pc[i] * e.at[i, "second"] * wc[dc > show_to].sum()),
+                           "after_year_w": float(wc[(dc + c2) > 365].sum())})
         np.add.at(t_svc, dc, pc[i] * e.at[i, "second"] * wc)
         np.add.at(t_ref, dr, pr[i] * e.at[i, "paid"] * wr)
         for a in AFFILIATES:
@@ -448,7 +625,7 @@ def build(ctx: C.Ctx) -> dict:
     t_last = int(np.nonzero(t_svc + t_ref + sum(t_known.values()) + sum(t_unk.values()))[0].max())
     cum = np.cumsum(t_svc) / t_svc.sum()
     ends = {"dec": int((pd.Timestamp(asof.year, 12, 31) - asof).days), "jan": int((pd.Timestamp(asof.year + 1, 1, 31) - asof).days),
-            "jun": int((pd.Timestamp(asof.year + 1, 6, 30) - asof).days)}
+            "show": show_to, "jun": int((pd.Timestamp(asof.year + 1, 6, 30) - asof).days)}
     noprop_timing = {"svc": [round(v, 4) for v in t_svc[:t_last + 1]], "refund_base": [round(v, 4) for v in t_ref[:t_last + 1]],
                      "known": {a: [round(v, 6) for v in t_known[a][:t_last + 1]] for a in AFFILIATES},
                      "unknown": {a: [round(v, 6) for v in t_unk[a][:t_last + 1]] for a in AFFILIATES},
@@ -460,9 +637,9 @@ def build(ctx: C.Ctx) -> dict:
               "p_close": round(float(pc[npm].mean()), 4), "p_refund": round(float(pr[npm].mean()), 4), "p_pause": round(float(pp[npm].mean()), 4),
               "aff": aff_parts(npm, pc), "hunting": int((npm & hunt).sum()), "not_started": int((npm & ~hunt).sum()),
               "timing": noprop_timing}
-    paused = {"n": int(pam.sum()), "second": round(float(e.loc[pam, "second"].sum()), 2), "paid": round(float(e.loc[pam, "paid"].sum()), 2),
-              "aff": aff_parts(pam, pd.Series(1.0, index=e.index)),
-              "paused_n": int((pam & e.rstatus.eq("Paused")).sum()), "additional_n": int((pam & e.rstatus.eq("Additional Service")).sum())}
+    noprop["timing"]["bands"] = _wait_bands(per_client)
+    noprop["timing"]["check"] = timing_check(ctx, e, H)
+    paused = _paused(ctx, e, pam, aff_parts)
     # timing spread for collections on the expected-days slider: the historical UC -> CLOSED spread around its median
     med = float(np.median(H["h_uc"]))
     offs, cnt = np.unique(np.clip(H["h_uc"] - med, -60, 120).astype(int), return_counts=True)
@@ -534,7 +711,7 @@ def build(ctx: C.Ctx) -> dict:
         "fixed": {"svc": [round(v, 2) for v in svc_d[:last + 1]], "refund_base": [round(v, 2) for v in ref_d[:last + 1]],
                   "known": {a: [round(v, 4) for v in known_d[a][:last + 1]] for a in AFFILIATES},
                   "unknown": {a: [round(v, 4) for v in unk_d[a][:last + 1]] for a in AFFILIATES}},
-        "noprop": noprop, "paused": paused, "spread": spread,
+        "noprop": noprop, "paused": paused, "spread": spread, "completed": completed_affiliates(ctx, e, el), "show_to": SHOW_TO,
         "history": {"uc_to_close": {"n": int(len(H["h_uc"])), "median": med, "p25": float(np.percentile(H["h_uc"], 25)), "p75": float(np.percentile(H["h_uc"], 75)), "max": int(H["h_uc"].max())},
                     "pi_to_close": {"n": int(len(H["h_pi"])), "median": float(np.median(H["h_pi"]))},
                     "uc_close_rate": round(H["uc_rate"], 3), "uc_n": H["uc_n"], "uc_fail_refund": round(H["uc_fail_refund"], 3),
@@ -544,6 +721,6 @@ def build(ctx: C.Ctx) -> dict:
                     "processed_refunds": {"n": groups["refunded"]["n"], "paid": groups["refunded"]["paid"]}},
         "affiliates": affiliate_history,
         "defaults": {"expected_days": EXPECTED_DAYS, "expected_days_max": EXPECTED_DAYS_MAX, "optimistic_days": int(1 + med),
-                     "paused_proceed": PAUSED_PROCEED, "paused_defaults": PAUSED_DEFAULTS, "refundable_share": REFUNDABLE_SHARE, "affiliates": AFFILIATES},
+                     "paused_close": paused["default"]["pct"], "refundable_share": REFUNDABLE_SHARE, "affiliates": AFFILIATES},
         "notes": {"zero_value_wins": int((e.value == 0).sum()), "scheduled_dates_to": e.loc[e.g.eq("scheduled"), "closed_raw"].max().strftime("%Y-%m-%d") if e.g.eq("scheduled").any() else None},
     }

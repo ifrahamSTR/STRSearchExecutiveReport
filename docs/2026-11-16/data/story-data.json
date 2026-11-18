@@ -13206,12 +13206,163 @@
      "collect_share": {
       "dec": 0.2369,
       "jan": 0.4598,
+      "show": 0.7728,
       "jun": 0.7951
      },
      "refund_share": {
       "dec": 0.5312,
       "jan": 0.6483,
+      "show": 0.8219,
       "jun": 0.8394
+     }
+    },
+    "bands": [
+     {
+      "from": 0,
+      "to": 30,
+      "n": 29,
+      "close_med": 66.0,
+      "closers_min": 131,
+      "closers_max": 180,
+      "close_carried": 0,
+      "refund_med": 23.0,
+      "refunds_min": 18,
+      "refund_carried": 0,
+      "collect": 222065.38,
+      "collect_later": 28343.37,
+      "after_year_w": 0.0726
+     },
+     {
+      "from": 31,
+      "to": 60,
+      "n": 28,
+      "close_med": 77.0,
+      "closers_min": 70,
+      "closers_max": 127,
+      "close_carried": 0,
+      "refund_med": 47.5,
+      "refunds_min": 10,
+      "refund_carried": 0,
+      "collect": 196143.14,
+      "collect_later": 34406.08,
+      "after_year_w": 0.1144
+     },
+     {
+      "from": 61,
+      "to": 90,
+      "n": 21,
+      "close_med": 84.0,
+      "closers_min": 45,
+      "closers_max": 69,
+      "close_carried": 0,
+      "refund_med": 51.0,
+      "refunds_min": 10,
+      "refund_carried": 5,
+      "collect": 122278.37,
+      "collect_later": 31229.13,
+      "after_year_w": 0.181
+     },
+     {
+      "from": 91,
+      "to": 180,
+      "n": 19,
+      "close_med": 110.0,
+      "closers_min": 16,
+      "closers_max": 43,
+      "close_carried": 0,
+      "refund_med": 49.0,
+      "refunds_min": 10,
+      "refund_carried": 19,
+      "collect": 92364.18,
+      "collect_later": 32006.61,
+      "after_year_w": 0.3023
+     },
+     {
+      "from": 181,
+      "to": null,
+      "n": 20,
+      "close_med": 265.0,
+      "closers_min": 10,
+      "closers_max": 12,
+      "close_carried": 16,
+      "refund_med": 49.0,
+      "refunds_min": 10,
+      "refund_carried": 20,
+      "collect": 45647.54,
+      "collect_later": 28152.2,
+      "after_year_w": 0.6822
+     }
+    ],
+    "check": {
+     "dates": [
+      "2026-02-16",
+      "2026-03-16",
+      "2026-04-16",
+      "2026-05-16"
+     ],
+     "months": 6,
+     "clients": 394,
+     "close": {
+      "actual": [
+       10,
+       55,
+       55,
+       28,
+       19,
+       7
+      ],
+      "spread": [
+       20.4,
+       53.6,
+       35.8,
+       22.0,
+       14.8,
+       9.1
+      ],
+      "median": [
+       0.0,
+       0.0,
+       148.7,
+       21.1,
+       10.7,
+       2.0
+      ],
+      "mae_spread": 4.0,
+      "mae_median": 16.6,
+      "peak_actual": 0.3161,
+      "peak_spread": 0.3443,
+      "peak_median": 0.8147
+     },
+     "refund": {
+      "actual": [
+       3,
+       2,
+       1,
+       1,
+       2,
+       1
+      ],
+      "spread": [
+       11.6,
+       3.2,
+       2.4,
+       2.0,
+       0.4,
+       1.6
+      ],
+      "median": [
+       6.0,
+       19.7,
+       0.0,
+       0.0,
+       0.0,
+       0.0
+      ],
+      "mae_spread": 8.7,
+      "mae_median": 18.9,
+      "peak_actual": 0.3,
+      "peak_spread": 0.5472,
+      "peak_median": 0.7659
      }
     }
    }
@@ -13220,6 +13371,7 @@
    "n": 113,
    "second": 927900.0,
    "paid": 973700.0,
+   "booked": 1901600.0,
    "aff": {
     "realtor": {
      "known": 22.0,
@@ -13235,7 +13387,66 @@
     }
    },
    "paused_n": 108,
-   "additional_n": 5
+   "additional_n": 5,
+   "payment": {
+    "recorded": 9,
+    "recorded_split": 7,
+    "recorded_pif": 2,
+    "assumed_split": 104,
+    "assumed_pif": 0,
+    "pif": 2,
+    "pif_paid": 45800.0,
+    "paid_recorded_type": 110600.0,
+    "paid_assumed_type": 863100.0,
+    "second_assumed_type": 863100.0
+   },
+   "master": {
+    "filter": "won_clients_master: issue_status = Paused",
+    "n": 106,
+    "booked": 1796700.0,
+    "moved_out": {
+     "n": 1,
+     "booked": 18900.0,
+     "to": {
+      "closed": 1
+     },
+     "closed_recorded": 1
+    },
+    "additional": {
+     "n": 5,
+     "booked": 76400.0
+    },
+    "recovered": {
+     "n": 3,
+     "booked": 47400.0,
+     "by": {
+      "own_jira": 2,
+      "separate_purchase": 1
+     }
+    },
+    "other": {
+     "n": 0,
+     "booked": 0.0
+    }
+   },
+   "fell_through": {
+    "deals": 29,
+    "paused_deals": 108,
+    "jira_paused": 108,
+    "jira_fell_through": 30,
+    "documented": 2,
+    "ended": 28
+   },
+   "default": {
+    "pts": {
+     "fell_through": 25,
+     "other": 30
+    },
+    "paused_close": 0.55,
+    "additional_close": 1.0,
+    "combined": 0.5699,
+    "pct": 57
+   }
   },
   "spread": [
    [
@@ -13479,6 +13690,77 @@
     0.002688
    ]
   ],
+  "completed": {
+   "from": "2026-10-01",
+   "to": "2026-11-16",
+   "n": 79,
+   "unique_keys": 79,
+   "in_forecast": 0,
+   "months": [
+    {
+     "month": "2026-10",
+     "n": 64,
+     "first_day": -46,
+     "aff": {
+      "realtor": {
+       "known": 19,
+       "unknown": 0,
+       "paid": 41,
+       "paid_chosen": 41,
+       "not": 4
+      },
+      "lender": {
+       "known": 39,
+       "unknown": 0,
+       "paid": 0,
+       "paid_chosen": 0,
+       "not": 25
+      },
+      "cribs": {
+       "known": 52,
+       "unknown": 3,
+       "paid": 0,
+       "paid_chosen": 0,
+       "not": 9
+      }
+     }
+    },
+    {
+     "month": "2026-11",
+     "n": 15,
+     "first_day": -15,
+     "aff": {
+      "realtor": {
+       "known": 15,
+       "unknown": 0,
+       "paid": 0,
+       "paid_chosen": 0,
+       "not": 0
+      },
+      "lender": {
+       "known": 10,
+       "unknown": 0,
+       "paid": 0,
+       "paid_chosen": 0,
+       "not": 5
+      },
+      "cribs": {
+       "known": 12,
+       "unknown": 2,
+       "paid": 0,
+       "paid_chosen": 0,
+       "not": 1
+      }
+     }
+    }
+   ],
+   "rules": {
+    "realtor": "Date Received in the brokerage records",
+    "lender": "Invoice Paid (never filled in the lender tracker)",
+    "cribs": "no payment field"
+   }
+  },
+  "show_to": "2027-05-31",
   "history": {
    "uc_to_close": {
     "n": 372,
@@ -13681,12 +13963,7 @@
    "expected_days": 57,
    "expected_days_max": 77,
    "optimistic_days": 37,
-   "paused_proceed": 0.1,
-   "paused_defaults": {
-    "resume": 10,
-    "refund": 40,
-    "remain": 50
-   },
+   "paused_close": 57,
    "refundable_share": 1.0,
    "affiliates": {
     "realtor": {
@@ -17398,27 +17675,31 @@
     "key": "net_cash",
     "label": "Forecast net cash (default assumptions)",
     "cj": null,
-    "explorer": 1796146.57,
-    "cash": 1796146.57,
+    "explorer": 2916871.27,
+    "cash": 2916871.27,
     "unit": "service + affiliate \u2212 future refunds, Cash Forecast defaults",
     "bridge": {
-     "service": 1360698.01,
-     "affiliate": 896752.34,
-     "refunds": -461303.78
+     "service": 1796811.01,
+     "affiliate": 1610575.04,
+     "refunds": -490514.78
     }
    }
   ],
   "explorer_asof": "2026-11-16",
   "cash_bridge": {
-   "service": 1360698.01,
+   "service": 1796811.01,
    "service_parts": {
     "contracts": 589409.38,
     "searching": 678498.63,
-    "paused": 92790.0
+    "paused": 528903.0
    },
-   "affiliate": 896752.34,
-   "refunds": -461303.78,
-   "net": 1796146.57
+   "affiliate": 1610575.04,
+   "affiliate_parts": {
+    "completed": 373350.0,
+    "forecast": 1237225.04
+   },
+   "refunds": -490514.78,
+   "net": 2916871.27
   }
  },
  "meta": {
@@ -17433,7 +17714,7 @@
   "snapshots": {
    "reporting_layer": "2026-11-16"
   },
-  "built_at": "2026-11-18 20:52",
+  "built_at": "2026-11-19 00:01",
   "chapters": [
    "journey",
    "outcomes",
@@ -18719,6 +19000,108 @@
    "check": "Cash forecast: processed refunds are not in the future cash flow",
    "page": true,
    "explorer": true,
+   "ok": true,
+   "hard": true
+  },
+  {
+   "check": "Cash forecast: won_clients_master's Paused filter - recorded closings + Additional Service + deals recovered by reconciliation = the paused group (deals, booked value)",
+   "page": [
+    113,
+    1901600.0,
+    0,
+    true
+   ],
+   "explorer": [
+    113,
+    1901600.0,
+    0,
+    true
+   ],
+   "ok": true,
+   "hard": true
+  },
+  {
+   "check": "Cash forecast: paused booked value = paid upfront + remaining installments; Paid In Full deals owe no installment",
+   "page": [
+    1901600.0,
+    113
+   ],
+   "explorer": [
+    1901600.0,
+    113
+   ],
+   "ok": true,
+   "hard": true
+  },
+  {
+   "check": "Cash forecast: paused default = (fall-through points + other points) of Paused + every Additional Service deal, as a whole percent; the fall-through points fit inside the fall-through share (Jira and forecast deals)",
+   "page": [
+    57,
+    true,
+    true,
+    true
+   ],
+   "explorer": [
+    57,
+    true,
+    true,
+    true
+   ],
+   "ok": true,
+   "hard": true
+  },
+  {
+   "check": "Cash forecast: the paused fall-through count equals the Client Journey's fall-through chapter (Paused clients with an ended contract or documented fall-through)",
+   "page": [
+    2,
+    28
+   ],
+   "explorer": [
+    2,
+    28
+   ],
+   "ok": true,
+   "hard": true
+  },
+  {
+   "check": "Cash forecast: completed purchases since 1 Oct are one per Jira issue, none is also forecast, and October equals the Client Journey's October closings",
+   "page": [
+    79,
+    0,
+    64
+   ],
+   "explorer": [
+    79,
+    0,
+    64
+   ],
+   "ok": true,
+   "hard": true
+  },
+  {
+   "check": "Cash forecast: every completed closing sits in exactly one fee class per partner (fee still due, no choice recorded, already received, other choice)",
+   "page": true,
+   "explorer": true,
+   "ok": true,
+   "hard": true
+  },
+  {
+   "check": "Cash forecast: timing back-test: spreading over comparable past clients matches past closing months better than per-client medians",
+   "page": true,
+   "explorer": true,
+   "ok": true,
+   "hard": false
+  },
+  {
+   "check": "Cash forecast: waiting bands add up to the clients still searching and their expected collections",
+   "page": [
+    117,
+    678499
+   ],
+   "explorer": [
+    117,
+    678499
+   ],
    "ok": true,
    "hard": true
   },

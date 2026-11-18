@@ -251,8 +251,10 @@ details.unres .tw { padding: 4px 20px 14px; }
 .bx.inf i { background: linear-gradient(90deg, currentColor 50%, transparent 50%); }
 .bx.sce { color: var(--acq); border-style: dashed; border-color: color-mix(in srgb, var(--acq) 60%, var(--line)); }
 .bx.sce i { border-style: dashed; }
+.bx.asm { color: var(--hold); border-style: dotted; }
+.bx.asm i { border-style: dotted; background: color-mix(in srgb, currentColor 30%, transparent); }
 .bs { display: flex; flex-wrap: wrap; gap: 5px; }
-.cf-key { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 8px 22px; padding: 12px 16px; border: 1px solid var(--line); border-radius: 12px; background: var(--surface); margin-top: 6px; max-width: 920px; }
+.cf-key { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 8px 22px; padding: 12px 16px; border: 1px solid var(--line); border-radius: 12px; background: var(--surface); margin-top: 6px; max-width: 1120px; }
 .cf-key-t { grid-column: 1 / -1; font: 600 11px/1.2 var(--f-mono); letter-spacing: .06em; text-transform: uppercase; color: var(--muted); }
 .cf-key-i { display: grid; gap: 5px; align-content: start; justify-items: start; }
 .cf-key-i small { font-size: 12.5px; color: var(--ink-2); line-height: 1.4; }
@@ -347,3 +349,12 @@ dl.acc-d dd .bx { vertical-align: 1px; margin: 0 2px; }
 
 /* amounts in running text never split from their sign */
 .ex-b b, dl.acc-d dd b, .mini-t td b { white-space: nowrap; }
+
+/* paused panel: reconciliation and booked-to-cash tables (Batch 5) */
+.px-rec { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 16px 22px; margin: 18px 0 6px; }
+@media (max-width: 1100px) { .px-rec { grid-template-columns: minmax(0, 1fr); } }
+table.px-m td small { display: block; font-size: 12px; color: var(--muted); line-height: 1.4; margin-top: 2px; }
+table.px-m td .bx { margin-left: 4px; vertical-align: 1px; }
+table.px-m tr.mid td { border-top: 1px dashed var(--line-2); font-weight: 600; }
+/* monthly table: the later block */
+table.dt tr.later td { background: var(--wf-band); }

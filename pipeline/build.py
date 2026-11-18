@@ -255,9 +255,9 @@ def checks(ctx: C.Ctx, data: dict) -> list[dict]:
     prm = [r for r in pc["monthly"] if r["partial"]]
     chk("3.2: the partial month has more contracts than starts, and the gap narrowed every full month after its peak", (bool(prm) and prm[0]["gap"] < 0, pc["gap"]["narrowing"]), (True, True), hard=False)
     br_ = data["reconcile"]["cash_bridge"]
-    pd_ = data["cash"]["defaults"]["paused_defaults"]
+    pcl = data["cash"]["defaults"]["paused_close"]
     chk("2.3 / Summary: paused clients carry most of the projected refunds at the default assumptions",
-        data["cash"]["groups"]["paused"]["paid"] * pd_["refund"] / 100 > 0.5 * abs(br_["refunds"]), True, hard=False)
+        data["cash"]["groups"]["paused"]["paid"] * (100 - pcl) / 100 > 0.5 * abs(br_["refunds"]), True, hard=False)
     # cash forecast tab: every engagement in exactly one group, balances reconcile with client_cash_forecast,
     # the fixed schedule holds exactly the expected amounts, and no engagement can produce both cash and a refund twice
     cf = data["cash"]
@@ -283,6 +283,32 @@ def checks(ctx: C.Ctx, data: dict) -> list[dict]:
     chk("Cash forecast: expected refund base never exceeds what refunding clients paid", cf["noprop"]["refund_base"] <= cf["noprop"]["paid"] and round(sum(cf["fixed"]["refund_base"])) <= round(g["under_contract"]["paid"] + g["scheduled"]["paid"]), True)
     chk("Cash forecast: timing spread is a distribution", abs(sum(w for _, w in cf["spread"]) - 1) < 1e-4, True)
     chk("Cash forecast: processed refunds are not in the future cash flow", g["refunded"]["n"] > 0 and "refunded" not in ("under_contract", "scheduled", "noprop", "paused"), True)
+    # Batch 5 (18 Nov 2026): one paused slider, its default and reconciliation; affiliate fees on completed purchases; timing evidence
+    PA = cf["paused"]
+    ms, dfl, ft = PA["master"], PA["default"], PA["fell_through"]
+    chk("Cash forecast: won_clients_master's Paused filter - recorded closings + Additional Service + deals recovered by reconciliation = the paused group (deals, booked value)",
+        (ms["n"] - ms["moved_out"]["n"] + ms["additional"]["n"] + ms["recovered"]["n"] + ms["other"]["n"],
+         round(ms["booked"] - ms["moved_out"]["booked"] + ms["additional"]["booked"] + ms["recovered"]["booked"] + ms["other"]["booked"], 2), ms["other"]["n"], ms["moved_out"]["n"] == ms["moved_out"]["closed_recorded"]),
+        (PA["n"], PA["booked"], 0, True))
+    chk("Cash forecast: paused booked value = paid upfront + remaining installments; Paid In Full deals owe no installment",
+        (round(PA["paid"] + PA["second"], 2), PA["payment"]["recorded"] + PA["payment"]["assumed_split"] + PA["payment"]["assumed_pif"]), (PA["booked"], PA["n"]))
+    chk("Cash forecast: paused default = (fall-through points + other points) of Paused + every Additional Service deal, as a whole percent; the fall-through points fit inside the fall-through share (Jira and forecast deals)",
+        (dfl["pct"], dfl["pts"]["fell_through"] <= 100 * min(ft["jira_fell_through"] / ft["jira_paused"], ft["deals"] / ft["paused_deals"]), ft["jira_paused"] == PA["paused_n"], ft["jira_fell_through"] == ft["documented"] + ft["ended"]),
+        (round(100 * ((dfl["pts"]["fell_through"] + dfl["pts"]["other"]) / 100 * PA["paused_n"] + PA["additional_n"]) / PA["n"]), True, True, True))
+    chk("Cash forecast: the paused fall-through count equals the Client Journey's fall-through chapter (Paused clients with an ended contract or documented fall-through)",
+        (ft["documented"], ft["ended"]), (fo["documented"]["now"].get("paused", 0), fo["ended"]["now"].get("paused", 0)))
+    cp_ = cf["completed"]
+    oct_cj = next(r for r in gl["months"] if r["month"] == "2026-10")["closed"]
+    chk("Cash forecast: completed purchases since 1 Oct are one per Jira issue, none is also forecast, and October equals the Client Journey's October closings",
+        (cp_["unique_keys"], cp_["in_forecast"], next(r["n"] for r in cp_["months"] if r["month"] == "2026-10")), (cp_["n"], 0, oct_cj))
+    chk("Cash forecast: every completed closing sits in exactly one fee class per partner (fee still due, no choice recorded, already received, other choice)",
+        all(m["aff"][a]["known"] + m["aff"][a]["unknown"] + m["aff"][a]["paid"] + m["aff"][a]["not"] == m["n"] for m in cp_["months"] for a in m["aff"]), True)
+    tc = cf["noprop"]["timing"]["check"]
+    chk("Cash forecast: timing back-test: spreading over comparable past clients matches past closing months better than per-client medians",
+        tc["close"]["mae_spread"] < tc["close"]["mae_median"], True, hard=False)
+    bands = cf["noprop"]["timing"]["bands"]
+    chk("Cash forecast: waiting bands add up to the clients still searching and their expected collections",
+        (sum(b["n"] for b in bands), round(sum(b["collect"] for b in bands))), (cf["noprop"]["n"], round(cf["noprop"]["collect"])))
     rc = cf["recent_closed"]
     chk("Cash forecast: closings in the last 30 days are dated inside the window and sit in no more deals than were closed",
         (rc["n"] == sum(rc["by_group"].values()), 0 < rc["n"] <= g["closed"]["n"] + g["refunded"]["n"] + g["scheduled"]["n"] + g["unverified_closing"]["n"] and rc["to"] == cf["asof"]), (True, True))
