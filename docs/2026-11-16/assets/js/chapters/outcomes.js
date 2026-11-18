@@ -1,4 +1,4 @@
-/* Chapter 2: where are our clients today? (L10 update, 18 Nov 2026)
+/* Chapter 2: where are our clients today? (updated 18 Nov 2026)
    2.1 every signed-up client in one stage, status first: no current contract or completed purchase = hunting + Inactive
        (Paused + Additional Service + Refunded) -> 2.2 how long the hunting clients have waited -> 2.3 where the others stand
        (pauses, refunds, contracts) -> 2.4 up to vs above $250K today -> 2.5 milestones reached.

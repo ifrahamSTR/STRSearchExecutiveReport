@@ -1,4 +1,4 @@
-/* Executive Summary (L10 update, 18 Nov 2026): written after the chapters, placed after them and before the method note.
+/* Executive Summary (updated 18 Nov 2026): written after the chapters, placed after them and before the method note.
    Every number is read from the same data file as the chapters, so the summary follows the data on a refresh; the build checks
    the statements it makes in words. Ends with the shared figures reconciled across the Client Journey, the Business Data Explorer
    and the Cash Forecast (pipeline/chapters/summary.py). */
@@ -60,6 +60,7 @@
     const nce = E['New Client Experience|Up to $250K'], nceHi = E['New Client Experience|Above $250K'];
     const lanes = D.speed.lanes, ye = F.year_end_2025;
     const k = v => '$' + Math.round(v / 1e3) + 'K';
+    const LO_ = 'Up to $250K', HI_ = 'Above $250K', bs = B.early.sets.all, mat = F.rows.filter(r => r.month >= '2026-06' && r.el30 && r.el30 === r.n);
     const card = (o) => `<li class="${o.lead ? 'lead' : ''}" style="--c:var(${o.c})"><div class="sc-h"><span class="sc-t">${o.t}</span></div>
         <div class="sc-k">${o.k.map(([v, l]) => `<span><b class="num">${v}</b><small>${l}</small></span>`).join('')}</div><p>${o.p}</p><span class="sc-go">Section ${o.gl}</span></li>`;
     const sec = document.createElement('section');
@@ -67,7 +68,7 @@
     sec.id = 'summary';
     sec.dataset.chapter = 'summary';
     sec.innerHTML = `<div class="stage"><header class="sh"><div class="sh-top"><span class="sh-ch">Executive Summary</span><span class="sh-ct">What the Client Journey says, read together</span><span class="sh-step">data as of ${S.date(D.meta.asof)}</span></div>
-        <h2>Closings are at a record, but 100 a month needs about ${S.int(cv.sales_needed)} sales a month and a stronger first two weeks</h2></header>
+        <h2>Closings are at a record, but 100 a month needs about ${S.int(cv.sales_needed)} sales a month, and early refunds now match early contracts</h2></header>
       <div class="body">
         <p class="sum-lead">October brought a record <b>${bc.n} closings</b>, the June sales surge arriving at the closing table. The goal of <b>100 a month</b> is still well ahead: at the conversion we record, it needs about <b>${S.int(cv.sales_needed)} sales a month</b>, and sales have slowed since ${mon(G.best.sales.month.at)}. Meanwhile ${S.int(st.hunting)} clients are hunting, and in their first 14 days as many new clients are refunded as go under contract. Clients up to $250K move as fast as those above; they refund more often early.</p>
         <ol class="sum-cards">
@@ -88,7 +89,7 @@
             p: `Like for like (same start month, experience and start rule) the 14-day difference is ${pts(m14.diff)} (95% ${pts(m14.lo)} to ${pts(m14.hi)}), and no contract or closing window differs. Refunds within 30 days are ${pts(m30.diff)} (95% ${pts(m30.lo)} to ${pts(m30.hi)}), concentrated in the New Client Experience (${nce.rf30.k} of ${nce.rf30.eligible} vs ${nceHi.rf30.k} of ${nceHi.rf30.eligible}). The budget is real: median purchase ${k(P['Up to $250K'].price.median)} vs ${k(P['Above $250K'].price.median)}.`, go: 'drivers-4', gl: '5.3–5.4 Budget: how fast, and early refunds' })}
           ${card({ lead: true, c: '--paused', t: `Paused clients are the largest swing in forecast cash`,
             k: [[S.int(p.n), `paused, a median ${Math.round(p.median_days)} days`], [money(cg.paid), 'paid up front by paused clients'], [money(cg.paid * pd.refund / 100), `of ${money(br.refunds)} projected refunds, at the default ${pd.refund}% refund`]],
-            p: `${S.int(p.from.long_search)} paused after eight or more weeks of searching. The Cash Forecast's default (${pd.resume}% resume, ${pd.refund}% refunded, ${pd.remain}% stay paused) puts most projected refunds on these clients; its net forecast is <b>${money(br.net)}</b>. A decision on paused clients moves cash more than any other assumption.`, go: 'outcomes-3', gl: '2.3 Where the others stand' })}
+            p: `${S.int(p.from.long_search)} paused after eight or more weeks of searching. The Cash Forecast's default (${pd.resume}% resume, ${pd.refund}% refunded, ${pd.remain}% stay paused) puts most projected refunds on these clients; its net forecast is <b>${money(br.net)}</b>. The paused-client assumption moves forecast cash more than any other input.`, go: 'outcomes-3', gl: '2.3 Where the others stand' })}
         </ol>
         <div class="sum-two">
           <div class="board"><h3>What changed</h3><ul>
@@ -97,11 +98,12 @@
             <li><b>Early refunds</b> rose from about ${S.pct(r30[0].rf30 / r30[0].el30)} of ${mon(r30[0].month)} starters to ${S.pct(r30[r30.length - 2].rf30 / r30[r30.length - 2].el30)} of ${mon(r30[r30.length - 2].month)} starters within 30 days.</li>
             <li><b>In this edition</b>: hunting waits use every hunting client with a start date (${S.int(h.with_start)} of ${S.int(h.n)}); the old chapter-4 lanes (${S.int(lanes.searching.n)} hunting, ${S.int(lanes.under_contract.n)} under contract, by reporting group) gave way to the status-first counts (${S.int(st.hunting)} and ${S.int(st.under_contract)}) that match the Cash Forecast; budget comparisons use the Explorer's up-to / above $250K split; pace is read against the 100-a-month goal by month and by Sunday–Saturday week.</li>
           </ul></div>
-          <div class="board"><h3>For discussion at the L10</h3><ol>
-            <li><b>Sales volume.</b> 100 closings a month needs about ${S.int(cv.sales_needed)} sales a month; ${mon(last.month)} had ${last.sales}${cur ? ` and ${mon(cur.month)} ${cur.sales} in ${cur.days} days` : ''}. What is the plan for December and January sales?</li>
-            <li><b>The first two weeks.</b> What happens between the sale and day 14: onboarding, the first properties sent? Should each early refund request get a review, starting with New Client Experience clients up to $250K?</li>
-            <li><b>Long waits and pauses.</b> ${S.int(h.over90)} clients have hunted 90+ days and ${S.int(p.n)} are paused (${S.int(p.bands.filter(b => b.lo > 180).reduce((a, b) => a + b.n, 0))} for over six months). Re-engage, re-scope or close out, and what does that mean for the paused assumption in the Cash Forecast?</li>
-            <li><b>Two data fixes.</b> Link a won deal to the ${S.int(h.no_start)} hunting clients without a start date, and log each property sent with its date so early deal flow can be measured.</li>
+          <div class="board"><h3>Talking points</h3><ol>
+            <li><b>Sales set the ceiling.</b> At today’s conversion, 100 closings a month needs about ${S.int(cv.sales_needed)} sales a month (${S.pct(cv.won_close)} of sales end in a closing). ${mon(last.month)} had ${last.sales} sales${cur ? `; ${mon(cur.month)} has ${cur.sales} in its first ${cur.days} days` : ''}, and a sale becomes a closing a median ${S.int(G.lag.sale_to_close)} days later.</li>
+            <li><b>The first two weeks.</b> Of ${S.int(sc.el14)} clients who started June–October, ${sc.rf14} were refunded and ${sc.uc14} went under contract within 14 days; by day 30 contracts lead (${sc.uc30} against ${sc.rf30}). Refunds within 30 days rose from ${S.pct(mat[0].rf30 / mat[0].el30)} of ${mon(mat[0].month)} starters to ${S.pct(mat[mat.length - 1].rf30 / mat[mat.length - 1].el30)} of ${mon(mat[mat.length - 1].month)} starters.</li>
+            <li><b>Clients who are waiting.</b> ${S.int(st.hunting)} are hunting; ${S.int(h.over90)} of the ${S.int(h.with_start)} with a start date have waited more than 90 days (median ${S.med(h.median)}). ${S.int(p.n)} are paused, ${S.int(p.bands.filter(b => b.lo > 180).reduce((a, b) => a + b.n, 0))} of them for over six months; they have paid ${money(cg.paid)}, and at the Cash Forecast’s default ${money(cg.paid * pd.refund / 100)} of its ${money(br.refunds)} projected refunds come from them.</li>
+            <li><b>Budget groups.</b> Clients up to $250K and above go under contract and close at a similar pace (${S.pct(bs[LO_].uc14.k / bs[LO_].uc14.eligible, 1)} and ${S.pct(bs[HI_].uc14.k / bs[HI_].uc14.eligible, 1)} in the first 14 days). Up to $250K, more are refunded within 30 days (${S.pct(bs[LO_].rf30.k / bs[LO_].rf30.eligible, 1)} against ${S.pct(bs[HI_].rf30.k / bs[HI_].rf30.eligible, 1)}); above $250K, more have paused by day 90 (${S.pct(bs[HI_].pa90.k / bs[HI_].pa90.eligible, 1)} against ${S.pct(bs[LO_].pa90.k / bs[LO_].pa90.eligible, 1)}).</li>
+            <li><b>Records that limit the answers.</b> ${S.int(h.no_start)} hunting clients have no start date because no won deal is linked to their Jira issue; pause dates exist only for pauses still in effect; and there is no dated log of the properties sent, so early deal flow cannot be measured.</li>
           </ol></div>
         </div>
         <div class="board" style="margin-top:16px"><h3 style="margin:0 0 4px;font:650 18px/1.25 var(--f-display)">Shared figures, reconciled</h3>

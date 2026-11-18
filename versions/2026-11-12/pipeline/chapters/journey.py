@@ -14,7 +14,7 @@ NCE = "New Client Experience"
 def build(ctx: C.Ctx) -> dict:
     ex, j, s, D = ctx.expected, ctx.jira, ctx.signed, ctx.D
     change = pd.Timestamp(D.NEW_EXPERIENCE_DATE)
-    pre = j[~j.carson_signed]
+    pre = j[~j.signed_list]
     # where the acquisition clock starts relative to the sale: client start minus Pipedrive won date (days)
     linked = s[s.pd_won_date.notna()].copy()
     linked["gap"] = (linked.start - linked.pd_won_date).dt.days

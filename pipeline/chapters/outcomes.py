@@ -61,7 +61,7 @@ def _bands(v: pd.Series, bands) -> list:
 
 
 def status(ctx: C.Ctx) -> dict:
-    """Scenes 2.2-2.3 (added for the L10, 18 Nov 2026): how long hunting clients have waited and where the other clients
+    """Scenes 2.2-2.3 (added 18 Nov 2026): how long hunting clients have waited and where the other clients
     without a current contract or completed purchase stand. Jira-issue grain, status first (records.stage), so every count
     equals scene 2.1. Hunting wait = data date - client start date (the reporting layer's client_start_date); clients without
     a start date are counted, not aged. Pause entry dates and previous statuses come from the 12 Nov 2026 Jira extract

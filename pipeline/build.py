@@ -145,7 +145,7 @@ def checks(ctx: C.Ctx, data: dict) -> list[dict]:
     cr = rp["cribs"]
     chk("STR Cribs: first and later designer choices add up to the repeat buyers' purchases", (sum(cr["first"].values()), sum(cr["later"].values())), (cr["clients"], cr["purchases"] - cr["clients"]))
     chk("STR Cribs: repeat buyers are the Jira clients with two or more completed purchases", cr["clients"], rp["jira"]["two_plus_purchases"])
-    # ---- L10 update (18 Nov 2026): the 100-a-month goal, client status, the first 14 days, budget groups, reconciliation
+    # ---- Added 18 Nov 2026: the 100-a-month goal, client status, the first 14 days, budget groups, reconciliation
     gl, dm = pc["goal"], ctx.f.daily
     day = dm.set_index("activity_date")
     cols = {"sales": "clients_won", "uc": "clients_went_uc", "closed": "properties_closed"}
@@ -233,7 +233,7 @@ def checks(ctx: C.Ctx, data: dict) -> list[dict]:
     chk("Budget scenes: dated pauses never exceed paused clients; no timed pause count exceeds the paused-today count", all(ea["sets"]["all"][lab]["pause_dated"] <= ea["sets"]["all"][lab]["paused_now"]
         and all(ea["sets"]["all"][lab][f"pa{w}"]["k"] <= ea["sets"]["all"][lab]["pause_dated"] for w in ea["windows"]["early"]) for lab in (LO_, HI_)), True)
     chk("Budget scenes: every like-for-like difference carries a 95% interval that contains it", all(m["lo"] <= m["diff"] <= m["hi"] for fam in ea["mh"].values() for ms in fam.values() for m in ms if m["diff"] is not None), True)
-    # L10 update: statements the chapters and the Executive Summary make in words (warn only)
+    # Added 18 Nov 2026: statements the chapters and the Executive Summary make in words (warn only)
     gm = [r for r in gl["months"] if not r["partial"]]
     cur = next((r for r in gl["months"] if r["partial"]), None)
     chk("Summary: the best closing month is the most closings of any month on record", gl["best"]["closed"]["month"]["n"] == max(r["closed"] for r in ctx.expected["q3"]), True, hard=False)

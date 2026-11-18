@@ -30,7 +30,7 @@ MIN_CELL = 5
 def funnel_class(j: pd.DataFrame) -> pd.Series:
     """The Explorer's onboarding-first funnel classes (Acquisition section): signed client if the current status is
     in the signed-up list, else Services Declined, else still in pre-sale onboarding (New Clients, Onboarding Completed)."""
-    return pd.Series(np.select([j.carson_signed, j.status == "Services Declined"], ["signed", "declined"], "presale"), index=j.index)
+    return pd.Series(np.select([j.signed_list, j.status == "Services Declined"], ["signed", "declined"], "presale"), index=j.index)
 
 
 def _month(s: pd.Series) -> pd.Series:

@@ -179,7 +179,7 @@ def cohorts(ctx: C.Ctx) -> dict:
     return out
 
 
-# ----------------------------------------------------------------------------- 3.1 (added for the L10, 18 Nov 2026): the 100-a-month goal
+# ----------------------------------------------------------------------------- 3.1 (added 18 Nov 2026): the 100-a-month goal
 GOAL_PER_MONTH = 100            # completed property purchases a month: the company goal
 GOAL_FROM = "2026-04-01"        # April 2026 to the data date
 DAYS_PER_MONTH = 365.25 / 12    # so the weekly benchmark = 100 x 7 / 30.44 = 23.0 per seven calendar days
@@ -272,7 +272,7 @@ def goal(ctx: C.Ctx) -> dict:
     }
 
 
-# ----------------------------------------------------------------------------- 3.4 (added for the L10, 18 Nov 2026): the first 14 days
+# ----------------------------------------------------------------------------- 3.4 (added 18 Nov 2026): the first 14 days
 FIRST_FROM = "2025-01"          # 2025 rows are context only: many 2025 contracts lack a UC date (COMPARE_FROM)
 
 

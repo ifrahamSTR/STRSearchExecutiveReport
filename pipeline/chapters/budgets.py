@@ -1,4 +1,4 @@
-"""Lower-budget vs higher-budget clients (added for the L10, 18 Nov 2026): the Business Data Explorer's budget findings, brought
+"""Lower-budget vs higher-budget clients (added 18 Nov 2026): the Business Data Explorer's budget findings, brought
 into the chapters where they answer a business question (2.4 where they stand, 3.3-3.4 monthly cohorts and the first 14 days,
 4.3 time to contract, 5.3 like-for-like).
 

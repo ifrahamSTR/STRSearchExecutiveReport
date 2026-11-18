@@ -492,7 +492,7 @@ footer.foot .stage { display: flex; flex-wrap: wrap; gap: 6px 18px; justify-cont
 .scene .dt td.nw { white-space: nowrap; }
 #cohAvg b { color: var(--ink); }
 
-/* ---------- L10 update (18 Nov 2026): goal pace, client status, budget groups, executive summary */
+/* ---------- Added 18 Nov 2026: goal pace, client status, budget groups, executive summary */
 .agenda li.sum .n { color: var(--sales); }
 .chart.h-goal { height: 430px; }
 .chart.h-goalw { height: 600px; }

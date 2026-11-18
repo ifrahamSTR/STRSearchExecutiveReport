@@ -140,7 +140,7 @@
   }
   const SERIES2 = ['Searches started', 'Under Contract'];
 
-  /* ---- L10 update (18 Nov 2026): 3.1 the 100-a-month goal ----------------------------------------------------------------
+  /* ---- Added 18 Nov 2026: 3.1 the 100-a-month goal ----------------------------------------------------------------
      Sales (Pipedrive won date), Under Contract (valid contract date) and Closed (completed closing date) from
      daily_client_activity, by calendar month or by Sunday-Saturday reporting week. Months can be read per seven calendar days
      covered, so a month, a partial month and a week all compare with the same weekly benchmark (100 a month = 23.0 per 7 days). */
@@ -311,7 +311,7 @@
   }
 
   // 3.3 same-cohort view: share of each start month's clients under contract within 14 / 30 / 60 / 90 days or to date,
-  // for all confirmed starts or split up to / above $250K (L10 update: the Explorer's budget groups, eligible counts on every bar)
+  // for all confirmed starts or split up to / above $250K (18 Nov 2026: the Explorer's budget groups, eligible counts on every bar)
   function cohortScene(main, D, ch, of) {
     const C = D.pace.cohorts, B = D.budgets, st = { w: '14', clock: 'start', range: '2026', grp: 'all' };
     const P = n => C.clocks[n].pooled, ps = P('start'), pw = P('won');
@@ -524,7 +524,7 @@
       const pc = D.pace, w = pc.windows, co = pc.cohort, sc = pc.intake.since_change, asof = D.meta.asof, OF = 5;
       const last = pc.monthly[pc.monthly.length - 1], since = S.date(pc.change_date).replace(/ \d{4}$/, '');
 
-      // 3.1 (L10 update) the 100-a-month goal
+      // 3.1 the 100-a-month goal
       goalScene(main, D, ch, OF);
 
       // 3.2 (reworked 18 Nov 2026): the question, the three numbers that matter, the paired chart with marks explained beside it, then the detail

@@ -9,7 +9,7 @@ INACTIVE_STATUSES = ["Paused", "Refunded", "Additional Service"]
 
 def build(ctx: C.Ctx) -> dict:
     ex, s = ctx.expected, ctx.signed
-    act = s[s.carson_active]
+    act = s[s.active_list]
     groups = []
     for gname in ACTIVE_GROUPS:
         g = act[act.group == gname]

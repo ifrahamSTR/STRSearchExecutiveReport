@@ -1,4 +1,4 @@
-"""Executive Summary support (added for the L10, 18 Nov 2026): the figures this report shares with the Business Data Explorer
+"""Executive Summary support (added 18 Nov 2026): the figures this report shares with the Business Data Explorer
 and the Cash Forecast, reconciled on one snapshot.
 
 Each row states the population, event date and counting unit on each side and the counts that bridge any difference, so a

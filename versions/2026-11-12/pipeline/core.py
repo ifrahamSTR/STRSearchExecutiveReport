@@ -54,7 +54,7 @@ def load(explorer: Path, reports: Path | None, use_cache: bool) -> Ctx:
     asof = min(pd.Timestamp(snap["jira"]), pd.Timestamp(snap["deals"])).normalize()
     jira["elapsed"] = (asof - jira["start"]).dt.days       # days on the acquisition clock so far
     expected = M.expected(deals, jira, asof)
-    return Ctx(jira=jira, signed=jira[jira.carson_signed].copy(), deals=deals, asof=asof, meta=meta, D=D, expected=expected, raw=frames)
+    return Ctx(jira=jira, signed=jira[jira.signed_list].copy(), deals=deals, asof=asof, meta=meta, D=D, expected=expected, raw=frames)
 
 
 def km_curve(t, e) -> pd.DataFrame:
