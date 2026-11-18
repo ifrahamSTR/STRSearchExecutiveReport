@@ -49,6 +49,136 @@ def _share(k: int, n: int):
     return None if n < MIN_CELL or 0 < k < MIN_CELL else round(k / n, 4)
 
 
+# ----------------------------------------------------------------------------- 3.2 table: month-on-month and year-on-year growth
+GROWTH_FROM = "2025-01"
+UC_GAP = ("2025-06", "2025-11")   # contract months behind the Aug-Dec 2025 closings that have no Under Contract date (checked in build.py)
+GAP_CLOSINGS = ("2025-08", "2025-12")
+RULE_MONTH = "2026-06"            # first month of the 1 Jun 2026 start rule (definitions.START_RULE_DATE; checked in build.py)
+REASONS = {
+    "early": "2024 Jira records are incomplete: {early_k} of {early_n} deals won in 2024 have a Jira issue (2025: {y25_k} of {y25_n}), so 2024 starts and contracts are undercounted.",
+    "rule": "The start date rule changed on 1 Jun 2026: from June a start is the won date, before it the kickoff date (a median {lag} days later), so starts from June are not counted the same way as earlier months.",
+    "ucgap": "{gap_k} of the {gap_n} clients who closed from August to December 2025 have no Under Contract date, so the contract counts for June to November 2025 are too low.",
+    "zero": "No events in the comparison period.",
+}
+
+
+def _comparable(metric: str, cur: str, base: str) -> str | None:
+    """Reason a growth figure is not shown, or None when the two periods count the same way."""
+    if metric == "won":
+        return None                                              # Pipedrive won date: one definition throughout
+    if base < GROWTH_FROM:
+        return "early"
+    if metric == "starts":
+        if (cur >= RULE_MONTH) != (base >= RULE_MONTH):
+            return "rule"
+    if metric == "uc" and (UC_GAP[0] <= cur <= UC_GAP[1] or UC_GAP[0] <= base <= UC_GAP[1]):
+        return "ucgap"
+    return None
+
+
+def growth(ctx: C.Ctx) -> dict:
+    """Monthly Won, Starts and Under Contract (daily_client_activity, as the chart above it) with month-on-month and
+    year-on-year growth where both periods count the same way. The current, partial month is compared with the same
+    days of the previous month and of the same month a year earlier."""
+    asof, daily = ctx.asof, ctx.f.daily
+    cur_m = asof.strftime("%Y-%m")
+    last_day = int(asof.day)
+    partial = asof != pd.Period(cur_m, "M").end_time.normalize()
+    cols = {"won": "clients_won", "starts": "clients_started", "uc": "clients_went_uc"}
+    dm = daily.assign(m=daily.activity_date.dt.strftime("%Y-%m"), d=daily.activity_date.dt.day)
+
+    def count(metric, month, upto=None):
+        g = dm[dm.m == month]
+        if upto is not None:
+            g = g[g.d <= upto]
+        return int(g[cols[metric]].sum())
+
+    months = [r["month"] for r in ctx.expected["q3"] if r["month"] >= GROWTH_FROM]
+    rows = []
+    for m in months:
+        p = pd.Period(m, "M")
+        upto = last_day if (m == cur_m and partial) else None
+        r = {"month": m, "label": C.month_label(m), "partial": upto is not None, "days": upto}
+        for k in cols:
+            v = count(k, m, upto)
+            r[k] = v
+            for kind, base_m in (("mom", str(p - 1)), ("yoy", str(p - 12))):
+                b = count(k, base_m, upto)
+                why = _comparable(k, m, base_m) or (None if b else "zero")
+                r[f"{k}_{kind}"] = {"base": b, "base_month": base_m, "pct": None if why else round(v / b - 1, 4), "why": why}
+        r["diff"] = r["starts"] - r["uc"]
+        rows.append(r)
+    # evidence behind the reasons (the build checks these still hold)
+    e = ctx.f.eng
+    won24 = e[e.won_date.dt.year == 2024]
+    won25 = e[e.won_date.dt.year == 2025]
+    clo = e[e.closed.notna()].assign(cm=lambda x: x.closed.dt.strftime("%Y-%m"))
+    gap = clo[(clo.cm >= GAP_CLOSINGS[0]) & (clo.cm <= GAP_CLOSINGS[1])]
+    rest25 = clo[(clo.cm >= "2025-01") & (clo.cm < GAP_CLOSINGS[0])]
+    c26 = clo[clo.cm >= "2026-01"]
+    pre = ctx.cohort[ctx.cohort.start_rule.isin(["due", "created+4"])]
+    ev = {"early_n": int(len(won24)), "early_k": int(won24.has_jira.sum()), "y25_n": int(len(won25)), "y25_k": int(won25.has_jira.sum()),
+          "gap_n": int(len(gap)), "gap_k": int(gap.uc.isna().sum()),
+          "rest25_n": int(len(rest25)), "rest25_k": int(rest25.uc.isna().sum()),
+          "y26_n": int(len(c26)), "y26_k": int(c26.uc.isna().sum()),
+          "lag": float((pre.start - pre.won_date).dt.days.median())}
+    lag = int(ev["lag"]) if float(ev["lag"]).is_integer() else ev["lag"]
+    reasons = {k: v.format(**{**ev, "lag": lag}) for k, v in REASONS.items()}
+    return {"from": GROWTH_FROM, "rows": rows, "uc_gap": list(UC_GAP), "rule_month": RULE_MONTH, "evidence": ev, "reasons": reasons,
+            "partial": {"month": cur_m if partial else None, "days": last_day if partial else None},
+            "hunting": int(ctx.jira.hunting.sum())}
+
+
+# ----------------------------------------------------------------------------- 3.3 cohorts: under contract within 14 / 30 / 60 / 90 days
+WINDOWS = [14, 30, 60, 90]
+COHORTS_FROM = "2025-01"
+COMPARE_FROM = "2026-01"     # 2025 cohorts lack many Under Contract dates (see uc_gap)
+
+
+def cohorts(ctx: C.Ctx) -> dict:
+    """client_cohort_performance by start month (the Explorer's matured-cohort rule): share of confirmed starts under
+    contract within N days = SUM(uc_within_Nd x eligible_Nd) / SUM(eligible_Nd). A window is maturing while some of the
+    month's clients have had fewer than N days. Two clocks: the reporting layer's client start date, and the Pipedrive won
+    date (one definition for every month). Counts are published with their denominators, as in the Explorer's own cohort
+    table; cells resting on fewer than 5 clients are marked small."""
+    co, asof = ctx.cohort, ctx.asof
+    sm = co.start.dt.strftime("%Y-%m")
+    clocks = {
+        "start": {"days": co.days_to_uc, "elapsed": co.days_since_start},
+        "won": {"days": (co.uc - co.won_date).dt.days, "elapsed": (asof - co.won_date).dt.days},
+    }
+    cur_m = asof.strftime("%Y-%m")
+    out = {"windows": WINDOWS, "from": COHORTS_FROM, "compare_from": COMPARE_FROM, "change_month": CHANGE_MONTH, "clocks": {}}
+    months = sorted(m for m in sm.unique() if m >= COHORTS_FROM)
+    for name, ck in clocks.items():
+        d, el = ck["days"], ck["elapsed"]
+        rows = []
+        for m in months:
+            g = sm == m
+            n = int(g.sum())
+            r = {"month": m, "label": C.month_label(m), "n": n, "partial": m == cur_m,
+                 "uc_dates_incomplete": m < COMPARE_FROM, "closed_no_uc": int((co.closed.notna() & co.uc.isna())[g].sum())}
+            for w in WINDOWS:
+                eli = g & (el >= w)
+                k = int((eli & (d >= 0) & (d <= w)).sum())
+                r[f"w{w}"] = {"k": k, "eligible": int(eli.sum()), "mature": bool(n) and int(eli.sum()) == n, "small": 0 < k < 5 or int(eli.sum()) < 5}
+            reached = int((g & co.uc.notna() & (d >= 0)).sum())
+            r["to_date"] = {"k": reached, "n": n, "small": 0 < reached < 5 or n < 5}
+            rows.append(r)
+
+        def pool(lo, hi, w):
+            cs = [r for r in rows if lo <= r["month"] <= hi and r[f"w{w}"]["mature"]]
+            k, n = sum(r[f"w{w}"]["k"] for r in cs), sum(r[f"w{w}"]["eligible"] for r in cs)
+            return {"k": k, "n": n, "share": round(k / n, 4) if n else None, "small": 0 < k < 5,
+                    "months": [cs[0]["month"], cs[-1]["month"]] if cs else None}
+        before_hi = str(pd.Period(CHANGE_MONTH, "M") - 1)
+        out["clocks"][name] = {"rows": rows, "pooled": {f"w{w}": {"before": pool(COMPARE_FROM, before_hi, w), "after": pool(CHANGE_MONTH, "9999-12", w)} for w in WINDOWS}}
+    pre = co[co.start_rule.isin(["due", "created+4"])]
+    out["kickoff_lag_median"] = float((pre.start - pre.won_date).dt.days.median())
+    out["refunded_included"] = int(co.refunded.fillna(False).astype(bool).sum())
+    return out
+
+
 def build(ctx: C.Ctx) -> dict:
     j, s, asof = ctx.jira, ctx.signed, ctx.asof
     cur = asof.strftime("%Y-%m")
@@ -148,4 +278,5 @@ def build(ctx: C.Ctx) -> dict:
                    "classes_all": {k: int((cls == k).sum()) for k in ("signed", "presale", "declined")},
                    "early_prospects": int(((cls != "signed") & (j.created < change)).sum())},
         "windows": windows, "gap": gap, "cohort": cohort_meta, "sales": sales,
+        "growth": growth(ctx), "cohorts": cohorts(ctx),
     }

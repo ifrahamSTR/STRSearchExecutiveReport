@@ -114,7 +114,61 @@
    "closed_share": 0.6759,
    "closed_scheduled": 6
   },
-  "hunting_engagements": 108
+  "hunting_engagements": 108,
+  "waiting": {
+   "denominator": 843,
+   "stages": {
+    "purchased": 460,
+    "under_contract": 65,
+    "hunting": 123,
+    "paused": 108,
+    "additional": 5,
+    "refunded": 82
+   },
+   "other": 0,
+   "no_contract": {
+    "n": 318,
+    "share": 0.3772
+   },
+   "yet_to_close": {
+    "n": 383,
+    "share": 0.4543
+   },
+   "excluding_refunded": {
+    "no_contract": 236,
+    "yet_to_close": 301,
+    "no_contract_share": 0.28,
+    "yet_share": 0.3571
+   },
+   "snapshot": {
+    "active": 648,
+    "inactive": 195,
+    "hunting": 123,
+    "paused": 108,
+    "refunded": 82,
+    "additional": 5
+   },
+   "purchased": {
+    "post_close_status": 454,
+    "uc_status_closing_recorded": 6,
+    "with_closing_date": 437,
+    "status_only": 23,
+    "no_uc_date": 71
+   },
+   "under_contract": {
+    "scheduled": 6,
+    "passed_inspection": 9
+   },
+   "moved_back_with_closing_date": {
+    "n": 3,
+    "statuses": {
+     "8 Weeks": 1,
+     "Paused": 1,
+     "Refunded": 1
+    }
+   },
+   "hunting_with_older_uc_date": 10
+  }
  },
  "pace": {
   "monthly": [
@@ -848,6 +902,3003 @@
     "won": 363,
     "starts": 352
    }
+  },
+  "growth": {
+   "from": "2025-01",
+   "rows": [
+    {
+     "month": "2025-01",
+     "label": "Jan 2025",
+     "partial": false,
+     "days": null,
+     "won": 12,
+     "won_mom": {
+      "base": 7,
+      "base_month": "2024-12",
+      "pct": 0.7143,
+      "why": null
+     },
+     "won_yoy": {
+      "base": 0,
+      "base_month": "2024-01",
+      "pct": null,
+      "why": "zero"
+     },
+     "starts": 10,
+     "starts_mom": {
+      "base": 7,
+      "base_month": "2024-12",
+      "pct": null,
+      "why": "early"
+     },
+     "starts_yoy": {
+      "base": 0,
+      "base_month": "2024-01",
+      "pct": null,
+      "why": "early"
+     },
+     "uc": 7,
+     "uc_mom": {
+      "base": 5,
+      "base_month": "2024-12",
+      "pct": null,
+      "why": "early"
+     },
+     "uc_yoy": {
+      "base": 0,
+      "base_month": "2024-01",
+      "pct": null,
+      "why": "early"
+     },
+     "diff": 3
+    },
+    {
+     "month": "2025-02",
+     "label": "Feb 2025",
+     "partial": false,
+     "days": null,
+     "won": 6,
+     "won_mom": {
+      "base": 12,
+      "base_month": "2025-01",
+      "pct": -0.5,
+      "why": null
+     },
+     "won_yoy": {
+      "base": 4,
+      "base_month": "2024-02",
+      "pct": 0.5,
+      "why": null
+     },
+     "starts": 4,
+     "starts_mom": {
+      "base": 10,
+      "base_month": "2025-01",
+      "pct": -0.6,
+      "why": null
+     },
+     "starts_yoy": {
+      "base": 2,
+      "base_month": "2024-02",
+      "pct": null,
+      "why": "early"
+     },
+     "uc": 3,
+     "uc_mom": {
+      "base": 7,
+      "base_month": "2025-01",
+      "pct": -0.5714,
+      "why": null
+     },
+     "uc_yoy": {
+      "base": 0,
+      "base_month": "2024-02",
+      "pct": null,
+      "why": "early"
+     },
+     "diff": 1
+    },
+    {
+     "month": "2025-03",
+     "label": "Mar 2025",
+     "partial": false,
+     "days": null,
+     "won": 12,
+     "won_mom": {
+      "base": 6,
+      "base_month": "2025-02",
+      "pct": 1.0,
+      "why": null
+     },
+     "won_yoy": {
+      "base": 2,
+      "base_month": "2024-03",
+      "pct": 5.0,
+      "why": null
+     },
+     "starts": 12,
+     "starts_mom": {
+      "base": 4,
+      "base_month": "2025-02",
+      "pct": 2.0,
+      "why": null
+     },
+     "starts_yoy": {
+      "base": 2,
+      "base_month": "2024-03",
+      "pct": null,
+      "why": "early"
+     },
+     "uc": 4,
+     "uc_mom": {
+      "base": 3,
+      "base_month": "2025-02",
+      "pct": 0.3333,
+      "why": null
+     },
+     "uc_yoy": {
+      "base": 1,
+      "base_month": "2024-03",
+      "pct": null,
+      "why": "early"
+     },
+     "diff": 8
+    },
+    {
+     "month": "2025-04",
+     "label": "Apr 2025",
+     "partial": false,
+     "days": null,
+     "won": 11,
+     "won_mom": {
+      "base": 12,
+      "base_month": "2025-03",
+      "pct": -0.0833,
+      "why": null
+     },
+     "won_yoy": {
+      "base": 11,
+      "base_month": "2024-04",
+      "pct": 0.0,
+      "why": null
+     },
+     "starts": 11,
+     "starts_mom": {
+      "base": 12,
+      "base_month": "2025-03",
+      "pct": -0.0833,
+      "why": null
+     },
+     "starts_yoy": {
+      "base": 10,
+      "base_month": "2024-04",
+      "pct": null,
+      "why": "early"
+     },
+     "uc": 7,
+     "uc_mom": {
+      "base": 4,
+      "base_month": "2025-03",
+      "pct": 0.75,
+      "why": null
+     },
+     "uc_yoy": {
+      "base": 4,
+      "base_month": "2024-04",
+      "pct": null,
+      "why": "early"
+     },
+     "diff": 4
+    },
+    {
+     "month": "2025-05",
+     "label": "May 2025",
+     "partial": false,
+     "days": null,
+     "won": 16,
+     "won_mom": {
+      "base": 11,
+      "base_month": "2025-04",
+      "pct": 0.4545,
+      "why": null
+     },
+     "won_yoy": {
+      "base": 2,
+      "base_month": "2024-05",
+      "pct": 7.0,
+      "why": null
+     },
+     "starts": 15,
+     "starts_mom": {
+      "base": 11,
+      "base_month": "2025-04",
+      "pct": 0.3636,
+      "why": null
+     },
+     "starts_yoy": {
+      "base": 3,
+      "base_month": "2024-05",
+      "pct": null,
+      "why": "early"
+     },
+     "uc": 6,
+     "uc_mom": {
+      "base": 7,
+      "base_month": "2025-04",
+      "pct": -0.1429,
+      "why": null
+     },
+     "uc_yoy": {
+      "base": 5,
+      "base_month": "2024-05",
+      "pct": null,
+      "why": "early"
+     },
+     "diff": 9
+    },
+    {
+     "month": "2025-06",
+     "label": "Jun 2025",
+     "partial": false,
+     "days": null,
+     "won": 16,
+     "won_mom": {
+      "base": 16,
+      "base_month": "2025-05",
+      "pct": 0.0,
+      "why": null
+     },
+     "won_yoy": {
+      "base": 8,
+      "base_month": "2024-06",
+      "pct": 1.0,
+      "why": null
+     },
+     "starts": 15,
+     "starts_mom": {
+      "base": 15,
+      "base_month": "2025-05",
+      "pct": 0.0,
+      "why": null
+     },
+     "starts_yoy": {
+      "base": 6,
+      "base_month": "2024-06",
+      "pct": null,
+      "why": "early"
+     },
+     "uc": 11,
+     "uc_mom": {
+      "base": 6,
+      "base_month": "2025-05",
+      "pct": null,
+      "why": "ucgap"
+     },
+     "uc_yoy": {
+      "base": 4,
+      "base_month": "2024-06",
+      "pct": null,
+      "why": "early"
+     },
+     "diff": 4
+    },
+    {
+     "month": "2025-07",
+     "label": "Jul 2025",
+     "partial": false,
+     "days": null,
+     "won": 24,
+     "won_mom": {
+      "base": 16,
+      "base_month": "2025-06",
+      "pct": 0.5,
+      "why": null
+     },
+     "won_yoy": {
+      "base": 13,
+      "base_month": "2024-07",
+      "pct": 0.8462,
+      "why": null
+     },
+     "starts": 24,
+     "starts_mom": {
+      "base": 15,
+      "base_month": "2025-06",
+      "pct": 0.6,
+      "why": null
+     },
+     "starts_yoy": {
+      "base": 8,
+      "base_month": "2024-07",
+      "pct": null,
+      "why": "early"
+     },
+     "uc": 4,
+     "uc_mom": {
+      "base": 11,
+      "base_month": "2025-06",
+      "pct": null,
+      "why": "ucgap"
+     },
+     "uc_yoy": {
+      "base": 6,
+      "base_month": "2024-07",
+      "pct": null,
+      "why": "early"
+     },
+     "diff": 20
+    },
+    {
+     "month": "2025-08",
+     "label": "Aug 2025",
+     "partial": false,
+     "days": null,
+     "won": 38,
+     "won_mom": {
+      "base": 24,
+      "base_month": "2025-07",
+      "pct": 0.5833,
+      "why": null
+     },
+     "won_yoy": {
+      "base": 13,
+      "base_month": "2024-08",
+      "pct": 1.9231,
+      "why": null
+     },
+     "starts": 29,
+     "starts_mom": {
+      "base": 24,
+      "base_month": "2025-07",
+      "pct": 0.2083,
+      "why": null
+     },
+     "starts_yoy": {
+      "base": 14,
+      "base_month": "2024-08",
+      "pct": null,
+      "why": "early"
+     },
+     "uc": 10,
+     "uc_mom": {
+      "base": 4,
+      "base_month": "2025-07",
+      "pct": null,
+      "why": "ucgap"
+     },
+     "uc_yoy": {
+      "base": 7,
+      "base_month": "2024-08",
+      "pct": null,
+      "why": "early"
+     },
+     "diff": 19
+    },
+    {
+     "month": "2025-09",
+     "label": "Sep 2025",
+     "partial": false,
+     "days": null,
+     "won": 37,
+     "won_mom": {
+      "base": 38,
+      "base_month": "2025-08",
+      "pct": -0.0263,
+      "why": null
+     },
+     "won_yoy": {
+      "base": 13,
+      "base_month": "2024-09",
+      "pct": 1.8462,
+      "why": null
+     },
+     "starts": 39,
+     "starts_mom": {
+      "base": 29,
+      "base_month": "2025-08",
+      "pct": 0.3448,
+      "why": null
+     },
+     "starts_yoy": {
+      "base": 7,
+      "base_month": "2024-09",
+      "pct": null,
+      "why": "early"
+     },
+     "uc": 7,
+     "uc_mom": {
+      "base": 10,
+      "base_month": "2025-08",
+      "pct": null,
+      "why": "ucgap"
+     },
+     "uc_yoy": {
+      "base": 11,
+      "base_month": "2024-09",
+      "pct": null,
+      "why": "early"
+     },
+     "diff": 32
+    },
+    {
+     "month": "2025-10",
+     "label": "Oct 2025",
+     "partial": false,
+     "days": null,
+     "won": 38,
+     "won_mom": {
+      "base": 37,
+      "base_month": "2025-09",
+      "pct": 0.027,
+      "why": null
+     },
+     "won_yoy": {
+      "base": 9,
+      "base_month": "2024-10",
+      "pct": 3.2222,
+      "why": null
+     },
+     "starts": 38,
+     "starts_mom": {
+      "base": 39,
+      "base_month": "2025-09",
+      "pct": -0.0256,
+      "why": null
+     },
+     "starts_yoy": {
+      "base": 8,
+      "base_month": "2024-10",
+      "pct": null,
+      "why": "early"
+     },
+     "uc": 17,
+     "uc_mom": {
+      "base": 7,
+      "base_month": "2025-09",
+      "pct": null,
+      "why": "ucgap"
+     },
+     "uc_yoy": {
+      "base": 4,
+      "base_month": "2024-10",
+      "pct": null,
+      "why": "early"
+     },
+     "diff": 21
+    },
+    {
+     "month": "2025-11",
+     "label": "Nov 2025",
+     "partial": false,
+     "days": null,
+     "won": 17,
+     "won_mom": {
+      "base": 38,
+      "base_month": "2025-10",
+      "pct": -0.5526,
+      "why": null
+     },
+     "won_yoy": {
+      "base": 6,
+      "base_month": "2024-11",
+      "pct": 1.8333,
+      "why": null
+     },
+     "starts": 20,
+     "starts_mom": {
+      "base": 38,
+      "base_month": "2025-10",
+      "pct": -0.4737,
+      "why": null
+     },
+     "starts_yoy": {
+      "base": 4,
+      "base_month": "2024-11",
+      "pct": null,
+      "why": "early"
+     },
+     "uc": 8,
+     "uc_mom": {
+      "base": 17,
+      "base_month": "2025-10",
+      "pct": null,
+      "why": "ucgap"
+     },
+     "uc_yoy": {
+      "base": 4,
+      "base_month": "2024-11",
+      "pct": null,
+      "why": "early"
+     },
+     "diff": 12
+    },
+    {
+     "month": "2025-12",
+     "label": "Dec 2025",
+     "partial": false,
+     "days": null,
+     "won": 42,
+     "won_mom": {
+      "base": 17,
+      "base_month": "2025-11",
+      "pct": 1.4706,
+      "why": null
+     },
+     "won_yoy": {
+      "base": 7,
+      "base_month": "2024-12",
+      "pct": 5.0,
+      "why": null
+     },
+     "starts": 21,
+     "starts_mom": {
+      "base": 20,
+      "base_month": "2025-11",
+      "pct": 0.05,
+      "why": null
+     },
+     "starts_yoy": {
+      "base": 7,
+      "base_month": "2024-12",
+      "pct": null,
+      "why": "early"
+     },
+     "uc": 10,
+     "uc_mom": {
+      "base": 8,
+      "base_month": "2025-11",
+      "pct": null,
+      "why": "ucgap"
+     },
+     "uc_yoy": {
+      "base": 5,
+      "base_month": "2024-12",
+      "pct": null,
+      "why": "early"
+     },
+     "diff": 11
+    },
+    {
+     "month": "2026-01",
+     "label": "Jan 2026",
+     "partial": false,
+     "days": null,
+     "won": 32,
+     "won_mom": {
+      "base": 42,
+      "base_month": "2025-12",
+      "pct": -0.2381,
+      "why": null
+     },
+     "won_yoy": {
+      "base": 12,
+      "base_month": "2025-01",
+      "pct": 1.6667,
+      "why": null
+     },
+     "starts": 35,
+     "starts_mom": {
+      "base": 21,
+      "base_month": "2025-12",
+      "pct": 0.6667,
+      "why": null
+     },
+     "starts_yoy": {
+      "base": 10,
+      "base_month": "2025-01",
+      "pct": 2.5,
+      "why": null
+     },
+     "uc": 12,
+     "uc_mom": {
+      "base": 10,
+      "base_month": "2025-12",
+      "pct": 0.2,
+      "why": null
+     },
+     "uc_yoy": {
+      "base": 7,
+      "base_month": "2025-01",
+      "pct": 0.7143,
+      "why": null
+     },
+     "diff": 23
+    },
+    {
+     "month": "2026-02",
+     "label": "Feb 2026",
+     "partial": false,
+     "days": null,
+     "won": 20,
+     "won_mom": {
+      "base": 32,
+      "base_month": "2026-01",
+      "pct": -0.375,
+      "why": null
+     },
+     "won_yoy": {
+      "base": 6,
+      "base_month": "2025-02",
+      "pct": 2.3333,
+      "why": null
+     },
+     "starts": 24,
+     "starts_mom": {
+      "base": 35,
+      "base_month": "2026-01",
+      "pct": -0.3143,
+      "why": null
+     },
+     "starts_yoy": {
+      "base": 4,
+      "base_month": "2025-02",
+      "pct": 5.0,
+      "why": null
+     },
+     "uc": 12,
+     "uc_mom": {
+      "base": 12,
+      "base_month": "2026-01",
+      "pct": 0.0,
+      "why": null
+     },
+     "uc_yoy": {
+      "base": 3,
+      "base_month": "2025-02",
+      "pct": 3.0,
+      "why": null
+     },
+     "diff": 12
+    },
+    {
+     "month": "2026-03",
+     "label": "Mar 2026",
+     "partial": false,
+     "days": null,
+     "won": 36,
+     "won_mom": {
+      "base": 20,
+      "base_month": "2026-02",
+      "pct": 0.8,
+      "why": null
+     },
+     "won_yoy": {
+      "base": 12,
+      "base_month": "2025-03",
+      "pct": 2.0,
+      "why": null
+     },
+     "starts": 31,
+     "starts_mom": {
+      "base": 24,
+      "base_month": "2026-02",
+      "pct": 0.2917,
+      "why": null
+     },
+     "starts_yoy": {
+      "base": 12,
+      "base_month": "2025-03",
+      "pct": 1.5833,
+      "why": null
+     },
+     "uc": 24,
+     "uc_mom": {
+      "base": 12,
+      "base_month": "2026-02",
+      "pct": 1.0,
+      "why": null
+     },
+     "uc_yoy": {
+      "base": 4,
+      "base_month": "2025-03",
+      "pct": 5.0,
+      "why": null
+     },
+     "diff": 7
+    },
+    {
+     "month": "2026-04",
+     "label": "Apr 2026",
+     "partial": false,
+     "days": null,
+     "won": 31,
+     "won_mom": {
+      "base": 36,
+      "base_month": "2026-03",
+      "pct": -0.1389,
+      "why": null
+     },
+     "won_yoy": {
+      "base": 11,
+      "base_month": "2025-04",
+      "pct": 1.8182,
+      "why": null
+     },
+     "starts": 27,
+     "starts_mom": {
+      "base": 31,
+      "base_month": "2026-03",
+      "pct": -0.129,
+      "why": null
+     },
+     "starts_yoy": {
+      "base": 11,
+      "base_month": "2025-04",
+      "pct": 1.4545,
+      "why": null
+     },
+     "uc": 28,
+     "uc_mom": {
+      "base": 24,
+      "base_month": "2026-03",
+      "pct": 0.1667,
+      "why": null
+     },
+     "uc_yoy": {
+      "base": 7,
+      "base_month": "2025-04",
+      "pct": 3.0,
+      "why": null
+     },
+     "diff": -1
+    },
+    {
+     "month": "2026-05",
+     "label": "May 2026",
+     "partial": false,
+     "days": null,
+     "won": 25,
+     "won_mom": {
+      "base": 31,
+      "base_month": "2026-04",
+      "pct": -0.1935,
+      "why": null
+     },
+     "won_yoy": {
+      "base": 16,
+      "base_month": "2025-05",
+      "pct": 0.5625,
+      "why": null
+     },
+     "starts": 37,
+     "starts_mom": {
+      "base": 27,
+      "base_month": "2026-04",
+      "pct": 0.3704,
+      "why": null
+     },
+     "starts_yoy": {
+      "base": 15,
+      "base_month": "2025-05",
+      "pct": 1.4667,
+      "why": null
+     },
+     "uc": 19,
+     "uc_mom": {
+      "base": 28,
+      "base_month": "2026-04",
+      "pct": -0.3214,
+      "why": null
+     },
+     "uc_yoy": {
+      "base": 6,
+      "base_month": "2025-05",
+      "pct": 2.1667,
+      "why": null
+     },
+     "diff": 18
+    },
+    {
+     "month": "2026-06",
+     "label": "Jun 2026",
+     "partial": false,
+     "days": null,
+     "won": 58,
+     "won_mom": {
+      "base": 25,
+      "base_month": "2026-05",
+      "pct": 1.32,
+      "why": null
+     },
+     "won_yoy": {
+      "base": 16,
+      "base_month": "2025-06",
+      "pct": 2.625,
+      "why": null
+     },
+     "starts": 57,
+     "starts_mom": {
+      "base": 37,
+      "base_month": "2026-05",
+      "pct": null,
+      "why": "rule"
+     },
+     "starts_yoy": {
+      "base": 15,
+      "base_month": "2025-06",
+      "pct": null,
+      "why": "rule"
+     },
+     "uc": 17,
+     "uc_mom": {
+      "base": 19,
+      "base_month": "2026-05",
+      "pct": -0.1053,
+      "why": null
+     },
+     "uc_yoy": {
+      "base": 11,
+      "base_month": "2025-06",
+      "pct": null,
+      "why": "ucgap"
+     },
+     "diff": 40
+    },
+    {
+     "month": "2026-07",
+     "label": "Jul 2026",
+     "partial": false,
+     "days": null,
+     "won": 79,
+     "won_mom": {
+      "base": 58,
+      "base_month": "2026-06",
+      "pct": 0.3621,
+      "why": null
+     },
+     "won_yoy": {
+      "base": 24,
+      "base_month": "2025-07",
+      "pct": 2.2917,
+      "why": null
+     },
+     "starts": 74,
+     "starts_mom": {
+      "base": 57,
+      "base_month": "2026-06",
+      "pct": 0.2982,
+      "why": null
+     },
+     "starts_yoy": {
+      "base": 24,
+      "base_month": "2025-07",
+      "pct": null,
+      "why": "rule"
+     },
+     "uc": 43,
+     "uc_mom": {
+      "base": 17,
+      "base_month": "2026-06",
+      "pct": 1.5294,
+      "why": null
+     },
+     "uc_yoy": {
+      "base": 4,
+      "base_month": "2025-07",
+      "pct": null,
+      "why": "ucgap"
+     },
+     "diff": 31
+    },
+    {
+     "month": "2026-08",
+     "label": "Aug 2026",
+     "partial": false,
+     "days": null,
+     "won": 76,
+     "won_mom": {
+      "base": 79,
+      "base_month": "2026-07",
+      "pct": -0.038,
+      "why": null
+     },
+     "won_yoy": {
+      "base": 38,
+      "base_month": "2025-08",
+      "pct": 1.0,
+      "why": null
+     },
+     "starts": 74,
+     "starts_mom": {
+      "base": 74,
+      "base_month": "2026-07",
+      "pct": 0.0,
+      "why": null
+     },
+     "starts_yoy": {
+      "base": 29,
+      "base_month": "2025-08",
+      "pct": null,
+      "why": "rule"
+     },
+     "uc": 52,
+     "uc_mom": {
+      "base": 43,
+      "base_month": "2026-07",
+      "pct": 0.2093,
+      "why": null
+     },
+     "uc_yoy": {
+      "base": 10,
+      "base_month": "2025-08",
+      "pct": null,
+      "why": "ucgap"
+     },
+     "diff": 22
+    },
+    {
+     "month": "2026-09",
+     "label": "Sep 2026",
+     "partial": false,
+     "days": null,
+     "won": 82,
+     "won_mom": {
+      "base": 76,
+      "base_month": "2026-08",
+      "pct": 0.0789,
+      "why": null
+     },
+     "won_yoy": {
+      "base": 37,
+      "base_month": "2025-09",
+      "pct": 1.2162,
+      "why": null
+     },
+     "starts": 79,
+     "starts_mom": {
+      "base": 74,
+      "base_month": "2026-08",
+      "pct": 0.0676,
+      "why": null
+     },
+     "starts_yoy": {
+      "base": 39,
+      "base_month": "2025-09",
+      "pct": null,
+      "why": "rule"
+     },
+     "uc": 60,
+     "uc_mom": {
+      "base": 52,
+      "base_month": "2026-08",
+      "pct": 0.1538,
+      "why": null
+     },
+     "uc_yoy": {
+      "base": 7,
+      "base_month": "2025-09",
+      "pct": null,
+      "why": "ucgap"
+     },
+     "diff": 19
+    },
+    {
+     "month": "2026-10",
+     "label": "Oct 2026",
+     "partial": false,
+     "days": null,
+     "won": 69,
+     "won_mom": {
+      "base": 82,
+      "base_month": "2026-09",
+      "pct": -0.1585,
+      "why": null
+     },
+     "won_yoy": {
+      "base": 38,
+      "base_month": "2025-10",
+      "pct": 0.8158,
+      "why": null
+     },
+     "starts": 68,
+     "starts_mom": {
+      "base": 79,
+      "base_month": "2026-09",
+      "pct": -0.1392,
+      "why": null
+     },
+     "starts_yoy": {
+      "base": 38,
+      "base_month": "2025-10",
+      "pct": null,
+      "why": "rule"
+     },
+     "uc": 55,
+     "uc_mom": {
+      "base": 60,
+      "base_month": "2026-09",
+      "pct": -0.0833,
+      "why": null
+     },
+     "uc_yoy": {
+      "base": 17,
+      "base_month": "2025-10",
+      "pct": null,
+      "why": "ucgap"
+     },
+     "diff": 13
+    },
+    {
+     "month": "2026-11",
+     "label": "Nov 2026",
+     "partial": true,
+     "days": 16,
+     "won": 11,
+     "won_mom": {
+      "base": 36,
+      "base_month": "2026-10",
+      "pct": -0.6944,
+      "why": null
+     },
+     "won_yoy": {
+      "base": 10,
+      "base_month": "2025-11",
+      "pct": 0.1,
+      "why": null
+     },
+     "starts": 10,
+     "starts_mom": {
+      "base": 35,
+      "base_month": "2026-10",
+      "pct": -0.7143,
+      "why": null
+     },
+     "starts_yoy": {
+      "base": 13,
+      "base_month": "2025-11",
+      "pct": null,
+      "why": "rule"
+     },
+     "uc": 26,
+     "uc_mom": {
+      "base": 23,
+      "base_month": "2026-10",
+      "pct": 0.1304,
+      "why": null
+     },
+     "uc_yoy": {
+      "base": 4,
+      "base_month": "2025-11",
+      "pct": null,
+      "why": "ucgap"
+     },
+     "diff": -16
+    }
+   ],
+   "uc_gap": [
+    "2025-06",
+    "2025-11"
+   ],
+   "rule_month": "2026-06",
+   "evidence": {
+    "early_n": 88,
+    "early_k": 73,
+    "y25_n": 269,
+    "y25_k": 257,
+    "gap_n": 86,
+    "gap_k": 46,
+    "rest25_n": 42,
+    "rest25_k": 2,
+    "y26_n": 284,
+    "y26_k": 17,
+    "lag": 5.0
+   },
+   "reasons": {
+    "early": "2024 Jira records are incomplete: 73 of 88 deals won in 2024 have a Jira issue (2025: 257 of 269), so 2024 starts and contracts are undercounted.",
+    "rule": "The start date rule changed on 1 Jun 2026: from June a start is the won date, before it the kickoff date (a median 5 days later), so starts from June are not counted the same way as earlier months.",
+    "ucgap": "46 of the 86 clients who closed from August to December 2025 have no Under Contract date, so the contract counts for June to November 2025 are too low.",
+    "zero": "No events in the comparison period."
+   },
+   "partial": {
+    "month": "2026-11",
+    "days": 16
+   },
+   "hunting": 123
+  },
+  "cohorts": {
+   "windows": [
+    14,
+    30,
+    60,
+    90
+   ],
+   "from": "2025-01",
+   "compare_from": "2026-01",
+   "change_month": "2026-06",
+   "clocks": {
+    "start": {
+     "rows": [
+      {
+       "month": "2025-01",
+       "label": "Jan 2025",
+       "n": 10,
+       "partial": false,
+       "uc_dates_incomplete": true,
+       "closed_no_uc": 2,
+       "w14": {
+        "k": 1,
+        "eligible": 10,
+        "mature": true,
+        "small": true
+       },
+       "w30": {
+        "k": 2,
+        "eligible": 10,
+        "mature": true,
+        "small": true
+       },
+       "w60": {
+        "k": 4,
+        "eligible": 10,
+        "mature": true,
+        "small": true
+       },
+       "w90": {
+        "k": 4,
+        "eligible": 10,
+        "mature": true,
+        "small": true
+       },
+       "to_date": {
+        "k": 5,
+        "n": 10,
+        "small": false
+       }
+      },
+      {
+       "month": "2025-02",
+       "label": "Feb 2025",
+       "n": 4,
+       "partial": false,
+       "uc_dates_incomplete": true,
+       "closed_no_uc": 0,
+       "w14": {
+        "k": 0,
+        "eligible": 4,
+        "mature": true,
+        "small": true
+       },
+       "w30": {
+        "k": 1,
+        "eligible": 4,
+        "mature": true,
+        "small": true
+       },
+       "w60": {
+        "k": 2,
+        "eligible": 4,
+        "mature": true,
+        "small": true
+       },
+       "w90": {
+        "k": 2,
+        "eligible": 4,
+        "mature": true,
+        "small": true
+       },
+       "to_date": {
+        "k": 2,
+        "n": 4,
+        "small": true
+       }
+      },
+      {
+       "month": "2025-03",
+       "label": "Mar 2025",
+       "n": 12,
+       "partial": false,
+       "uc_dates_incomplete": true,
+       "closed_no_uc": 1,
+       "w14": {
+        "k": 1,
+        "eligible": 12,
+        "mature": true,
+        "small": true
+       },
+       "w30": {
+        "k": 3,
+        "eligible": 12,
+        "mature": true,
+        "small": true
+       },
+       "w60": {
+        "k": 6,
+        "eligible": 12,
+        "mature": true,
+        "small": false
+       },
+       "w90": {
+        "k": 6,
+        "eligible": 12,
+        "mature": true,
+        "small": false
+       },
+       "to_date": {
+        "k": 6,
+        "n": 12,
+        "small": false
+       }
+      },
+      {
+       "month": "2025-04",
+       "label": "Apr 2025",
+       "n": 11,
+       "partial": false,
+       "uc_dates_incomplete": true,
+       "closed_no_uc": 1,
+       "w14": {
+        "k": 1,
+        "eligible": 11,
+        "mature": true,
+        "small": true
+       },
+       "w30": {
+        "k": 2,
+        "eligible": 11,
+        "mature": true,
+        "small": true
+       },
+       "w60": {
+        "k": 5,
+        "eligible": 11,
+        "mature": true,
+        "small": false
+       },
+       "w90": {
+        "k": 6,
+        "eligible": 11,
+        "mature": true,
+        "small": false
+       },
+       "to_date": {
+        "k": 6,
+        "n": 11,
+        "small": false
+       }
+      },
+      {
+       "month": "2025-05",
+       "label": "May 2025",
+       "n": 15,
+       "partial": false,
+       "uc_dates_incomplete": true,
+       "closed_no_uc": 2,
+       "w14": {
+        "k": 2,
+        "eligible": 15,
+        "mature": true,
+        "small": true
+       },
+       "w30": {
+        "k": 6,
+        "eligible": 15,
+        "mature": true,
+        "small": false
+       },
+       "w60": {
+        "k": 9,
+        "eligible": 15,
+        "mature": true,
+        "small": false
+       },
+       "w90": {
+        "k": 10,
+        "eligible": 15,
+        "mature": true,
+        "small": false
+       },
+       "to_date": {
+        "k": 10,
+        "n": 15,
+        "small": false
+       }
+      },
+      {
+       "month": "2025-06",
+       "label": "Jun 2025",
+       "n": 15,
+       "partial": false,
+       "uc_dates_incomplete": true,
+       "closed_no_uc": 4,
+       "w14": {
+        "k": 0,
+        "eligible": 15,
+        "mature": true,
+        "small": false
+       },
+       "w30": {
+        "k": 0,
+        "eligible": 15,
+        "mature": true,
+        "small": false
+       },
+       "w60": {
+        "k": 0,
+        "eligible": 15,
+        "mature": true,
+        "small": false
+       },
+       "w90": {
+        "k": 2,
+        "eligible": 15,
+        "mature": true,
+        "small": true
+       },
+       "to_date": {
+        "k": 5,
+        "n": 15,
+        "small": false
+       }
+      },
+      {
+       "month": "2025-07",
+       "label": "Jul 2025",
+       "n": 24,
+       "partial": false,
+       "uc_dates_incomplete": true,
+       "closed_no_uc": 8,
+       "w14": {
+        "k": 1,
+        "eligible": 24,
+        "mature": true,
+        "small": true
+       },
+       "w30": {
+        "k": 3,
+        "eligible": 24,
+        "mature": true,
+        "small": true
+       },
+       "w60": {
+        "k": 6,
+        "eligible": 24,
+        "mature": true,
+        "small": false
+       },
+       "w90": {
+        "k": 7,
+        "eligible": 24,
+        "mature": true,
+        "small": false
+       },
+       "to_date": {
+        "k": 9,
+        "n": 24,
+        "small": false
+       }
+      },
+      {
+       "month": "2025-08",
+       "label": "Aug 2025",
+       "n": 29,
+       "partial": false,
+       "uc_dates_incomplete": true,
+       "closed_no_uc": 9,
+       "w14": {
+        "k": 3,
+        "eligible": 29,
+        "mature": true,
+        "small": true
+       },
+       "w30": {
+        "k": 4,
+        "eligible": 29,
+        "mature": true,
+        "small": true
+       },
+       "w60": {
+        "k": 8,
+        "eligible": 29,
+        "mature": true,
+        "small": false
+       },
+       "w90": {
+        "k": 9,
+        "eligible": 29,
+        "mature": true,
+        "small": false
+       },
+       "to_date": {
+        "k": 12,
+        "n": 29,
+        "small": false
+       }
+      },
+      {
+       "month": "2025-09",
+       "label": "Sep 2025",
+       "n": 39,
+       "partial": false,
+       "uc_dates_incomplete": true,
+       "closed_no_uc": 10,
+       "w14": {
+        "k": 1,
+        "eligible": 39,
+        "mature": true,
+        "small": true
+       },
+       "w30": {
+        "k": 5,
+        "eligible": 39,
+        "mature": true,
+        "small": false
+       },
+       "w60": {
+        "k": 12,
+        "eligible": 39,
+        "mature": true,
+        "small": false
+       },
+       "w90": {
+        "k": 15,
+        "eligible": 39,
+        "mature": true,
+        "small": false
+       },
+       "to_date": {
+        "k": 21,
+        "n": 39,
+        "small": false
+       }
+      },
+      {
+       "month": "2025-10",
+       "label": "Oct 2025",
+       "n": 38,
+       "partial": false,
+       "uc_dates_incomplete": true,
+       "closed_no_uc": 12,
+       "w14": {
+        "k": 4,
+        "eligible": 38,
+        "mature": true,
+        "small": true
+       },
+       "w30": {
+        "k": 7,
+        "eligible": 38,
+        "mature": true,
+        "small": false
+       },
+       "w60": {
+        "k": 8,
+        "eligible": 38,
+        "mature": true,
+        "small": false
+       },
+       "w90": {
+        "k": 8,
+        "eligible": 38,
+        "mature": true,
+        "small": false
+       },
+       "to_date": {
+        "k": 15,
+        "n": 38,
+        "small": false
+       }
+      },
+      {
+       "month": "2025-11",
+       "label": "Nov 2025",
+       "n": 20,
+       "partial": false,
+       "uc_dates_incomplete": true,
+       "closed_no_uc": 3,
+       "w14": {
+        "k": 1,
+        "eligible": 20,
+        "mature": true,
+        "small": true
+       },
+       "w30": {
+        "k": 3,
+        "eligible": 20,
+        "mature": true,
+        "small": true
+       },
+       "w60": {
+        "k": 5,
+        "eligible": 20,
+        "mature": true,
+        "small": false
+       },
+       "w90": {
+        "k": 5,
+        "eligible": 20,
+        "mature": true,
+        "small": false
+       },
+       "to_date": {
+        "k": 11,
+        "n": 20,
+        "small": false
+       }
+      },
+      {
+       "month": "2025-12",
+       "label": "Dec 2025",
+       "n": 21,
+       "partial": false,
+       "uc_dates_incomplete": true,
+       "closed_no_uc": 2,
+       "w14": {
+        "k": 3,
+        "eligible": 21,
+        "mature": true,
+        "small": true
+       },
+       "w30": {
+        "k": 3,
+        "eligible": 21,
+        "mature": true,
+        "small": true
+       },
+       "w60": {
+        "k": 8,
+        "eligible": 21,
+        "mature": true,
+        "small": false
+       },
+       "w90": {
+        "k": 10,
+        "eligible": 21,
+        "mature": true,
+        "small": false
+       },
+       "to_date": {
+        "k": 16,
+        "n": 21,
+        "small": false
+       }
+      },
+      {
+       "month": "2026-01",
+       "label": "Jan 2026",
+       "n": 35,
+       "partial": false,
+       "uc_dates_incomplete": false,
+       "closed_no_uc": 0,
+       "w14": {
+        "k": 2,
+        "eligible": 35,
+        "mature": true,
+        "small": true
+       },
+       "w30": {
+        "k": 6,
+        "eligible": 35,
+        "mature": true,
+        "small": false
+       },
+       "w60": {
+        "k": 12,
+        "eligible": 35,
+        "mature": true,
+        "small": false
+       },
+       "w90": {
+        "k": 17,
+        "eligible": 35,
+        "mature": true,
+        "small": false
+       },
+       "to_date": {
+        "k": 24,
+        "n": 35,
+        "small": false
+       }
+      },
+      {
+       "month": "2026-02",
+       "label": "Feb 2026",
+       "n": 24,
+       "partial": false,
+       "uc_dates_incomplete": false,
+       "closed_no_uc": 1,
+       "w14": {
+        "k": 1,
+        "eligible": 24,
+        "mature": true,
+        "small": true
+       },
+       "w30": {
+        "k": 5,
+        "eligible": 24,
+        "mature": true,
+        "small": false
+       },
+       "w60": {
+        "k": 9,
+        "eligible": 24,
+        "mature": true,
+        "small": false
+       },
+       "w90": {
+        "k": 11,
+        "eligible": 24,
+        "mature": true,
+        "small": false
+       },
+       "to_date": {
+        "k": 16,
+        "n": 24,
+        "small": false
+       }
+      },
+      {
+       "month": "2026-03",
+       "label": "Mar 2026",
+       "n": 31,
+       "partial": false,
+       "uc_dates_incomplete": false,
+       "closed_no_uc": 3,
+       "w14": {
+        "k": 3,
+        "eligible": 31,
+        "mature": true,
+        "small": true
+       },
+       "w30": {
+        "k": 7,
+        "eligible": 31,
+        "mature": true,
+        "small": false
+       },
+       "w60": {
+        "k": 14,
+        "eligible": 31,
+        "mature": true,
+        "small": false
+       },
+       "w90": {
+        "k": 17,
+        "eligible": 31,
+        "mature": true,
+        "small": false
+       },
+       "to_date": {
+        "k": 20,
+        "n": 31,
+        "small": false
+       }
+      },
+      {
+       "month": "2026-04",
+       "label": "Apr 2026",
+       "n": 27,
+       "partial": false,
+       "uc_dates_incomplete": false,
+       "closed_no_uc": 1,
+       "w14": {
+        "k": 3,
+        "eligible": 27,
+        "mature": true,
+        "small": true
+       },
+       "w30": {
+        "k": 9,
+        "eligible": 27,
+        "mature": true,
+        "small": false
+       },
+       "w60": {
+        "k": 13,
+        "eligible": 27,
+        "mature": true,
+        "small": false
+       },
+       "w90": {
+        "k": 15,
+        "eligible": 27,
+        "mature": true,
+        "small": false
+       },
+       "to_date": {
+        "k": 21,
+        "n": 27,
+        "small": false
+       }
+      },
+      {
+       "month": "2026-05",
+       "label": "May 2026",
+       "n": 37,
+       "partial": false,
+       "uc_dates_incomplete": false,
+       "closed_no_uc": 2,
+       "w14": {
+        "k": 2,
+        "eligible": 37,
+        "mature": true,
+        "small": true
+       },
+       "w30": {
+        "k": 3,
+        "eligible": 37,
+        "mature": true,
+        "small": true
+       },
+       "w60": {
+        "k": 10,
+        "eligible": 37,
+        "mature": true,
+        "small": false
+       },
+       "w90": {
+        "k": 23,
+        "eligible": 37,
+        "mature": true,
+        "small": false
+       },
+       "to_date": {
+        "k": 25,
+        "n": 37,
+        "small": false
+       }
+      },
+      {
+       "month": "2026-06",
+       "label": "Jun 2026",
+       "n": 57,
+       "partial": false,
+       "uc_dates_incomplete": false,
+       "closed_no_uc": 2,
+       "w14": {
+        "k": 0,
+        "eligible": 57,
+        "mature": true,
+        "small": false
+       },
+       "w30": {
+        "k": 14,
+        "eligible": 57,
+        "mature": true,
+        "small": false
+       },
+       "w60": {
+        "k": 27,
+        "eligible": 57,
+        "mature": true,
+        "small": false
+       },
+       "w90": {
+        "k": 36,
+        "eligible": 57,
+        "mature": true,
+        "small": false
+       },
+       "to_date": {
+        "k": 42,
+        "n": 57,
+        "small": false
+       }
+      },
+      {
+       "month": "2026-07",
+       "label": "Jul 2026",
+       "n": 74,
+       "partial": false,
+       "uc_dates_incomplete": false,
+       "closed_no_uc": 0,
+       "w14": {
+        "k": 5,
+        "eligible": 74,
+        "mature": true,
+        "small": false
+       },
+       "w30": {
+        "k": 26,
+        "eligible": 74,
+        "mature": true,
+        "small": false
+       },
+       "w60": {
+        "k": 45,
+        "eligible": 74,
+        "mature": true,
+        "small": false
+       },
+       "w90": {
+        "k": 52,
+        "eligible": 74,
+        "mature": true,
+        "small": false
+       },
+       "to_date": {
+        "k": 56,
+        "n": 74,
+        "small": false
+       }
+      },
+      {
+       "month": "2026-08",
+       "label": "Aug 2026",
+       "n": 74,
+       "partial": false,
+       "uc_dates_incomplete": false,
+       "closed_no_uc": 0,
+       "w14": {
+        "k": 6,
+        "eligible": 74,
+        "mature": true,
+        "small": false
+       },
+       "w30": {
+        "k": 24,
+        "eligible": 74,
+        "mature": true,
+        "small": false
+       },
+       "w60": {
+        "k": 39,
+        "eligible": 74,
+        "mature": true,
+        "small": false
+       },
+       "w90": {
+        "k": 22,
+        "eligible": 43,
+        "mature": false,
+        "small": false
+       },
+       "to_date": {
+        "k": 47,
+        "n": 74,
+        "small": false
+       }
+      },
+      {
+       "month": "2026-09",
+       "label": "Sep 2026",
+       "n": 79,
+       "partial": false,
+       "uc_dates_incomplete": false,
+       "closed_no_uc": 0,
+       "w14": {
+        "k": 6,
+        "eligible": 79,
+        "mature": true,
+        "small": false
+       },
+       "w30": {
+        "k": 17,
+        "eligible": 79,
+        "mature": true,
+        "small": false
+       },
+       "w60": {
+        "k": 24,
+        "eligible": 44,
+        "mature": false,
+        "small": false
+       },
+       "w90": {
+        "k": 0,
+        "eligible": 0,
+        "mature": false,
+        "small": true
+       },
+       "to_date": {
+        "k": 39,
+        "n": 79,
+        "small": false
+       }
+      },
+      {
+       "month": "2026-10",
+       "label": "Oct 2026",
+       "n": 68,
+       "partial": false,
+       "uc_dates_incomplete": false,
+       "closed_no_uc": 0,
+       "w14": {
+        "k": 8,
+        "eligible": 68,
+        "mature": true,
+        "small": false
+       },
+       "w30": {
+        "k": 11,
+        "eligible": 37,
+        "mature": false,
+        "small": false
+       },
+       "w60": {
+        "k": 0,
+        "eligible": 0,
+        "mature": false,
+        "small": true
+       },
+       "w90": {
+        "k": 0,
+        "eligible": 0,
+        "mature": false,
+        "small": true
+       },
+       "to_date": {
+        "k": 19,
+        "n": 68,
+        "small": false
+       }
+      },
+      {
+       "month": "2026-11",
+       "label": "Nov 2026",
+       "n": 10,
+       "partial": true,
+       "uc_dates_incomplete": false,
+       "closed_no_uc": 0,
+       "w14": {
+        "k": 0,
+        "eligible": 0,
+        "mature": false,
+        "small": true
+       },
+       "w30": {
+        "k": 0,
+        "eligible": 0,
+        "mature": false,
+        "small": true
+       },
+       "w60": {
+        "k": 0,
+        "eligible": 0,
+        "mature": false,
+        "small": true
+       },
+       "w90": {
+        "k": 0,
+        "eligible": 0,
+        "mature": false,
+        "small": true
+       },
+       "to_date": {
+        "k": 1,
+        "n": 10,
+        "small": true
+       }
+      }
+     ],
+     "pooled": {
+      "w14": {
+       "before": {
+        "k": 11,
+        "n": 154,
+        "share": 0.0714,
+        "small": false,
+        "months": [
+         "2026-01",
+         "2026-05"
+        ]
+       },
+       "after": {
+        "k": 25,
+        "n": 352,
+        "share": 0.071,
+        "small": false,
+        "months": [
+         "2026-06",
+         "2026-10"
+        ]
+       }
+      },
+      "w30": {
+       "before": {
+        "k": 30,
+        "n": 154,
+        "share": 0.1948,
+        "small": false,
+        "months": [
+         "2026-01",
+         "2026-05"
+        ]
+       },
+       "after": {
+        "k": 81,
+        "n": 284,
+        "share": 0.2852,
+        "small": false,
+        "months": [
+         "2026-06",
+         "2026-09"
+        ]
+       }
+      },
+      "w60": {
+       "before": {
+        "k": 58,
+        "n": 154,
+        "share": 0.3766,
+        "small": false,
+        "months": [
+         "2026-01",
+         "2026-05"
+        ]
+       },
+       "after": {
+        "k": 111,
+        "n": 205,
+        "share": 0.5415,
+        "small": false,
+        "months": [
+         "2026-06",
+         "2026-08"
+        ]
+       }
+      },
+      "w90": {
+       "before": {
+        "k": 83,
+        "n": 154,
+        "share": 0.539,
+        "small": false,
+        "months": [
+         "2026-01",
+         "2026-05"
+        ]
+       },
+       "after": {
+        "k": 88,
+        "n": 131,
+        "share": 0.6718,
+        "small": false,
+        "months": [
+         "2026-06",
+         "2026-07"
+        ]
+       }
+      }
+     }
+    },
+    "won": {
+     "rows": [
+      {
+       "month": "2025-01",
+       "label": "Jan 2025",
+       "n": 10,
+       "partial": false,
+       "uc_dates_incomplete": true,
+       "closed_no_uc": 2,
+       "w14": {
+        "k": 0,
+        "eligible": 10,
+        "mature": true,
+        "small": false
+       },
+       "w30": {
+        "k": 2,
+        "eligible": 10,
+        "mature": true,
+        "small": true
+       },
+       "w60": {
+        "k": 4,
+        "eligible": 10,
+        "mature": true,
+        "small": true
+       },
+       "w90": {
+        "k": 4,
+        "eligible": 10,
+        "mature": true,
+        "small": true
+       },
+       "to_date": {
+        "k": 5,
+        "n": 10,
+        "small": false
+       }
+      },
+      {
+       "month": "2025-02",
+       "label": "Feb 2025",
+       "n": 4,
+       "partial": false,
+       "uc_dates_incomplete": true,
+       "closed_no_uc": 0,
+       "w14": {
+        "k": 0,
+        "eligible": 4,
+        "mature": true,
+        "small": true
+       },
+       "w30": {
+        "k": 1,
+        "eligible": 4,
+        "mature": true,
+        "small": true
+       },
+       "w60": {
+        "k": 2,
+        "eligible": 4,
+        "mature": true,
+        "small": true
+       },
+       "w90": {
+        "k": 2,
+        "eligible": 4,
+        "mature": true,
+        "small": true
+       },
+       "to_date": {
+        "k": 2,
+        "n": 4,
+        "small": true
+       }
+      },
+      {
+       "month": "2025-03",
+       "label": "Mar 2025",
+       "n": 12,
+       "partial": false,
+       "uc_dates_incomplete": true,
+       "closed_no_uc": 1,
+       "w14": {
+        "k": 0,
+        "eligible": 12,
+        "mature": true,
+        "small": false
+       },
+       "w30": {
+        "k": 3,
+        "eligible": 12,
+        "mature": true,
+        "small": true
+       },
+       "w60": {
+        "k": 6,
+        "eligible": 12,
+        "mature": true,
+        "small": false
+       },
+       "w90": {
+        "k": 6,
+        "eligible": 12,
+        "mature": true,
+        "small": false
+       },
+       "to_date": {
+        "k": 6,
+        "n": 12,
+        "small": false
+       }
+      },
+      {
+       "month": "2025-04",
+       "label": "Apr 2025",
+       "n": 11,
+       "partial": false,
+       "uc_dates_incomplete": true,
+       "closed_no_uc": 1,
+       "w14": {
+        "k": 2,
+        "eligible": 11,
+        "mature": true,
+        "small": true
+       },
+       "w30": {
+        "k": 2,
+        "eligible": 11,
+        "mature": true,
+        "small": true
+       },
+       "w60": {
+        "k": 4,
+        "eligible": 11,
+        "mature": true,
+        "small": true
+       },
+       "w90": {
+        "k": 5,
+        "eligible": 11,
+        "mature": true,
+        "small": false
+       },
+       "to_date": {
+        "k": 6,
+        "n": 11,
+        "small": false
+       }
+      },
+      {
+       "month": "2025-05",
+       "label": "May 2025",
+       "n": 15,
+       "partial": false,
+       "uc_dates_incomplete": true,
+       "closed_no_uc": 2,
+       "w14": {
+        "k": 1,
+        "eligible": 15,
+        "mature": true,
+        "small": true
+       },
+       "w30": {
+        "k": 4,
+        "eligible": 15,
+        "mature": true,
+        "small": true
+       },
+       "w60": {
+        "k": 8,
+        "eligible": 15,
+        "mature": true,
+        "small": false
+       },
+       "w90": {
+        "k": 9,
+        "eligible": 15,
+        "mature": true,
+        "small": false
+       },
+       "to_date": {
+        "k": 10,
+        "n": 15,
+        "small": false
+       }
+      },
+      {
+       "month": "2025-06",
+       "label": "Jun 2025",
+       "n": 15,
+       "partial": false,
+       "uc_dates_incomplete": true,
+       "closed_no_uc": 4,
+       "w14": {
+        "k": 0,
+        "eligible": 15,
+        "mature": true,
+        "small": false
+       },
+       "w30": {
+        "k": 1,
+        "eligible": 15,
+        "mature": true,
+        "small": true
+       },
+       "w60": {
+        "k": 2,
+        "eligible": 15,
+        "mature": true,
+        "small": true
+       },
+       "w90": {
+        "k": 3,
+        "eligible": 15,
+        "mature": true,
+        "small": true
+       },
+       "to_date": {
+        "k": 6,
+        "n": 15,
+        "small": false
+       }
+      },
+      {
+       "month": "2025-07",
+       "label": "Jul 2025",
+       "n": 24,
+       "partial": false,
+       "uc_dates_incomplete": true,
+       "closed_no_uc": 8,
+       "w14": {
+        "k": 0,
+        "eligible": 24,
+        "mature": true,
+        "small": false
+       },
+       "w30": {
+        "k": 2,
+        "eligible": 24,
+        "mature": true,
+        "small": true
+       },
+       "w60": {
+        "k": 6,
+        "eligible": 24,
+        "mature": true,
+        "small": false
+       },
+       "w90": {
+        "k": 7,
+        "eligible": 24,
+        "mature": true,
+        "small": false
+       },
+       "to_date": {
+        "k": 9,
+        "n": 24,
+        "small": false
+       }
+      },
+      {
+       "month": "2025-08",
+       "label": "Aug 2025",
+       "n": 29,
+       "partial": false,
+       "uc_dates_incomplete": true,
+       "closed_no_uc": 9,
+       "w14": {
+        "k": 2,
+        "eligible": 29,
+        "mature": true,
+        "small": true
+       },
+       "w30": {
+        "k": 4,
+        "eligible": 29,
+        "mature": true,
+        "small": true
+       },
+       "w60": {
+        "k": 8,
+        "eligible": 29,
+        "mature": true,
+        "small": false
+       },
+       "w90": {
+        "k": 9,
+        "eligible": 29,
+        "mature": true,
+        "small": false
+       },
+       "to_date": {
+        "k": 12,
+        "n": 29,
+        "small": false
+       }
+      },
+      {
+       "month": "2025-09",
+       "label": "Sep 2025",
+       "n": 39,
+       "partial": false,
+       "uc_dates_incomplete": true,
+       "closed_no_uc": 10,
+       "w14": {
+        "k": 1,
+        "eligible": 39,
+        "mature": true,
+        "small": true
+       },
+       "w30": {
+        "k": 3,
+        "eligible": 39,
+        "mature": true,
+        "small": true
+       },
+       "w60": {
+        "k": 12,
+        "eligible": 39,
+        "mature": true,
+        "small": false
+       },
+       "w90": {
+        "k": 14,
+        "eligible": 39,
+        "mature": true,
+        "small": false
+       },
+       "to_date": {
+        "k": 21,
+        "n": 39,
+        "small": false
+       }
+      },
+      {
+       "month": "2025-10",
+       "label": "Oct 2025",
+       "n": 38,
+       "partial": false,
+       "uc_dates_incomplete": true,
+       "closed_no_uc": 12,
+       "w14": {
+        "k": 2,
+        "eligible": 38,
+        "mature": true,
+        "small": true
+       },
+       "w30": {
+        "k": 5,
+        "eligible": 38,
+        "mature": true,
+        "small": false
+       },
+       "w60": {
+        "k": 8,
+        "eligible": 38,
+        "mature": true,
+        "small": false
+       },
+       "w90": {
+        "k": 8,
+        "eligible": 38,
+        "mature": true,
+        "small": false
+       },
+       "to_date": {
+        "k": 15,
+        "n": 38,
+        "small": false
+       }
+      },
+      {
+       "month": "2025-11",
+       "label": "Nov 2025",
+       "n": 20,
+       "partial": false,
+       "uc_dates_incomplete": true,
+       "closed_no_uc": 3,
+       "w14": {
+        "k": 1,
+        "eligible": 20,
+        "mature": true,
+        "small": true
+       },
+       "w30": {
+        "k": 2,
+        "eligible": 20,
+        "mature": true,
+        "small": true
+       },
+       "w60": {
+        "k": 5,
+        "eligible": 20,
+        "mature": true,
+        "small": false
+       },
+       "w90": {
+        "k": 5,
+        "eligible": 20,
+        "mature": true,
+        "small": false
+       },
+       "to_date": {
+        "k": 11,
+        "n": 20,
+        "small": false
+       }
+      },
+      {
+       "month": "2025-12",
+       "label": "Dec 2025",
+       "n": 21,
+       "partial": false,
+       "uc_dates_incomplete": true,
+       "closed_no_uc": 2,
+       "w14": {
+        "k": 1,
+        "eligible": 21,
+        "mature": true,
+        "small": true
+       },
+       "w30": {
+        "k": 4,
+        "eligible": 21,
+        "mature": true,
+        "small": true
+       },
+       "w60": {
+        "k": 7,
+        "eligible": 21,
+        "mature": true,
+        "small": false
+       },
+       "w90": {
+        "k": 10,
+        "eligible": 21,
+        "mature": true,
+        "small": false
+       },
+       "to_date": {
+        "k": 16,
+        "n": 21,
+        "small": false
+       }
+      },
+      {
+       "month": "2026-01",
+       "label": "Jan 2026",
+       "n": 35,
+       "partial": false,
+       "uc_dates_incomplete": false,
+       "closed_no_uc": 0,
+       "w14": {
+        "k": 1,
+        "eligible": 35,
+        "mature": true,
+        "small": true
+       },
+       "w30": {
+        "k": 4,
+        "eligible": 35,
+        "mature": true,
+        "small": true
+       },
+       "w60": {
+        "k": 9,
+        "eligible": 35,
+        "mature": true,
+        "small": false
+       },
+       "w90": {
+        "k": 14,
+        "eligible": 35,
+        "mature": true,
+        "small": false
+       },
+       "to_date": {
+        "k": 24,
+        "n": 35,
+        "small": false
+       }
+      },
+      {
+       "month": "2026-02",
+       "label": "Feb 2026",
+       "n": 24,
+       "partial": false,
+       "uc_dates_incomplete": false,
+       "closed_no_uc": 1,
+       "w14": {
+        "k": 0,
+        "eligible": 24,
+        "mature": true,
+        "small": false
+       },
+       "w30": {
+        "k": 2,
+        "eligible": 24,
+        "mature": true,
+        "small": true
+       },
+       "w60": {
+        "k": 8,
+        "eligible": 24,
+        "mature": true,
+        "small": false
+       },
+       "w90": {
+        "k": 10,
+        "eligible": 24,
+        "mature": true,
+        "small": false
+       },
+       "to_date": {
+        "k": 16,
+        "n": 24,
+        "small": false
+       }
+      },
+      {
+       "month": "2026-03",
+       "label": "Mar 2026",
+       "n": 31,
+       "partial": false,
+       "uc_dates_incomplete": false,
+       "closed_no_uc": 3,
+       "w14": {
+        "k": 0,
+        "eligible": 31,
+        "mature": true,
+        "small": false
+       },
+       "w30": {
+        "k": 6,
+        "eligible": 31,
+        "mature": true,
+        "small": false
+       },
+       "w60": {
+        "k": 12,
+        "eligible": 31,
+        "mature": true,
+        "small": false
+       },
+       "w90": {
+        "k": 16,
+        "eligible": 31,
+        "mature": true,
+        "small": false
+       },
+       "to_date": {
+        "k": 20,
+        "n": 31,
+        "small": false
+       }
+      },
+      {
+       "month": "2026-04",
+       "label": "Apr 2026",
+       "n": 27,
+       "partial": false,
+       "uc_dates_incomplete": false,
+       "closed_no_uc": 1,
+       "w14": {
+        "k": 1,
+        "eligible": 27,
+        "mature": true,
+        "small": true
+       },
+       "w30": {
+        "k": 8,
+        "eligible": 27,
+        "mature": true,
+        "small": false
+       },
+       "w60": {
+        "k": 12,
+        "eligible": 27,
+        "mature": true,
+        "small": false
+       },
+       "w90": {
+        "k": 14,
+        "eligible": 27,
+        "mature": true,
+        "small": false
+       },
+       "to_date": {
+        "k": 21,
+        "n": 27,
+        "small": false
+       }
+      },
+      {
+       "month": "2026-05",
+       "label": "May 2026",
+       "n": 37,
+       "partial": false,
+       "uc_dates_incomplete": false,
+       "closed_no_uc": 2,
+       "w14": {
+        "k": 0,
+        "eligible": 37,
+        "mature": true,
+        "small": false
+       },
+       "w30": {
+        "k": 1,
+        "eligible": 37,
+        "mature": true,
+        "small": true
+       },
+       "w60": {
+        "k": 10,
+        "eligible": 37,
+        "mature": true,
+        "small": false
+       },
+       "w90": {
+        "k": 17,
+        "eligible": 37,
+        "mature": true,
+        "small": false
+       },
+       "to_date": {
+        "k": 25,
+        "n": 37,
+        "small": false
+       }
+      },
+      {
+       "month": "2026-06",
+       "label": "Jun 2026",
+       "n": 57,
+       "partial": false,
+       "uc_dates_incomplete": false,
+       "closed_no_uc": 2,
+       "w14": {
+        "k": 0,
+        "eligible": 57,
+        "mature": true,
+        "small": false
+       },
+       "w30": {
+        "k": 14,
+        "eligible": 57,
+        "mature": true,
+        "small": false
+       },
+       "w60": {
+        "k": 27,
+        "eligible": 57,
+        "mature": true,
+        "small": false
+       },
+       "w90": {
+        "k": 36,
+        "eligible": 57,
+        "mature": true,
+        "small": false
+       },
+       "to_date": {
+        "k": 42,
+        "n": 57,
+        "small": false
+       }
+      },
+      {
+       "month": "2026-07",
+       "label": "Jul 2026",
+       "n": 74,
+       "partial": false,
+       "uc_dates_incomplete": false,
+       "closed_no_uc": 0,
+       "w14": {
+        "k": 5,
+        "eligible": 74,
+        "mature": true,
+        "small": false
+       },
+       "w30": {
+        "k": 26,
+        "eligible": 74,
+        "mature": true,
+        "small": false
+       },
+       "w60": {
+        "k": 45,
+        "eligible": 74,
+        "mature": true,
+        "small": false
+       },
+       "w90": {
+        "k": 52,
+        "eligible": 74,
+        "mature": true,
+        "small": false
+       },
+       "to_date": {
+        "k": 56,
+        "n": 74,
+        "small": false
+       }
+      },
+      {
+       "month": "2026-08",
+       "label": "Aug 2026",
+       "n": 74,
+       "partial": false,
+       "uc_dates_incomplete": false,
+       "closed_no_uc": 0,
+       "w14": {
+        "k": 6,
+        "eligible": 74,
+        "mature": true,
+        "small": false
+       },
+       "w30": {
+        "k": 24,
+        "eligible": 74,
+        "mature": true,
+        "small": false
+       },
+       "w60": {
+        "k": 39,
+        "eligible": 74,
+        "mature": true,
+        "small": false
+       },
+       "w90": {
+        "k": 22,
+        "eligible": 44,
+        "mature": false,
+        "small": false
+       },
+       "to_date": {
+        "k": 47,
+        "n": 74,
+        "small": false
+       }
+      },
+      {
+       "month": "2026-09",
+       "label": "Sep 2026",
+       "n": 79,
+       "partial": false,
+       "uc_dates_incomplete": false,
+       "closed_no_uc": 0,
+       "w14": {
+        "k": 6,
+        "eligible": 79,
+        "mature": true,
+        "small": false
+       },
+       "w30": {
+        "k": 17,
+        "eligible": 79,
+        "mature": true,
+        "small": false
+       },
+       "w60": {
+        "k": 24,
+        "eligible": 44,
+        "mature": false,
+        "small": false
+       },
+       "w90": {
+        "k": 0,
+        "eligible": 1,
+        "mature": false,
+        "small": true
+       },
+       "to_date": {
+        "k": 39,
+        "n": 79,
+        "small": false
+       }
+      },
+      {
+       "month": "2026-10",
+       "label": "Oct 2026",
+       "n": 68,
+       "partial": false,
+       "uc_dates_incomplete": false,
+       "closed_no_uc": 0,
+       "w14": {
+        "k": 8,
+        "eligible": 68,
+        "mature": true,
+        "small": false
+       },
+       "w30": {
+        "k": 11,
+        "eligible": 37,
+        "mature": false,
+        "small": false
+       },
+       "w60": {
+        "k": 0,
+        "eligible": 0,
+        "mature": false,
+        "small": true
+       },
+       "w90": {
+        "k": 0,
+        "eligible": 0,
+        "mature": false,
+        "small": true
+       },
+       "to_date": {
+        "k": 19,
+        "n": 68,
+        "small": false
+       }
+      },
+      {
+       "month": "2026-11",
+       "label": "Nov 2026",
+       "n": 10,
+       "partial": true,
+       "uc_dates_incomplete": false,
+       "closed_no_uc": 0,
+       "w14": {
+        "k": 0,
+        "eligible": 0,
+        "mature": false,
+        "small": true
+       },
+       "w30": {
+        "k": 0,
+        "eligible": 0,
+        "mature": false,
+        "small": true
+       },
+       "w60": {
+        "k": 0,
+        "eligible": 0,
+        "mature": false,
+        "small": true
+       },
+       "w90": {
+        "k": 0,
+        "eligible": 0,
+        "mature": false,
+        "small": true
+       },
+       "to_date": {
+        "k": 1,
+        "n": 10,
+        "small": true
+       }
+      }
+     ],
+     "pooled": {
+      "w14": {
+       "before": {
+        "k": 2,
+        "n": 154,
+        "share": 0.013,
+        "small": true,
+        "months": [
+         "2026-01",
+         "2026-05"
+        ]
+       },
+       "after": {
+        "k": 25,
+        "n": 352,
+        "share": 0.071,
+        "small": false,
+        "months": [
+         "2026-06",
+         "2026-10"
+        ]
+       }
+      },
+      "w30": {
+       "before": {
+        "k": 21,
+        "n": 154,
+        "share": 0.1364,
+        "small": false,
+        "months": [
+         "2026-01",
+         "2026-05"
+        ]
+       },
+       "after": {
+        "k": 81,
+        "n": 284,
+        "share": 0.2852,
+        "small": false,
+        "months": [
+         "2026-06",
+         "2026-09"
+        ]
+       }
+      },
+      "w60": {
+       "before": {
+        "k": 51,
+        "n": 154,
+        "share": 0.3312,
+        "small": false,
+        "months": [
+         "2026-01",
+         "2026-05"
+        ]
+       },
+       "after": {
+        "k": 111,
+        "n": 205,
+        "share": 0.5415,
+        "small": false,
+        "months": [
+         "2026-06",
+         "2026-08"
+        ]
+       }
+      },
+      "w90": {
+       "before": {
+        "k": 71,
+        "n": 154,
+        "share": 0.461,
+        "small": false,
+        "months": [
+         "2026-01",
+         "2026-05"
+        ]
+       },
+       "after": {
+        "k": 88,
+        "n": 131,
+        "share": 0.6718,
+        "small": false,
+        "months": [
+         "2026-06",
+         "2026-07"
+        ]
+       }
+      }
+     }
+    }
+   },
+   "kickoff_lag_median": 5.0,
+   "refunded_included": 77
   }
  },
  "speed": {
@@ -1818,7 +4869,204 @@
    "median": 36.0
   },
   "running": 179,
-  "closed_without_uc_date": 66
+  "closed_without_uc_date": 66,
+  "scenario": {
+   "all": {
+    "clients": 825,
+    "recorded": {
+     "n": 492,
+     "mean": 56.17,
+     "median": 37.5
+    },
+    "hunting": 108,
+    "waits": {
+     "n": 108,
+     "mean": 106.02,
+     "median": 60.0
+    },
+    "scenario": {
+     "n": 591,
+     "mean": 65.33,
+     "median": 40.0
+    },
+    "km_median": 76.0,
+    "hunting_with_older_uc": 9
+   },
+   "budgets": [
+    {
+     "label": "$200K",
+     "range": "$150K\u2013$200K",
+     "clients": 119,
+     "recorded": {
+      "n": 67,
+      "mean": 43.6,
+      "median": 38.0
+     },
+     "hunting": 27,
+     "waits": {
+      "n": 27,
+      "mean": 62.74,
+      "median": 55.0
+     },
+     "scenario": {
+      "n": 91,
+      "mean": 49.49,
+      "median": 43.0
+     },
+     "km_median": 61.0,
+     "hunting_with_older_uc": 3
+    },
+    {
+     "label": "$250K",
+     "range": "$200K\u2013$250K",
+     "clients": 79,
+     "recorded": {
+      "n": 49,
+      "mean": 38.22,
+      "median": 31.0
+     },
+     "hunting": 15,
+     "waits": {
+      "n": 15,
+      "mean": 71.13,
+      "median": 45.0
+     },
+     "scenario": {
+      "n": 64,
+      "mean": 45.94,
+      "median": 31.5
+     },
+     "km_median": 51.0,
+     "hunting_with_older_uc": 0
+    },
+    {
+     "label": "$300K",
+     "range": "$250K\u2013$300K",
+     "clients": 74,
+     "recorded": {
+      "n": 46,
+      "mean": 41.78,
+      "median": 30.5
+     },
+     "hunting": 15,
+     "waits": {
+      "n": 15,
+      "mean": 43.73,
+      "median": 31.0
+     },
+     "scenario": {
+      "n": 60,
+      "mean": 42.02,
+      "median": 31.0
+     },
+     "km_median": 57.0,
+     "hunting_with_older_uc": 1
+    },
+    {
+     "label": "$350K\u2013$400K",
+     "range": "$300K\u2013$400K",
+     "clients": 59,
+     "recorded": {
+      "n": 22,
+      "mean": 39.91,
+      "median": 36.5
+     },
+     "hunting": 21,
+     "waits": {
+      "n": 21,
+      "mean": 52.43,
+      "median": 47.0
+     },
+     "scenario": {
+      "n": 42,
+      "mean": 46.64,
+      "median": 43.5
+     },
+     "km_median": 101.0,
+     "hunting_with_older_uc": 1
+    },
+    {
+     "label": "$450K and above",
+     "range": "$400K\u2013$500K and $500K+",
+     "clients": 63,
+     "recorded": {
+      "n": 42,
+      "mean": 40.95,
+      "median": 35.0
+     },
+     "hunting": 13,
+     "waits": {
+      "n": 13,
+      "mean": 75.85,
+      "median": 73.0
+     },
+     "scenario": {
+      "n": 55,
+      "mean": 49.2,
+      "median": 40.0
+     },
+     "km_median": 49.0,
+     "hunting_with_older_uc": 0
+    },
+    {
+     "label": "Not recorded",
+     "range": null,
+     "clients": 431,
+     "recorded": {
+      "n": 266,
+      "mean": 68.87,
+      "median": 41.0
+     },
+     "hunting": 17,
+     "waits": {
+      "n": 17,
+      "mean": 349.76,
+      "median": 323.0
+     },
+     "scenario": {
+      "n": 279,
+      "mean": 85.95,
+      "median": 46.0
+     },
+     "km_median": 103.0,
+     "hunting_with_older_uc": 4
+    }
+   ],
+   "budget_rule": {
+    "field": "Total out-of-pocket capital available (all-in)",
+    "column": "M",
+    "form_since": "2026-04-20",
+    "measures": "down payment + closing costs + renovation + furniture + amenities (all-in capital, not the purchase price)",
+    "matched": 394,
+    "since_form": 409,
+    "since_form_matched": 394,
+    "via_deal_only": 2,
+    "jira_budget_filled": 146,
+    "signed": 843
+   },
+   "jira_hunting": 123,
+   "jira_hunting_not_confirmed": 15,
+   "jira_hunting_not_confirmed_why": {
+    "No deal link": 8,
+    "lost": 3,
+    "open": 2,
+    "Deal not in base": 1,
+    "won": 1
+   },
+   "all_hunting_sensitivity": {
+    "n": 593,
+    "mean": 65.24,
+    "median": 40.0
+   },
+   "left_out": {
+    "Inactive": 155,
+    "Post-close": 59,
+    "Closed": 11,
+    "Pre-sale onboarding": 8
+   },
+   "negative_excluded": 1,
+   "km_median": 76.0
+  }
  },
  "drivers": {
   "form_from": "2026-04-20",
@@ -2476,6 +5724,221 @@
   "matched_cohort": {
    "from": "2026-04-28",
    "to": "2026-10-17"
+  }
+ },
+ "fallout": {
+  "source": "12 Nov 2026 Jira extract (data as of 11 Nov 2026) for the fall-out address, Under Contract count and first / latest dates; 16 Nov reporting layer for statuses",
+  "known": {
+   "n": 570,
+   "uc_record": 497,
+   "fell_only": 5,
+   "purchase_only": 68
+  },
+  "groups": {
+   "documented": {
+    "n": 12,
+    "share": 0.0211
+   },
+   "ended": {
+    "n": 43,
+    "share": 0.0754
+   },
+   "returned": {
+    "n": 4,
+    "share": 0.007
+   },
+   "second_entry": {
+    "n": 32,
+    "share": 0.0561
+   },
+   "none": {
+    "n": 479,
+    "share": 0.8404
+   }
+  },
+  "documented": {
+   "n": 12,
+   "now": {
+    "purchased": 10,
+    "paused": 2
+   },
+   "same_address_as_today": 12,
+   "address_on_record": 12,
+   "replacement_documented": 0,
+   "purchased_with_closing_date": 9,
+   "uc_record": 7,
+   "second_entry": 4
+  },
+  "ended": {
+   "n": 43,
+   "now": {
+    "hunting": 10,
+    "paused": 28,
+    "additional": 2,
+    "refunded": 3
+   },
+   "with_closing_date_entered": 3,
+   "second_entry": 2,
+   "previous_status_search": 28
+  },
+  "returned": {
+   "n": 4,
+   "now": {
+    "under_contract": 4
+   }
+  },
+  "none": {
+   "n": 479,
+   "now": {
+    "purchased": 418,
+    "under_contract": 61
+   }
+  },
+  "second_entry": {
+   "n": 32,
+   "now": {
+    "purchased": 32
+   },
+   "same_day": 1,
+   "gap_median": 20.5
+  },
+  "fell_through": {
+   "n": 59,
+   "share": 0.1035,
+   "new_contract": 4,
+   "replacement_documented": 0,
+   "without_property": 45,
+   "same_address_purchase": 10
+  },
+  "uc_count_2plus": 42,
+  "fell_field_filled_all_issues": 12,
+  "not_in_12nov_extract": 14
+ },
+ "repeat": {
+  "jira": {
+   "issues": 843,
+   "clients": 801,
+   "multi_clients": 39,
+   "multi_issues": 81,
+   "searches": {
+    "1": 762,
+    "2": 36,
+    "3": 3
+   },
+   "two_plus_purchases": 19,
+   "purchases_dist": {
+    "2": 17,
+    "3": 2
+   },
+   "pursuing": 8,
+   "pursuing_by_purchase": {
+    "2": 8
+   },
+   "pursuing_status": {
+    "hunting": 7,
+    "under_contract": 1
+   },
+   "categories": {
+    "two_plus": 19,
+    "two_plus_pursuing": 0,
+    "one_pursuing": 8,
+    "one_inactive": 11,
+    "none_completed": 1,
+    "other": 0
+   },
+   "not_in_12nov_extract": 14
+  },
+  "pipedrive": {
+   "deals": 876,
+   "clients": 812,
+   "repeat_clients": 59,
+   "repeat_client_deals": 123,
+   "deals_beyond_first": 64,
+   "won_deals_dist": {
+    "2": 54,
+    "3": 5
+   },
+   "no_own_jira": {
+    "confirmed_repeat": {
+     "deals": 9,
+     "clients": 9,
+     "won_2026": 7
+    },
+    "second_deal_review": {
+     "deals": 7,
+     "clients": 7,
+     "won_2026": 1
+    },
+    "either": {
+     "deals": 16,
+     "clients": 15
+    },
+    "both": 1
+   },
+   "within_repeat_clients": true,
+   "reporting_flag": {
+    "deals": 25,
+    "in_repeat_clients": 22
+   },
+   "resolution": {
+    "own_jira": 5,
+    "separate_purchase": 1,
+    "second_deal_review": 7,
+    "repeat": 9
+   }
+  },
+  "cribs": {
+   "clients": 19,
+   "purchases": 40,
+   "first_purchases": 19,
+   "later_purchases": 21,
+   "first": {
+    "cribs": 13,
+    "other": 0,
+    "turnkey": 0,
+    "unknown": 6
+   },
+   "later": {
+    "cribs": 10,
+    "other": 6,
+    "turnkey": 0,
+    "unknown": 5
+   },
+   "clients_first_cribs": 13,
+   "clients_later_cribs": 10,
+   "clients_both": 10,
+   "clients_first_cribs_not_later": 2,
+   "clients_first_cribs_later_unknown": 1,
+   "clients_later_only": 0,
+   "clients_first_unknown": 6,
+   "clients_first_other": 0,
+   "tracker_handed_off": {
+    "first": 15,
+    "later": 2
+   },
+   "tracker_any_deal": {
+    "first": 15,
+    "later": 4
+   },
+   "all_purchases": {
+    "n": 460,
+    "cribs": 291,
+    "unknown": 100,
+    "unknown_by_year": {
+     "2024": [
+      45,
+      46
+     ],
+     "2025": [
+      47,
+      134
+     ],
+     "2026": [
+      8,
+      280
+     ]
+    }
+   }
   }
  },
  "cash": {
@@ -8724,13 +12187,15 @@
   "snapshots": {
    "reporting_layer": "2026-11-16"
   },
-  "built_at": "2026-11-18 02:01",
+  "built_at": "2026-11-18 06:48",
   "chapters": [
    "journey",
    "outcomes",
    "pace",
    "speed",
-   "drivers"
+   "drivers",
+   "fallout",
+   "repeat"
   ],
   "source": "https://ifrahamstr.github.io/STRSearchBusinessDataExplorer-Public/2026-11-16/",
   "reconciliation": {
@@ -9240,7 +12705,7 @@
    "hard": true
   },
   {
-   "check": "Keeping pace: no published share rests on 1-4 clients",
+   "check": "Keeping pace: no published share rests on 1-4 clients (the monthly cohort table publishes counts with their denominators and marks small cells instead)",
    "page": 0,
    "explorer": 0,
    "ok": true,
@@ -9278,6 +12743,230 @@
    "check": "Capital (Pipedrive): every confirmed start with a stated capital is in the survival analysis",
    "page": 668,
    "explorer": 668,
+   "ok": true,
+   "hard": true
+  },
+  {
+   "check": "Still waiting: the six stages add up to the signed-up clients, none unclassified",
+   "page": [
+    843,
+    0
+   ],
+   "explorer": [
+    843,
+    0
+   ],
+   "ok": true,
+   "hard": true
+  },
+  {
+   "check": "Still waiting: Hunting / Paused / Inactive equal the snapshot status counts",
+   "page": [
+    123,
+    108,
+    195
+   ],
+   "explorer": [
+    123,
+    108,
+    195
+   ],
+   "ok": true,
+   "hard": true
+  },
+  {
+   "check": "Still waiting: purchased + under contract + hunting = Active",
+   "page": 648,
+   "explorer": 648,
+   "ok": true,
+   "hard": true
+  },
+  {
+   "check": "Still waiting: no contract = hunting + paused + additional + refunded; yet to close = that + under contract",
+   "page": [
+    318,
+    383
+   ],
+   "explorer": [
+    318,
+    383
+   ],
+   "ok": true,
+   "hard": true
+  },
+  {
+   "check": "Growth table: Won / Starts / UC of every full month equal the monthly table above it (daily_client_activity)",
+   "page": 0,
+   "explorer": 0,
+   "ok": true,
+   "hard": true
+  },
+  {
+   "check": "Growth table: every growth figure shown = this period / the same days of the comparison period - 1",
+   "page": true,
+   "explorer": true,
+   "ok": true,
+   "hard": true
+  },
+  {
+   "check": "Growth table: the June-November 2025 contract gap still holds (30%+ of Aug-Dec 2025 closings lack a UC date; at most 10% in Jan-Jul 2025 and in 2026)",
+   "page": true,
+   "explorer": true,
+   "ok": true,
+   "hard": true
+  },
+  {
+   "check": "Growth table: the start-rule month is the month of definitions.START_RULE_DATE",
+   "page": "2026-06",
+   "explorer": "2026-06",
+   "ok": true,
+   "hard": true
+  },
+  {
+   "check": "Cohorts (client start clock): within 14 / 30 / 60 / 90 days equal the Explorer's matured-cohort table, months that differ",
+   "page": 0,
+   "explorer": 0,
+   "ok": true,
+   "hard": true
+  },
+  {
+   "check": "Cohorts: month sizes equal the confirmed starts",
+   "page": 0,
+   "explorer": 0,
+   "ok": true,
+   "hard": true
+  },
+  {
+   "check": "Cohorts: numerators never exceed eligible clients, eligible never exceeds the month, cells under 5 are marked small (both clocks)",
+   "page": true,
+   "explorer": true,
+   "ok": true,
+   "hard": true
+  },
+  {
+   "check": "UC tomorrow: recorded durations equal the published headline (n / mean / median)",
+   "page": [
+    492,
+    56.17,
+    37.5
+   ],
+   "explorer": [
+    492,
+    56.17,
+    37.5
+   ],
+   "ok": true,
+   "hard": true
+  },
+  {
+   "check": "UC tomorrow: each search counts once (recorded - hunting with an older date + hunting = pooled)",
+   "page": 591,
+   "explorer": 591,
+   "ok": true,
+   "hard": true
+  },
+  {
+   "check": "UC tomorrow: hunting searches = the reporting layer's hunting engagements",
+   "page": 108,
+   "explorer": 108,
+   "ok": true,
+   "hard": true
+  },
+  {
+   "check": "UC tomorrow: budget groups add up to every confirmed start, recorded duration and hunting search",
+   "page": [
+    825,
+    108,
+    492,
+    591
+   ],
+   "explorer": [
+    825,
+    108,
+    492,
+    591
+   ],
+   "ok": true,
+   "hard": true
+  },
+  {
+   "check": "UC tomorrow: no budget-group average or median rests on fewer than 5 searches",
+   "page": true,
+   "explorer": true,
+   "ok": true,
+   "hard": true
+  },
+  {
+   "check": "Fall-through: the five evidence groups add up to the clients known to have gone under contract",
+   "page": 570,
+   "explorer": 570,
+   "ok": true,
+   "hard": true
+  },
+  {
+   "check": "Fall-through: known = UC record + fall-out address only + purchase only",
+   "page": 570,
+   "explorer": 570,
+   "ok": true,
+   "hard": true
+  },
+  {
+   "check": "Fall-through: where documented and status-implied fall-throughs stand today adds up",
+   "page": [
+    12,
+    43
+   ],
+   "explorer": [
+    12,
+    43
+   ],
+   "ok": true,
+   "hard": true
+  },
+  {
+   "check": "Repeat clients: deals without their own Jira issue are the Cash Forecast reconciliation's (repeat purchases / second deals under review)",
+   "page": [
+    9,
+    7
+   ],
+   "explorer": [
+    9,
+    7
+   ],
+   "ok": true,
+   "hard": true
+  },
+  {
+   "check": "Repeat clients: every deal without its own Jira issue belongs to a client with two or more won deals",
+   "page": true,
+   "explorer": true,
+   "ok": true,
+   "hard": true
+  },
+  {
+   "check": "Repeat clients: the Jira categories add up to the clients with two or more searches",
+   "page": 39,
+   "explorer": 39,
+   "ok": true,
+   "hard": true
+  },
+  {
+   "check": "STR Cribs: first and later designer choices add up to the repeat buyers' purchases",
+   "page": [
+    19,
+    21
+   ],
+   "explorer": [
+    19,
+    21
+   ],
+   "ok": true,
+   "hard": true
+  },
+  {
+   "check": "STR Cribs: repeat buyers are the Jira clients with two or more completed purchases",
+   "page": 19,
+   "explorer": 19,
    "ok": true,
    "hard": true
   },

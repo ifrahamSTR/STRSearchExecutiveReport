@@ -24,6 +24,85 @@ def _bins(values: pd.Series, width: int, cap: int) -> dict:
     return {"width": width, "cap": cap, "counts": counts, "overflow": int((v >= cap).sum()), "n": int(len(v))}
 
 
+# ----------------------------------------------------------------------------- 4.4 scenario: every hunting client under contract tomorrow
+# Budget = the upper amount of the onboarding-form range "Total out-of-pocket capital available (all-in)" (column M of the
+# current form, live since 20 Apr 2026): the interim rule is to carry that amount into Jira until Acquisitions cleans the
+# Jira budget field. It measures all-in capital (down payment + closing costs + renovation + furniture + amenities), not the
+# purchase price. Matched to clients as in chapter 5 (e-mail first, the form's deal id as a fallback; the answer given
+# before the client's Under Contract date).
+BUDGETS = [(200, "$200K", "$150K–$200K"), (250, "$250K", "$200K–$250K"), (300, "$300K", "$250K–$300K"),
+           (400, "$350K–$400K", "$300K–$400K"), (10_000, "$450K and above", "$400K–$500K and $500K+")]
+NO_BUDGET = "Not recorded"
+
+
+def _budget(cap) -> str:
+    if cap is None or pd.isna(cap):
+        return NO_BUDGET
+    c = float(cap)
+    if c < 0:                       # an open-ended answer such as "$400K+" (upper amount unknown, at least $400K)
+        return BUDGETS[-1][1]
+    return next(lab for hi, lab, _ in BUDGETS if c <= hi)
+
+
+def _st(v: pd.Series) -> dict:
+    v = pd.to_numeric(v, errors="coerce").dropna()
+    return {"n": int(len(v)), "mean": round(float(v.mean()), 2) if len(v) else None, "median": float(v.median()) if len(v) else None}
+
+
+def scenario(ctx: C.Ctx) -> dict:
+    """Observed days from client start to Under Contract, and the 'UC tomorrow' scenario: every hunting search counts as
+    reaching Under Contract on the day after the data date, pooled with the recorded durations of every other search. Each
+    search (engagement with a confirmed start) counts once: a hunting search that still carries an older Under Contract
+    date counts as waiting, not with that older date. Paused and refunded searches without a contract are in neither."""
+    from chapters import drivers as DR
+    co, asof = ctx.cohort.copy(), ctx.asof
+    form = DR.load_form(C.ROOT.parent / "12 Nov 26 Reports" / "DataDrive" / DR.WORKBOOK)
+    ans, info = DR.match(co, form, DR.jira_email_hashes(ctx.explorer))
+    co["budget"] = ans.cap.map(_budget)
+    hunt = co.hunting.fillna(False).astype(bool)
+    rec = co.uc.notna() & (co.days_uc >= 0)
+    co["obs"] = co.days_uc.where(rec)
+    co["wait"] = ((asof + pd.Timedelta(days=1)) - co.start).dt.days.where(hunt)
+    co["pool"] = co.wait.where(hunt, co.obs)
+    co["t"], co["e"] = np.where(co.uc.notna(), co.days_uc, co.elapsed), co.uc.notna()
+
+    def km_med(g):
+        g = g[g.t >= 0]
+        k = C.km_curve(g.t, g.e.astype(bool))
+        hit = k[k.cum >= 0.5]
+        return float(hit.t.iloc[0]) if len(hit) else None
+
+    def block(g):
+        return {"clients": int(len(g)), "recorded": _st(g.obs), "hunting": int(g.wait.notna().sum()), "waits": _st(g.wait),
+                "scenario": _st(g.pool), "km_median": km_med(g), "hunting_with_older_uc": int((g.wait.notna() & g.uc.notna()).sum())}
+
+    groups = []
+    for _, lab, rng in BUDGETS + [(None, NO_BUDGET, None)]:
+        g = co[co.budget == lab]
+        groups.append({"label": lab, "range": rng, **block(g)})
+    # every hunting Jira client, including the 15 without a confirmed start on a won deal (measured from their Jira start)
+    jh = ctx.jira[ctx.jira.hunting]
+    extra = jh[~jh.key.isin(co.jira_key) & jh.start.notna()]
+    ext_wait = ((asof + pd.Timedelta(days=1)) - extra.start).dt.days
+    all_pool = pd.concat([co.pool.dropna(), ext_wait])
+    sig = ctx.signed
+    since = co[co.start >= pd.Timestamp("2026-04-20")]
+    return {
+        "all": block(co), "budgets": groups,
+        "budget_rule": {"field": "Total out-of-pocket capital available (all-in)", "column": "M", "form_since": "2026-04-20",
+                        "measures": "down payment + closing costs + renovation + furniture + amenities (all-in capital, not the purchase price)",
+                        "matched": int(ans.matched.sum()), "since_form": int(len(since)), "since_form_matched": int(since.index.isin(ans.index[ans.matched]).sum()),
+                        "via_deal_only": info["via_deal_only"], "jira_budget_filled": int(sig.budget.notna().sum()), "signed": int(len(sig))},
+        "jira_hunting": int(len(jh)), "jira_hunting_not_confirmed": int((~jh.key.isin(co.jira_key)).sum()),
+        "jira_hunting_not_confirmed_why": {k: int(v) for k, v in jh[~jh.key.isin(co.jira_key)].pd_status.value_counts().items()},
+        "all_hunting_sensitivity": _st(all_pool),
+        # searches in neither figure: no recorded contract and not hunting (by status group: Closed / Post-close = closings without a UC date)
+        "left_out": {k: int(v) for k, v in co[~hunt & co.uc.isna()].group.fillna("No Jira status").value_counts().items()},
+        "negative_excluded": int((co.uc.notna() & (co.days_uc < 0)).sum()),
+        "km_median": ctx.expected["q1"]["km_uc"],
+    }
+
+
 def build(ctx: C.Ctx) -> dict:
     ex, s = ctx.expected, ctx.cohort
     q1 = ex["q1"]
@@ -65,4 +144,5 @@ def build(ctx: C.Ctx) -> dict:
         "uc_to_close": {"n": int(len(gap)), "median": float(gap.median())},
         "running": int(sum(l["n"] for l in lanes.values())),
         "closed_without_uc_date": int((s.closed.notna() & s.uc.isna()).sum()),
+        "scenario": scenario(ctx),
     }

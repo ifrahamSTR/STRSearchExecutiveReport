@@ -170,6 +170,122 @@
     });
   }
 
+  /* ---- added 18 Nov 2026 -------------------------------------------------------------------------------------------- */
+  const phrase = d => (d > 0 ? `${d} more start${d === 1 ? '' : 's'} than contracts` : d < 0 ? `${-d} more contract${d === -1 ? '' : 's'} than starts` : 'as many starts as contracts');
+  const monName = k => MONTHS[+k.slice(5) - 1].slice(0, 3);
+  const span = p => (p && p.months ? (p.months[0] === p.months[1] ? monName(p.months[0]) : `${monName(p.months[0])}–${monName(p.months[1])}`) : '');
+  const NOTE = { early: 'a', rule: 'b', ucgap: 'c' };
+
+  // 3.2 table: Won, Starts, Under Contract with growth against the previous month or the same month a year earlier
+  function growthTable(host, gr, mode, range) {
+    const R = gr.reasons;
+    const dlt = (r, m) => {
+      const x = r[`${m}_${mode}`];
+      if (x.pct == null) return x.why === 'zero' ? `<span class="nc" title="${R.zero}">–</span>` : `<span class="nc" title="${R[x.why]}">n/c<sup>${NOTE[x.why]}</sup></span>`;
+      return `${S.signed(x.pct)}<small>vs ${S.int(x.base)}</small>`;
+    };
+    const vs = mode === 'mom' ? 'vs previous month' : 'vs same month last year';
+    const lab = r => `${r.label}${r.partial ? `<small>1–${r.days} ${r.label.slice(0, 3)} (partial), compared with the same days ${mode === 'mom' ? 'of the previous month' : 'a year earlier'}</small>` : ''}`;
+    const cols = [{ k: 'month', label: 'Month', html: lab }];
+    [['won', 'Won (Pipedrive)'], ['starts', 'Jira starts'], ['uc', 'Under Contract']].forEach(([m, l]) => {
+      cols.push({ k: m, label: l, num: true, html: r => S.int(r[m]) });
+      cols.push({ k: `${m}_${mode}`, label: `<small style="margin:0">${vs}</small>`, num: true, sv: r => r[`${m}_${mode}`].pct, html: r => dlt(r, m) });
+    });
+    cols.push({ k: 'diff', label: 'Starts − Under Contract', cls: 'nw', html: r => phrase(r.diff) + (r.partial ? '<small>so far</small>' : '') });
+    S.ui.table(host, cols, gr.rows.filter(r => range === 'all' || r.month >= '2026-01').reverse().map(r => Object.assign({ _cls: r.partial ? 'part' : '' }, r)), {
+      caption: 'Monthly Won, Jira starts and Under Contract with growth',
+      notes: `<span>n/c = not comparable; hover for the reason.</span>${Object.entries(NOTE).map(([k, l]) => `<span><b>${l}</b>${R[k]}</span>`).join('')}<span>Growth = this period ÷ the comparison period − 1. The hunting count (${S.int(gr.hunting)} today) is the backlog; monthly differences are not added up.</span>`,
+    });
+  }
+
+  // 3.3 same-cohort view: share of each start month's clients under contract within 14 / 30 / 60 / 90 days or to date
+  function cohortScene(main, D, ch) {
+    const C = D.pace.cohorts, st = { w: '14', clock: 'start', range: '2026' };
+    const P = n => C.clocks[n].pooled, ps = P('start'), pw = P('won');
+    const cmp = (a, b) => (Math.abs(a - b) < 0.02 ? 'about the same as' : a > b ? 'up from' : 'down from');
+    const b14 = ps.w14.before, a14 = ps.w14.after, b30 = ps.w30.before, a30 = ps.w30.after;
+    const old = C.clocks.start.rows.filter(r => r.uc_dates_incomplete), oldN = old.reduce((a, r) => a + r.n, 0), oldK = old.reduce((a, r) => a + r.closed_no_uc, 0);
+    const body = S.scene(main, { ch, step: 3, of: 3, label: 'Are newer clients faster?',
+      title: `First 14 days: ${S.pct(a14.share)} of starters since June went under contract, ${cmp(a14.share, b14.share)} ${S.pct(b14.share)} before; by day 30, ${S.pct(a30.share)}, ${cmp(a30.share, b30.share)} ${S.pct(b30.share)}` });
+    body.innerHTML = `<div class="figs qf">
+        <div class="fig"><span class="v num"><span class="from">${S.pct(b14.share)}</span><span class="ar2">→</span>${S.pct(a14.share)}</span><span class="l"><i style="background:var(--uc)"></i>under contract within 14 days: ${span(b14)} → ${span(a14)} start months (${b14.k} of ${S.int(b14.n)} → ${a14.k} of ${S.int(a14.n)})</span></div>
+        <div class="fig"><span class="v num"><span class="from">${S.pct(b30.share)}</span><span class="ar2">→</span>${S.pct(a30.share)}</span><span class="l"><i style="background:var(--uc)"></i>within 30 days: ${span(b30)} → ${span(a30)} (${b30.k} of ${S.int(b30.n)} → ${a30.k} of ${S.int(a30.n)})</span></div>
+        <div class="fig"><span class="v num"><span class="from">${S.pct(pw.w14.before.share)}</span><span class="ar2">→</span>${S.pct(pw.w14.after.share)}</span><span class="l"><i style="background:var(--uc-2)"></i>within 14 days counted from the won date, one clock for every month (${pw.w14.before.k} of ${S.int(pw.w14.before.n)} → ${pw.w14.after.k} of ${S.int(pw.w14.after.n)})</span></div>
+      </div>
+      <div class="board" id="cohBoard">
+        <div class="ptools"><div class="pl">${S.ui.seg('w', 'Window', [['14', 'Within 14 days'], ['30', '30'], ['60', '60'], ['90', '90'], ['todate', 'To date']], '14', 'only-chart')}${S.ui.seg('clock', 'Clock', [['start', 'From client start'], ['won', 'From won date']], 'start')}${S.ui.seg('range', 'Months shown', [['2026', '2026'], ['all', 'Since Jan 2025']], '2026', 'only-table')}</div><div class="pr">${S.ui.toggle()}</div></div>
+        <div class="pv-chart"><div class="chart h-coh" id="cohChart" role="img" aria-label="Share of each 2026 start month's clients under contract within 14 days: ${C.clocks.start.rows.filter(r => r.month >= C.compare_from && r.w14.eligible).map(r => `${S.monShort(r.month)} ${r.w14.k} of ${r.w14.eligible}`).join(', ')}."></div>
+          <div class="legend"><span><i style="background:var(--uc)"></i>Every client in the month has had the full window</span><span><i class="hatch-uc"></i>Maturing: share so far</span><span id="cohAvg"></span><span><i class="line" style="background:var(--sales)"></i>Late May changes</span></div></div>
+        <div class="pv-table tw" id="cohTable"></div>
+      </div>
+      ${S.ui.ex('How is this number built?', [
+        `<p class="ex-h">The measure</p><p>Each start month's confirmed starts (won deals with a Jira start, ${S.int(D.speed.estimate.n)} in all) and how many reached Under Contract within 14, 30, 60 or 90 days of their start: <code>SUM(uc_within_Nd × eligible_Nd) ÷ SUM(eligible_Nd)</code>, the Explorer's matured-cohort rule. A window is <b>maturing</b> while some of the month's clients have had fewer than N days; the chart then shows the share so far. Under Contract is the latest valid contract, so a client whose first contract fell through counts at the later one. Refunded clients stay in (${S.int(C.refunded_included)}).</p>
+         <p class="ex-h">Comparable months</p><p>Months whose whole window has passed, from January 2026: ${span(b14)} 2026 before the late-May changes, June 2026 on after. 2025 start months are in the table but not compared: ${S.int(oldK)} of their ${S.int(oldN)} clients closed without an Under Contract date, so their shares read low. Cells resting on fewer than 5 clients are marked <sup>s</sup>.</p>`,
+        `<p class="ex-h">Two clocks</p><p><b>From client start</b> (the reporting rule): before June the start is the kickoff, a median ${S.d1(C.kickoff_lag_median)} days after the sale; from 1 June it is the won date. So clients since June get about ${S.d1(C.kickoff_lag_median)} fewer search days inside the same window, which works against the newer months.</p>
+         <p><b>From won date</b> counts every month from the sale. It removes that shift, but since 27 May clients meet Acquisitions in the Confidence Call before they buy, so part of their search can start before the won date. The true change in the first two weeks lies between the two readings: ${S.pct(b14.share)} → ${S.pct(a14.share)} and ${S.pct(pw.w14.before.share)} → ${S.pct(pw.w14.after.share)}.</p>`,
+      ])}
+      <p class="cap">Confirmed starts by start month · bars show the selected window · the table shows every window with its numerator and eligible clients.</p>`;
+    const board = S.$('#cohBoard', body), node = S.$('#cohChart', body), host = S.$('#cohTable', body);
+    const cellOf = (r, w) => (w === 'todate' ? { k: r.to_date.k, el: r.to_date.n, mature: true, small: r.to_date.small } : { k: r[`w${w}`].k, el: r[`w${w}`].eligible, mature: r[`w${w}`].mature, small: r[`w${w}`].small });
+    const rec = S.chart(node, t => {
+      const rows = C.clocks[st.clock].rows.filter(r => r.month >= C.compare_from), n = rows.length, w = st.w;
+      const ci = rows.findIndex(r => r.month === C.change_month), pool = w === 'todate' ? null : C.clocks[st.clock].pooled[`w${w}`];
+      const pts = rows.map(r => { const c = cellOf(r, w); return { c, v: c.el ? (100 * c.k) / c.el : null }; });
+      const idx = m => rows.findIndex(r => r.month === m);
+      const ref = p => (p && p.months ? [[{ coord: [idx(p.months[0]) - 0.42, p.share * 100] }, { coord: [idx(p.months[1]) + 0.42, p.share * 100] }]] : []);
+      const ymax = Math.max(20, Math.ceil(Math.max(...pts.map(p => p.v || 0), pool ? pool.after.share * 100 : 0, pool ? pool.before.share * 100 : 0) / 10) * 10 + 10);
+      return Object.assign(S.base(t), {
+        grid: { left: 8, right: 14, top: 30, bottom: 28, containLabel: true },
+        tooltip: Object.assign(S.base(t).tooltip, { trigger: 'item', formatter: p => {
+          const r = rows[p.dataIndex], c = pts[p.dataIndex].c, wl = w === 'todate' ? 'to date' : `within ${w} days`;
+          if (!c.el) return `<b>${r.label} starters</b> · ${S.int(r.n)} clients<br>No client has had ${w} days yet`;
+          return `<b>${r.label} starters</b> · ${S.int(r.n)} clients<br>Under contract ${wl}: <b>${c.k} of ${c.el}</b> (${S.pct(c.k / c.el)})`
+            + (c.mature ? '' : `<br><span style="color:${t.muted}">Maturing: ${c.el} of ${r.n} clients have had ${w} days</span>`)
+            + (c.small ? `<br><span style="color:${t.muted}">Fewer than 5: one client moves this by ${S.pct(1 / c.el)}</span>` : '');
+        } }),
+        xAxis: [{ type: 'category', data: rows.map(r => r.month), axisTick: { show: false }, axisLine: { lineStyle: { color: t.axis } }, axisLabel: { color: t.label, fontSize: 12.5, formatter: S.monShort } },
+          { type: 'value', min: -0.5, max: n - 0.5, show: false }],
+        yAxis: S.valAxis(t, { max: ymax, axisLabel: { color: t.label, fontSize: 12, formatter: v => v + '%' } }),
+        series: [
+          { type: 'bar', barWidth: '58%', z: 3, data: pts.map(p => ({ value: p.v == null ? 0 : p.v,
+            itemStyle: { color: p.c.mature ? t.uc : stripes(t.uc, t.uc2), borderRadius: [4, 4, 0, 0] },
+            label: { show: true, position: 'top', distance: 5, color: p.c.mature ? t.ink : t.muted, fontWeight: p.c.mature ? 700 : 500, fontSize: 12.5, backgroundColor: t.surface, padding: [1, 3], borderRadius: 3,
+              formatter: p.v == null ? 'too recent' : `${Math.round(p.v)}%${p.c.mature ? '' : ' so far'}` } })) },
+          { type: 'line', xAxisIndex: 1, data: [], silent: true, z: 1,
+            markLine: { symbol: 'none', silent: true, z: 1, lineStyle: { color: t.ink2, type: 'dashed', width: 1.8 }, label: { show: false },
+              data: pool ? [...ref(pool.before), ...ref(pool.after)] : [] } },
+          { type: 'line', xAxisIndex: 1, data: [], silent: true,
+            markLine: { symbol: 'none', silent: true, lineStyle: { color: t.sales, type: 'solid', width: 1.6, opacity: 0.8 },
+              label: { show: true, position: 'end', formatter: 'Late May changes', color: t.sales, fontWeight: 700, fontSize: 12 }, data: ci > 0 ? [{ xAxis: ci - 0.5 }] : [] } },
+        ],
+      });
+    });
+    const table = () => {
+      const rows = C.clocks[st.clock].rows, pool = C.clocks[st.clock].pooled, W = ['14', '30', '60', '90'];
+      const cell = (r, w) => {
+        const c = cellOf(r, w);
+        if (!c.el) return '<span class="nc" title="No client in this month has had the full window yet">–</span>';
+        const s = c.small ? '<sup title="Fewer than 5 clients">s</sup>' : '';
+        return c.mature ? `${S.pct(c.k / c.el)}${s}<small>${c.k} of ${c.el}</small>` : `<span class="mat">${S.pct(c.k / c.el)} so far${s}</span><small>${c.k} of ${c.el} eligible</small>`;
+      };
+      const cols = [{ k: 'month', label: 'Start month', html: r => `${r.label}${r.uc_dates_incomplete ? '<sup title="Under Contract dates incomplete">u</sup>' : ''}${r.partial ? '<small>partial month</small>' : ''}` },
+        { k: 'n', label: 'Clients', num: true, html: r => S.int(r.n) },
+        ...W.map(w => ({ k: `w${w}`, label: w === '14' ? '<b>Within 14 days</b>' : `Within ${w}`, num: true, sv: r => (r[`w${w}`].eligible ? r[`w${w}`].k / r[`w${w}`].eligible : null), html: r => cell(r, w) })),
+        { k: 'to_date', label: 'Under contract to date', num: true, sv: r => r.to_date.k / (r.to_date.n || 1), html: r => cell(r, 'todate') }];
+      S.ui.table(host, cols, rows.filter(r => st.range === 'all' || !r.uc_dates_incomplete).reverse().map(r => Object.assign({ _cls: r.uc_dates_incomplete ? 'dim' : r.partial ? 'part' : '' }, r)), {
+        caption: 'Under Contract within 14, 30, 60 and 90 days by start month',
+        notes: `<span><b>s</b>fewer than 5 clients: one client moves the share by several points.</span><span><b>u</b>2025: ${S.int(oldK)} of ${S.int(oldN)} clients closed without an Under Contract date, so these shares read low; not compared.</span><span>Comparable months, pooled (full windows only): ${W.map(w => `${w} days ${S.pct(pool[`w${w}`].before.share)} (${pool[`w${w}`].before.k} of ${pool[`w${w}`].before.n}, ${span(pool[`w${w}`].before)}) → ${S.pct(pool[`w${w}`].after.share)} (${pool[`w${w}`].after.k} of ${pool[`w${w}`].after.n}, ${span(pool[`w${w}`].after)})`).join(' · ')}.</span>`,
+      });
+    };
+    const avg = () => {
+      const el = S.$('#cohAvg', body), p = st.w === 'todate' ? null : C.clocks[st.clock].pooled[`w${st.w}`];
+      el.innerHTML = p ? `<i class="dash" style="color:var(--ink-2)"></i>Average of the comparable months: ${span(p.before)} <b>${S.pct(p.before.share)}</b> (${p.before.k} of ${S.int(p.before.n)}) · ${span(p.after)} <b>${S.pct(p.after.share)}</b> (${p.after.k} of ${S.int(p.after.n)})` : 'To date: older months have had longer, so they are not compared';
+    };
+    avg();
+    table();
+    S.ui.wire(board, (name, v) => { st[name] = v; if (name !== 'range') { rec.draw(); avg(); } if (name !== 'w') table(); });
+  }
+
   S.chapter('pace', {
     n: 3, title: 'Are we keeping pace?',
     render(main, D, ch) {
@@ -177,7 +293,7 @@
       const last = pc.monthly[pc.monthly.length - 1], since = S.date(pc.change_date).replace(/ \d{4}$/, '');
 
       // 3.1
-      let body = S.scene(main, { ch, step: 1, of: 2, label: 'What enters Jira',
+      let body = S.scene(main, { ch, step: 1, of: 3, label: 'What enters Jira',
         title: `Jira intake jumped from about ${r10(w.intake.before)} to ${r10(w.intake.after)} a month: issues now open before the sale` });
       body.innerHTML = `<div class="board">
           <div class="chart h-l" id="intakeChart" role="img" aria-label="New Jira issues per month from ${pc.intake.monthly[0].label} to ${last.label}, by where each issue stands today. Before ${since} 2026 almost every issue is a signed client; from June 2026 intake rises to between ${Math.min(...w.after.map(m => pc.intake.monthly.find(r => r.month === m).total))} and ${Math.max(...w.after.map(m => pc.intake.monthly.find(r => r.month === m).total))} a month, most of them prospects."></div>
@@ -189,19 +305,31 @@
         <p class="cap">New issues by month created, coloured by where each stands today, not by what happened that month · ${r10(w.intake.before)} → ${r10(w.intake.after)}: average of the five full months either side of ${since}.</p>`;
       intake(S.$('#intakeChart', body), pc, asof);
 
-      // 3.2
-      const g = pc.gap, lastT = g.tail[g.tail.length - 1];
-      const fill = pc.monthly.filter(r => r.filling && r.month >= g.from).map(r => r.month);
-      body = S.scene(main, { ch, step: 2, of: 2, label: 'Clients in, contracts out',
-        title: `Acquisition starts outnumbered new contracts by ${g.peak}${g.peak_months.length > 1 ? ' a month' : ''} in ${listMon(g.peak_months)}; `
-          + (g.narrowing ? 'the gap has narrowed every month since' : lastT ? `in ${fullMon(lastT.month)} the gap was ${sgn(lastT.gap)}` : 'the widest gap so far') });
-      body.innerHTML = `<div class="board">
-          <div class="legend legend-top" id="paceLegend">
+      // 3.2 (answer first, then the chart / table with growth, then how it is built)
+      const g = pc.gap, gr = pc.growth, full = gr.rows.filter(r => !r.partial), lf = full[full.length - 1], pr = gr.rows.find(r => r.partial);
+      body = S.scene(main, { ch, step: 2, of: 3, label: 'Starts vs contracts',
+        title: lf.diff > 0 ? `Starts still outpace contracts${g.narrowing ? ', but by less each month' : ''}: ${phrase(lf.diff)} in ${fullMon(lf.month)}, against ${g.peak} in ${listMon(g.peak_months)}`
+          : `Contracts caught up with starts in ${fullMon(lf.month)}: ${phrase(lf.diff)}` });
+      body.innerHTML = `<div class="figs qf">
+          <div class="fig"><span class="v num">${Math.abs(lf.diff)}</span><span class="l"><i style="background:var(--ink-2)"></i>${phrase(lf.diff).replace(/^\d+ /, '')} in ${fullMon(lf.month)}: ${lf.starts} starts, ${lf.uc} contracts ${S.ui.chip('rec')}</span></div>
+          ${pr ? `<div class="fig"><span class="v num">${Math.abs(pr.diff)}</span><span class="l"><i style="background:var(--uc)"></i>${phrase(pr.diff).replace(/^\d+ /, '')} so far in ${fullMon(pr.month)} (1–${pr.days} ${pr.label.slice(0, 3)}, partial): ${pr.starts} starts, ${pr.uc} contracts</span></div>` : ''}
+          <div class="fig"><span class="v num">${S.int(gr.hunting)}</span><span class="l"><i style="background:var(--wait)"></i>clients hunting today: the actual backlog (monthly differences are not added up)</span></div>
+        </div>
+        <div class="board" id="paceBoard">
+          <div class="ptools"><div class="pl"><div class="legend legend-top only-chart" id="paceLegend">
             <button type="button" aria-pressed="true" data-s="${SERIES[0]}"><i style="background:var(--hold-2)"></i>${SERIES[0]}</button>
             <button type="button" aria-pressed="true" data-s="${SERIES[1]}"><i class="line" style="background:var(--uc)"></i>${SERIES[1]}</button>
             <button type="button" aria-pressed="true" data-s="${SERIES[2]}"><i class="line" style="background:var(--closed)"></i>${SERIES[2]}</button>
-          </div>
-          <div class="chart h-pace" id="paceChart" role="img" aria-label="Monthly confirmed starts, Under Contract and CLOSED events from ${pc.monthly[0].label} to ${last.label}. Below, starts minus Under Contract each month: ${pc.monthly.filter(r => r.month >= g.from && !r.partial).map(r => `${S.monShort(r.month)} ${sgn(r.gap)}`).join(', ')}. Then the share of each month's starters under contract within ${co.days} days: ${co.rows.filter(c => c.share != null).map(c => `${S.monShort(c.month)} ${S.pct(c.share)}`).join(', ')}."></div></div>
+          </div>${S.ui.seg('growth', 'Growth', [['mom', 'Month on month'], ['yoy', 'Year on year']], 'mom', 'only-table')}${S.ui.seg('range', 'Months shown', [['2026', '2026'], ['all', 'Since Jan 2025']], '2026', 'only-table')}</div><div class="pr">${S.ui.toggle()}</div></div>
+          <div class="pv-chart"><div class="chart h-pace" id="paceChart" role="img" aria-label="Monthly confirmed starts, Under Contract and CLOSED events from ${pc.monthly[0].label} to ${last.label}. Below, starts minus Under Contract each month: ${pc.monthly.filter(r => r.month >= g.from && !r.partial).map(r => `${S.monShort(r.month)} ${sgn(r.gap)}`).join(', ')}. Then the share of each month's starters under contract within ${co.days} days: ${co.rows.filter(c => c.share != null).map(c => `${S.monShort(c.month)} ${S.pct(c.share)}`).join(', ')}."></div></div>
+          <div class="pv-table tw" id="growthTable"></div>
+        </div>
+        ${S.ui.ex('How is this number built?', [
+          `<p class="ex-h">The three counts</p><p><b>Won</b> = Pipedrive STR Search deals won that month (Client Won events, ${S.int(gr.rows.reduce((a, r) => a + r.won, 0))} since ${gr.rows[0].label}). <b>Jira starts</b> = confirmed client starts, dated by the client start date. <b>Under Contract</b> = contracts by the date of the latest valid contract. All three come from daily_client_activity, the reporting layer's daily counts.</p>
+           <p><b>Starts − Under Contract</b> compares two counts in the same month; the contracts often belong to clients who started earlier. It is calendar throughput, not a backlog, and is never added up. The backlog is the number of clients hunting today: <b>${S.int(gr.hunting)}</b>.</p>`,
+          `<p class="ex-h">Growth</p><p>Month on month and year on year = this month ÷ the comparison month − 1, shown only where both periods count the same way. ${pr ? `The partial month (1–${pr.days} ${pr.label.slice(0, 3)}) is compared with the same ${pr.days} days of the previous month and of the year before.` : ''}</p>
+           <ul>${Object.entries(NOTE).map(([k, l]) => `<li><b>${l}</b> ${gr.reasons[k]}</li>`).join('')}</ul>`,
+        ])}
         <p class="cap">Gap = that month’s starts minus its Under Contract events (net client change), which often come from earlier starters: calendar throughput, not the hunting backlog · from 1 Jun 2026 a start is the won date, so a finished month no longer changes${last.partial ? ` · ${last.label.split(' ')[0]} runs to ${S.date(asof)}` : ''}.</p>`;
       const rec = throughput(S.$('#paceChart', body), pc, asof);
       body.querySelectorAll('#paceLegend button').forEach(b => b.addEventListener('click', () => {
@@ -209,6 +337,13 @@
         rec.inst.dispatchAction({ type: 'legendToggleSelect', name: b.dataset.s });
         b.setAttribute('aria-pressed', b.getAttribute('aria-pressed') === 'true' ? 'false' : 'true');
       }));
+      const gt = S.$('#growthTable', body);
+      const gs = { growth: 'mom', range: '2026' };
+      growthTable(gt, gr, gs.growth, gs.range);
+      S.ui.wire(S.$('#paceBoard', body), (name, v) => { gs[name] = v; growthTable(gt, gr, gs.growth, gs.range); });
+
+      // 3.3
+      cohortScene(main, D, ch);
     },
   });
 })();

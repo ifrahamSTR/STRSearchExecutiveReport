@@ -147,13 +147,147 @@
     });
   }
 
+  /* 4.4 (added 18 Nov 2026) the "UC tomorrow" scenario next to the recorded durations and the Kaplan-Meier estimate,
+     for all clients or by budget (upper amount of the onboarding-form range). Solid = recorded, striped = scenario,
+     half-filled dot = Kaplan-Meier (inferred). Bars run to the median; the lighter extension and tick mark the average. */
+  function scenarioChart(node, sc, st) {
+    const stripes = (fg, bg) => {
+      const r = Math.min(2, Math.ceil(window.devicePixelRatio || 1)), s = 6, c = document.createElement('canvas');
+      c.width = c.height = s * r;
+      const x = c.getContext('2d');
+      x.scale(r, r); x.fillStyle = bg; x.fillRect(0, 0, s, s); x.strokeStyle = fg; x.lineWidth = 2.1; x.beginPath();
+      [0, s, 2 * s].forEach(k => { x.moveTo(k - s - 2, s + 2); x.lineTo(k + 2, -2); });
+      x.stroke();
+      return { image: c, repeat: 'repeat' };
+    };
+    return S.chart(node, (t, el) => {
+      const all = st.mode === 'all', a = sc.all;
+      const rows = all ? [
+        { name: 'Recorded', sub: `${S.int(a.recorded.n)} contracts`, kind: 'rec', med: a.recorded.median, mean: a.recorded.mean },
+        { name: 'UC tomorrow', sub: `${S.int(a.scenario.n)} searches`, kind: 'sce', med: a.scenario.median, mean: a.scenario.mean },
+        { name: 'Kaplan–Meier', sub: `all ${S.int(a.clients)} searches`, kind: 'inf', med: a.km_median, mean: null },
+      ] : sc.budgets.flatMap(g => [
+        { group: g.label, name: 'Recorded', sub: `${g.recorded.n}`, kind: 'rec', med: g.recorded.median, mean: g.recorded.mean },
+        { group: '', name: 'UC tomorrow', sub: `${g.scenario.n}`, kind: 'sce', med: g.scenario.median, mean: g.scenario.mean, km: g.km_median, nm: g.label },
+      ]);
+      const MAX = all ? 120 : 120, h = all ? 28 : 15, L = all ? 190 : 250;
+      const col = { rec: [t.uc, t.uc2], sce: [stripes(t.uc, t.uc2), t.uc2] };
+      const F = (w, s, f) => `${w} ${s}px ${f === 'd' ? '"Bricolage Grotesque", Figtree, sans-serif' : 'Figtree, sans-serif'}`;
+      return Object.assign(S.base(t), {
+        tooltip: Object.assign(S.base(t).tooltip, { trigger: 'item', formatter: p => {
+          const r = rows[p.value[0]];
+          const g = r.group || r.nm;
+          return `<b>${g ? g + ' · ' : ''}${r.name}</b><br>Median <b>${S.med(r.med)}</b> days${r.mean != null ? ` · average <b>${S.d1(r.mean)}</b>` : ' (no average: not every client has reached Under Contract)'}${r.km ? `<br>Kaplan–Meier median for this group: ${S.med(r.km)} days` : ''}`;
+        } }),
+        grid: { left: L, right: 40, top: all ? 34 : 18, bottom: 40 },
+        xAxis: S.dayAxis(t, MAX, { name: 'days from client start date to Under Contract' }),
+        yAxis: { type: 'category', data: rows.map((_, i) => i), inverse: true, show: false },
+        series: [{
+          type: 'custom', encode: { x: [1, 2], y: 0 }, data: rows.map((r, i) => [i, r.med, r.mean == null ? r.med : r.mean]),
+          renderItem: (p, api) => {
+            const i = api.value(0), r = rows[i], [x0, y] = api.coord([0, i]), xm = api.coord([Math.min(r.med, MAX), i])[0];
+            const ch = [];
+            if (r.kind === 'inf') {
+              ch.push({ type: 'line', shape: { x1: x0, y1: y, x2: xm, y2: y }, style: { stroke: t.uc, lineWidth: 2, lineDash: [2, 4] } },
+                { type: 'circle', shape: { cx: xm, cy: y, r: 9 }, style: { fill: t.surface, stroke: t.uc, lineWidth: 2.5 } },
+                { type: 'sector', shape: { cx: xm, cy: y, r: 9, r0: 0, startAngle: Math.PI / 2, endAngle: Math.PI * 1.5 }, style: { fill: t.uc } },
+                { type: 'text', style: { x: xm + 16, y, text: `${S.med(r.med)} days median · no average`, textVerticalAlign: 'middle', font: F(600, 13), fill: t.ink2 } });
+            } else {
+              const xa = api.coord([Math.min(r.mean, MAX), i])[0];
+              ch.push({ type: 'rect', shape: { x: x0, y: y - h / 2, width: xa - x0, height: h, r: h / 2 }, style: { fill: col[r.kind][1], opacity: 0.55 } },
+                { type: 'rect', shape: { x: x0, y: y - h / 2, width: xm - x0, height: h, r: h / 2 }, style: { fill: col[r.kind][0], stroke: r.kind === 'sce' ? t.uc : null, lineWidth: r.kind === 'sce' ? 1.4 : 0 } },
+                { type: 'line', shape: { x1: xa, y1: y - h / 2 - 4, x2: xa, y2: y + h / 2 + 4 }, style: { stroke: t.ink2, lineWidth: 2 } });
+              if (all) ch.push({ type: 'text', style: { x: xm, y: y - h / 2 - 7, text: S.med(r.med), textAlign: 'right', textVerticalAlign: 'bottom', font: F(700, 26, 'd'), fill: t.ink } },
+                { type: 'text', style: { x: xm + 6, y: y - h / 2 - 10, text: 'days median', textVerticalAlign: 'bottom', font: F(500, 13), fill: t.ink2 } },
+                { type: 'text', style: { x: xa + 8, y, text: `average ${S.d1(r.mean)}`, textVerticalAlign: 'middle', font: F(500, 13), fill: t.ink2 } });
+              else ch.push({ type: 'text', style: { x: xa + 8, y, text: `${S.med(r.med)} · avg ${S.d1(r.mean)}`, textVerticalAlign: 'middle', font: F(600, 12.5), fill: t.ink2 } });
+              if (r.km) {
+                const xk = api.coord([Math.min(r.km, MAX), i])[0];
+                ch.push({ type: 'circle', shape: { cx: xk, cy: y + h / 2 + 7, r: 5 }, style: { fill: t.surface, stroke: t.uc, lineWidth: 1.8 } },
+                  { type: 'sector', shape: { cx: xk, cy: y + h / 2 + 7, r: 5, r0: 0, startAngle: Math.PI / 2, endAngle: Math.PI * 1.5 }, style: { fill: t.uc } });
+              }
+            }
+            if (all) ch.push({ type: 'text', style: { x: x0 - 16, y: y - 8, text: r.name, textAlign: 'right', textVerticalAlign: 'middle', font: F(650, 16, 'd'), fill: t.ink } },
+              { type: 'text', style: { x: x0 - 16, y: y + 11, text: `${r.kind === 'rec' ? 'Recorded' : r.kind === 'sce' ? 'Scenario' : 'Inferred'} · ${r.sub}`, textAlign: 'right', textVerticalAlign: 'middle', font: F(500, 12), fill: t.muted } });
+            else {
+              if (r.group) ch.push({ type: 'text', style: { x: 0 + 8, y: y + 12, text: r.group, textVerticalAlign: 'middle', font: F(650, 14.5, 'd'), fill: t.ink } });
+              ch.push({ type: 'text', style: { x: x0 - 12, y, text: `${r.name} · ${r.sub}`, textAlign: 'right', textVerticalAlign: 'middle', font: F(500, 12), fill: t.muted } });
+            }
+            return { type: 'group', children: ch };
+          },
+        }],
+      });
+    });
+  }
+
+  function scenarioScene(main, D, ch) {
+    const sp = D.speed, sc = sp.scenario, a = sc.all, BR = sc.budget_rule, st = { mode: 'all' };
+    const body = S.scene(main, { ch, step: 4, of: 5, label: 'If they all went under contract tomorrow',
+      title: `If every hunting client went under contract tomorrow: average ${S.d1(a.scenario.mean)} days, median ${S.med(a.scenario.median)}` });
+    const nr = sc.budgets.find(g => g.label === 'Not recorded');
+    const why = Object.entries(sc.jira_hunting_not_confirmed_why).map(([k, v]) => `${v} ${k.toLowerCase() === 'lost' || k.toLowerCase() === 'open' || k.toLowerCase() === 'won' ? k + ' deal' + (v > 1 ? 's' : '') : k.toLowerCase()}`).join(', ');
+    const lo = sc.left_out;
+    body.innerHTML = `<div class="figs qf">
+        <div class="fig"><span class="v num">${S.med(a.recorded.median)}<small>days</small></span><span class="l"><i style="background:var(--uc)"></i>median, recorded contracts · average ${S.d1(a.recorded.mean)} · ${S.int(a.recorded.n)} contracts ${S.ui.chip('rec')}</span></div>
+        <div class="fig"><span class="v num">${S.med(a.scenario.median)}<small>days</small></span><span class="l"><i class="hatch-uc" style="background:var(--uc)"></i>median if the ${S.int(a.hunting)} hunting searches went under contract tomorrow · average ${S.d1(a.scenario.mean)} · ${S.int(a.scenario.n)} searches ${S.ui.chip('sce')}</span></div>
+        <div class="fig"><span class="v num">${S.med(a.km_median)}<small>days</small></span><span class="l"><i style="background:linear-gradient(90deg,var(--uc) 50%,var(--uc-2) 50%)"></i>Kaplan–Meier median, the statistical estimate for all ${S.int(a.clients)} searches (next scene) ${S.ui.chip('inf')}</span></div>
+      </div>
+      <div class="board" id="scnBoard">
+        <div class="ptools"><div class="pl">${S.ui.seg('mode', 'Group', [['all', 'All clients'], ['budget', 'By budget']], 'all')}<span class="vt-l only-budget" hidden>Budget = upper amount of the form range</span></div><div class="pr">${S.ui.toggle()}</div></div>
+        <div class="pv-chart"><div class="chart h-scn" id="scnChart" role="img" aria-label="Days from client start to Under Contract. Recorded: median ${a.recorded.median}, average ${a.recorded.mean}. If every hunting client went under contract tomorrow: median ${a.scenario.median}, average ${a.scenario.mean}. Kaplan–Meier median ${a.km_median}. By budget: ${sc.budgets.map(g => `${g.label} recorded median ${g.recorded.median}, scenario median ${g.scenario.median}`).join('; ')}."></div>
+          <div class="legend"><span><i style="background:var(--uc)"></i>Recorded, to the median</span><span><i class="hatch-uc"></i>UC tomorrow (scenario), to the median</span><span><i style="background:var(--uc-2)"></i>To the average (tick)</span><span><i class="ring" style="color:var(--uc);border-color:var(--uc);background:linear-gradient(90deg,var(--uc) 50%,transparent 50%) !important"></i>Kaplan–Meier median</span></div></div>
+        <div class="pv-table tw" id="scnTable"></div>
+      </div>
+      ${S.ui.ex('How is this number built?', [
+        `<p class="ex-h">The scenario</p><p>Each of the <b>${S.int(a.hunting)}</b> hunting searches counts as reaching Under Contract on ${S.date(new Date(new Date(D.meta.asof + 'T12:00:00').getTime() + 864e5).toISOString())}, the day after the snapshot: its days = that date − its client start date (median ${S.med(a.waits.median)}, average ${S.d1(a.waits.mean)}). They are pooled with the <b>${S.int(a.scenario.n - a.hunting)}</b> recorded durations of every other search, so each search counts once: the ${S.int(a.hunting_with_older_uc)} hunting searches that still carry an older Under Contract date count as waiting, not with that date.</p>
+         <p>Searches = won deals with a confirmed Jira start, as elsewhere in this chapter. Jira lists ${S.int(sc.jira_hunting)} hunting clients; ${S.int(sc.jira_hunting_not_confirmed)} have no confirmed start on a won deal (${why}). Counting them too, from their Jira start: average ${S.d1(sc.all_hunting_sensitivity.mean)}, median ${S.med(sc.all_hunting_sensitivity.median)}. Not in either figure: searches with no recorded contract that are not hunting (${Object.entries(lo).map(([k, v]) => `${k} ${v}`).join(', ')}; Closed and Post-close here are closings without an Under Contract date). ${sc.negative_excluded} contract dated before its start is left out.</p>`,
+        `<p class="ex-h">Budget</p><p>The upper amount of the onboarding-form range <b>"${BR.field}"</b> (column ${BR.column}), carried into Jira as the interim rule until Acquisitions cleans the Jira budget field. It measures ${BR.measures}. Matched to ${S.int(BR.since_form_matched)} of the ${S.int(BR.since_form)} confirmed starts since the form went live on ${S.date(BR.form_since)} (e-mail first, the form's deal id as a fallback), using the answer given before the contract. <b>Not recorded</b> (${S.int(nr.clients)}) is mostly clients who started before the form existed, so their times reflect older periods, not their budget. Jira's own budget field is filled for ${S.int(BR.jira_budget_filled)} of ${S.int(BR.signed)} signed-up clients and is not used.</p>
+         <p class="ex-h">Three readings, three labels</p><p>${S.ui.chip('rec')} what has happened; ${S.ui.chip('sce')} an assumption that every hunting search ends tomorrow, so it is a floor for those searches; ${S.ui.chip('inf')} Kaplan–Meier, which lets unfinished searches progress as earlier ones did (next scene).</p>`,
+      ])}
+      <p class="cap">Days from client start date to the latest valid Under Contract date · confirmed starts · the scenario changes only the ${S.int(a.hunting)} hunting searches.</p>`;
+    const board = S.$('#scnBoard', body), node = S.$('#scnChart', body), host = S.$('#scnTable', body);
+    const rec = scenarioChart(node, sc, st);
+    const table = () => {
+      const row = (lab, rng, g) => ({ lab, rng, clients: g.clients, rn: g.recorded.n, ra: g.recorded.mean, rm: g.recorded.median, h: g.hunting, sn: g.scenario.n, sa: g.scenario.mean, sm: g.scenario.median, km: g.km_median });
+      const rows = st.mode === 'all' ? [row('All clients', 'every confirmed start', a)] : sc.budgets.map(g => row(g.label, g.range ? `form range ${g.range}` : 'no matched form answer', g));
+      const d = v => (v == null ? '–' : S.d1(v)), m = v => (v == null ? 'not reached' : S.med(v));
+      S.ui.table(host, [
+        { k: 'lab', label: st.mode === 'all' ? 'Group' : 'Budget (upper amount)', html: r => `${r.lab}<small>${r.rng}</small>` },
+        { k: 'clients', label: 'Searches', num: true, html: r => S.int(r.clients) },
+        { k: 'rn', label: 'Contracts', num: true, html: r => S.int(r.rn) },
+        { k: 'ra', label: 'Average', num: true, html: r => d(r.ra) },
+        { k: 'rm', label: 'Median', num: true, html: r => m(r.rm) },
+        { k: 'h', label: 'Hunting now', num: true, html: r => S.int(r.h) },
+        { k: 'sn', label: 'Searches pooled', num: true, html: r => S.int(r.sn) },
+        { k: 'sa', label: 'Average', num: true, html: r => d(r.sa) },
+        { k: 'sm', label: 'Median', num: true, html: r => m(r.sm) },
+        { k: 'km', label: 'Median', num: true, html: r => m(r.km) },
+      ], rows, {
+        caption: 'Days from client start to Under Contract: recorded, UC tomorrow scenario and Kaplan–Meier', sortable: st.mode !== 'all',
+        head: `<tr class="sup"><th></th><th></th><th colspan="3">Recorded ${S.ui.chip('rec')}</th><th colspan="4">UC tomorrow ${S.ui.chip('sce')}</th><th>Kaplan–Meier ${S.ui.chip('inf')}</th></tr>`,
+        total: st.mode === 'all' ? [Object.assign(row(`All ${S.int(sc.jira_hunting)} hunting Jira clients`, `adds the ${sc.jira_hunting_not_confirmed} without a confirmed start, measured from their Jira start`, a), { rn: a.recorded.n, h: a.hunting + sc.jira_hunting_not_confirmed, sn: sc.all_hunting_sensitivity.n, sa: sc.all_hunting_sensitivity.mean, sm: sc.all_hunting_sensitivity.median, km: null, clients: a.clients + sc.jira_hunting_not_confirmed })]
+          : [row('All clients', 'every confirmed start', a)],
+      });
+    };
+    table();
+    S.ui.wire(board, (name, v) => {
+      st[name] = v;
+      node.classList.toggle('h-scn', v === 'all');
+      node.classList.toggle('h-scb', v !== 'all');
+      board.querySelector('.only-budget').hidden = v === 'all';
+      if (rec.inst) rec.inst.resize();
+      rec.draw();
+      table();
+    });
+  }
+
   S.chapter('speed', {
     n: 4, title: 'How long does acquisition actually take?',
     render(main, D, ch) {
       const sp = D.speed, ob = sp.observed, h = sp.hist, L = sp.lanes, est = sp.estimate;
 
       // 2.1
-      let body = S.scene(main, { ch, step: 1, of: 4, label: 'What has happened', title: `Recorded journeys: median ${S.med(ob.uc.median)} days to Under Contract, ${S.med(ob.closed.median)} to CLOSED` });
+      let body = S.scene(main, { ch, step: 1, of: 5, label: 'What has happened', title: `Recorded journeys: median ${S.med(ob.uc.median)} days to Under Contract, ${S.med(ob.closed.median)} to CLOSED` });
       const ck = sp.clock;
       body.innerHTML = `<div class="board">
           <div class="clock" aria-label="How the days are counted">
@@ -166,7 +300,7 @@
       ruler(S.$('#rulerChart', body), ob);
 
       // 2.2
-      body = S.scene(main, { ch, step: 2, of: 4, label: 'Where the bulk falls', title: `Most recorded contracts land early, with the largest group at ${h.largest.from}–${h.largest.to} days` });
+      body = S.scene(main, { ch, step: 2, of: 5, label: 'Where the bulk falls', title: `Most recorded contracts land early, with the largest group at ${h.largest.from}–${h.largest.to} days` });
       body.innerHTML = `<div class="figs">
           <div class="fig"><span class="v num">${h.largest.from}–${h.largest.to}<small>days</small></span><span class="l"><i style="background:var(--uc)"></i>largest group · ${S.int(h.largest.n)} clients</span></div>
           <div class="fig"><span class="v num">${S.pct(h.within60.share)}</span><span class="l"><i style="background:var(--uc);opacity:.6"></i>of recorded contracts within 60 days</span></div>
@@ -177,7 +311,7 @@
       histogram(S.$('#histChart', body), h);
 
       // 2.3
-      body = S.scene(main, { ch, step: 3, of: 4, label: 'Who is still waiting', title: `${S.int(sp.running)} started clients have not bought a property yet` });
+      body = S.scene(main, { ch, step: 3, of: 5, label: 'Who is still waiting', title: `${S.int(sp.running)} started clients have not bought a property yet` });
       body.innerHTML = `<div class="board">
           <div class="lane"><div class="lane-head"><span class="v num">${S.int(L.searching.n)}</span><span class="t"><i style="background:var(--wait)"></i>Hunting, no contract yet</span><span class="s">${S.int(L.searching.past_ref)} have already waited longer than ${L.searching.ref} days</span></div>
             <div class="chart h-s" id="laneSearch" role="img" aria-label="${L.searching.n} clients hunting, by days so far."></div></div>
@@ -188,8 +322,11 @@
       lane(S.$('#laneSearch', body), L.searching, 'wait', `recorded median to Under Contract · ${L.searching.ref}`, false);
       lane(S.$('#laneUC', body), L.under_contract, 'uc', `recorded median to CLOSED · ${L.under_contract.ref}`, true);
 
-      // 2.4
-      body = S.scene(main, { ch, step: 4, of: 4, label: 'What it means for the timeline', title: `Counting everyone still waiting: ${est.uc.median} days to Under Contract, ${est.closed.median} to CLOSED` });
+      // 4.4 (added 18 Nov 2026)
+      scenarioScene(main, D, ch);
+
+      // 4.5 (was 4.4)
+      body = S.scene(main, { ch, step: 5, of: 5, label: 'What it means for the timeline', title: `Counting everyone still waiting: ${est.uc.median} days to Under Contract, ${est.closed.median} to CLOSED` });
       body.innerHTML = `<div class="board" style="margin-bottom:16px"><div class="chart h-s" id="extChart" role="img" aria-label="Recorded medians ${ob.uc.median} and ${ob.closed.median} days extend to ${est.uc.median} and ${est.closed.median} days when unfinished journeys are counted."></div></div>
         <div class="duo">
           <div class="board"><div class="fig arrow"><span class="v num"><span class="from">${ob.uc.median}</span><span class="ar">→</span><span class="to">${est.uc.median}</span><small>days</small></span><span class="l"><i style="background:var(--uc)"></i>Under Contract</span></div>

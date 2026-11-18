@@ -20,9 +20,9 @@ from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 import core as C  # noqa: E402
-from chapters import cash, drivers, journey, outcomes, pace, speed  # noqa: E402
+from chapters import cash, drivers, fallout, journey, outcomes, pace, repeat, speed  # noqa: E402
 
-CHAPTERS = {"journey": journey, "outcomes": outcomes, "pace": pace, "speed": speed, "drivers": drivers}
+CHAPTERS = {"journey": journey, "outcomes": outcomes, "pace": pace, "speed": speed, "drivers": drivers, "fallout": fallout, "repeat": repeat}
 OUT = C.ROOT / "docs" / C.VERSION_ID / "data" / "story-data.js"
 
 
@@ -87,12 +87,62 @@ def checks(ctx: C.Ctx, data: dict) -> list[dict]:
         sum(1 for r in pc["intake"]["monthly"] if r["signed"] + r["presale"] + r["declined"] != int(jt.get(r["month"], 0))), 0)
     cs = ctx.cohort.start.dt.strftime("%Y-%m").value_counts()
     chk("Same-cohort strip: start months whose size differs from the confirmed starts", sum(1 for c in pc["cohort"]["rows"] if c["n"] != int(cs.get(c["month"], 0))), 0)
-    chk("Keeping pace: no published share rests on 1-4 clients", small_cells(pc), 0)
+    chk("Keeping pace: no published share rests on 1-4 clients (the monthly cohort table publishes counts with their denominators and marks small cells instead)",
+        small_cells({k: v for k, v in pc.items() if k not in ("cohorts", "growth")}), 0)
     chk("Fast/slow: the four speed groups add up to classifiable clients with 75+ days on the clock", sum(g["n"] for g in dr["composition"]["groups"]), dr["bases"]["d75"]["eligible"])
     chk("Fast/slow: matched clients never exceed eligible clients", all(dr["bases"][b]["matched"] <= dr["bases"][b]["eligible"] for b in ("d30", "d75")), True)
     chk("Onboarding answers used all precede the client's Under Contract date", dr["matching"]["answers_after_uc_used"], 0)
     chk("Fast/slow: no published share rests on 1-4 clients", small_cells(dr), 0)
     chk("Capital (Pipedrive): every confirmed start with a stated capital is in the survival analysis", dr["capital"]["pipedrive"]["n"], dr["capital"]["pipedrive"]["coverage"]["known"])
+    # ---- questions added 18 Nov 2026 (scenes 2.2, 3.2 table, 3.3, 4.4, chapters 6 and 7)
+    w = oc["waiting"]
+    st = w["stages"]
+    chk("Still waiting: the six stages add up to the signed-up clients, none unclassified", (sum(st.values()), w["other"]), (ex["jira"]["signed"], 0))
+    chk("Still waiting: Hunting / Paused / Inactive equal the snapshot status counts", (st["hunting"], st["paused"], st["paused"] + st["additional"] + st["refunded"]),
+        (ex["jira"]["hunting"], w["snapshot"]["paused"], ex["jira"]["inactive"]))
+    chk("Still waiting: purchased + under contract + hunting = Active", st["purchased"] + st["under_contract"] + st["hunting"], ex["jira"]["active"])
+    chk("Still waiting: no contract = hunting + paused + additional + refunded; yet to close = that + under contract",
+        (w["no_contract"]["n"], w["yet_to_close"]["n"]), (st["hunting"] + st["paused"] + st["additional"] + st["refunded"], st["hunting"] + st["paused"] + st["additional"] + st["refunded"] + st["under_contract"]))
+    gr = pc["growth"]
+    chk("Growth table: Won / Starts / UC of every full month equal the monthly table above it (daily_client_activity)",
+        sum(1 for r in gr["rows"] if not r["partial"] and (r["won"], r["starts"], r["uc"]) != (q3[r["month"]]["won"], q3[r["month"]]["started"], q3[r["month"]]["uc"])), 0)
+    chk("Growth table: every growth figure shown = this period / the same days of the comparison period - 1",
+        all(abs(r[f"{m}_{k}"]["pct"] - (r[m] / r[f"{m}_{k}"]["base"] - 1)) < 1e-3 for r in gr["rows"] for m in ("won", "starts", "uc") for k in ("mom", "yoy") if r[f"{m}_{k}"]["pct"] is not None), True)
+    ev = gr["evidence"]
+    chk("Growth table: the June-November 2025 contract gap still holds (30%+ of Aug-Dec 2025 closings lack a UC date; at most 10% in Jan-Jul 2025 and in 2026)",
+        ev["gap_k"] / ev["gap_n"] >= 0.3 and ev["rest25_k"] / ev["rest25_n"] <= 0.1 and ev["y26_k"] / ev["y26_n"] <= 0.1, True)
+    chk("Growth table: the start-rule month is the month of definitions.START_RULE_DATE", gr["rule_month"], ctx.D.START_RULE_DATE[:7])
+    cc, exc = pc["cohorts"]["clocks"]["start"]["rows"], {r["month"]: r for r in ex["cohort"]}
+    chk("Cohorts (client start clock): within 14 / 30 / 60 / 90 days equal the Explorer's matured-cohort table, months that differ",
+        sum(1 for r in cc if any((r[f"w{d}"]["k"], r[f"w{d}"]["eligible"]) != (exc[r["month"]][f"w{d}"]["converted"], exc[r["month"]][f"w{d}"]["eligible"]) for d in (14, 30, 60, 90))), 0)
+    chk("Cohorts: month sizes equal the confirmed starts", sum(1 for r in cc if r["n"] != int(cs.get(r["month"], 0))), 0)
+    chk("Cohorts: numerators never exceed eligible clients, eligible never exceeds the month, cells under 5 are marked small (both clocks)",
+        all(c[f"w{d}"]["k"] <= c[f"w{d}"]["eligible"] <= c["n"] and (c[f"w{d}"]["small"] or c[f"w{d}"]["k"] == 0 or c[f"w{d}"]["k"] >= 5)
+            for ck in pc["cohorts"]["clocks"].values() for c in ck["rows"] for d in (14, 30, 60, 90)), True)
+    sc, q1 = sp["scenario"], ex["q1"]
+    a = sc["all"]
+    chk("UC tomorrow: recorded durations equal the published headline (n / mean / median)", (a["recorded"]["n"], a["recorded"]["mean"], a["recorded"]["median"]),
+        (q1["uc"]["n"], q1["uc"]["mean"], q1["uc"]["median"]))
+    chk("UC tomorrow: each search counts once (recorded - hunting with an older date + hunting = pooled)", a["recorded"]["n"] - a["hunting_with_older_uc"] + a["hunting"], a["scenario"]["n"])
+    chk("UC tomorrow: hunting searches = the reporting layer's hunting engagements", a["hunting"], ex["engagements"]["hunting_official"])
+    chk("UC tomorrow: budget groups add up to every confirmed start, recorded duration and hunting search",
+        tuple(sum(b[k] for b in sc["budgets"]) for k in ("clients", "hunting")) + (sum(b["recorded"]["n"] for b in sc["budgets"]), sum(b["scenario"]["n"] for b in sc["budgets"])),
+        (a["clients"], a["hunting"], a["recorded"]["n"], a["scenario"]["n"]))
+    chk("UC tomorrow: no budget-group average or median rests on fewer than 5 searches", min(min(b["recorded"]["n"], b["scenario"]["n"]) for b in sc["budgets"]) >= 5, True)
+    fo = data["fallout"]
+    chk("Fall-through: the five evidence groups add up to the clients known to have gone under contract", sum(g["n"] for g in fo["groups"].values()), fo["known"]["n"])
+    chk("Fall-through: known = UC record + fall-out address only + purchase only", fo["known"]["uc_record"] + fo["known"]["fell_only"] + fo["known"]["purchase_only"], fo["known"]["n"])
+    chk("Fall-through: where documented and status-implied fall-throughs stand today adds up",
+        (sum(fo["documented"]["now"].values()), sum(fo["ended"]["now"].values())), (fo["documented"]["n"], fo["ended"]["n"]))
+    rp = data["repeat"]
+    nj = rp["pipedrive"]["no_own_jira"]
+    chk("Repeat clients: deals without their own Jira issue are the Cash Forecast reconciliation's (repeat purchases / second deals under review)",
+        (nj["confirmed_repeat"]["deals"], nj["second_deal_review"]["deals"]), (data["cash"]["resolution"]["repeat"], data["cash"]["resolution"]["second_deal_review"]))
+    chk("Repeat clients: every deal without its own Jira issue belongs to a client with two or more won deals", rp["pipedrive"]["within_repeat_clients"], True)
+    chk("Repeat clients: the Jira categories add up to the clients with two or more searches", sum(rp["jira"]["categories"].values()), rp["jira"]["multi_clients"])
+    cr = rp["cribs"]
+    chk("STR Cribs: first and later designer choices add up to the repeat buyers' purchases", (sum(cr["first"].values()), sum(cr["later"].values())), (cr["clients"], cr["purchases"] - cr["clients"]))
+    chk("STR Cribs: repeat buyers are the Jira clients with two or more completed purchases", cr["clients"], rp["jira"]["two_plus_purchases"])
     # statements the presentation makes in words (warn only: on a refresh the page text follows the data)
     gp = pc["gap"]
     chk("Keeping pace: 'the gap has narrowed every month since' its peak after late May", gp["narrowing"], True, hard=False)
