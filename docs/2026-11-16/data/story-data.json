@@ -359,6 +359,21 @@
      "2024": 4,
      "2025": 42,
      "2026": 60
+    },
+    "over180": 49,
+    "prior": {
+     "documented": 2,
+     "ended": 28,
+     "evidence": 30,
+     "none": 78
+    },
+    "cross": {
+     "long_evidence": 12,
+     "long_none": 37,
+     "short_evidence": 17,
+     "short_none": 40,
+     "undated_evidence": 1,
+     "undated_none": 1
     }
    },
    "refunded": {
@@ -5900,6 +5915,10 @@
     "check": 117.0
    },
    "n": 825,
+   "events": {
+    "uc": 493,
+    "closed": 438
+   },
    "recorded_curve": {
     "uc": [
      0.0,
@@ -6642,7 +6661,20 @@
      "median_elapsed": 111.0
     }
    ],
-   "stopped_no_contract": 203
+   "stopped_no_contract": 203,
+   "all_eligible": 679,
+   "all_fast": 169,
+   "stopped_by_status": {
+    "Paused": 74,
+    "Refunded": 48,
+    "Content Pulled": 34,
+    "Listed": 25,
+    "CLOSED": 11,
+    "New Clients": 4,
+    "Onboarding Completed": 3,
+    "Additional Service": 3,
+    "Photography Shared": 1
+   }
   },
   "bases": {
    "d30": {
@@ -7083,6 +7115,46 @@
      "n_all": 228
     }
    ],
+   "same_clients": {
+    "n": 354,
+    "from": "2026-04-28",
+    "to": "2026-10-17",
+    "rows": [
+     {
+      "key": "0",
+      "label": "No offers yet",
+      "n": 47,
+      "k14": 2,
+      "k30": 6,
+      "share14": 0.0426,
+      "share30": 0.1277,
+      "small14": true,
+      "small30": false
+     },
+     {
+      "key": "1-2",
+      "label": "1\u20132 offers",
+      "n": 104,
+      "k14": 7,
+      "k30": 23,
+      "share14": 0.0673,
+      "share30": 0.2212,
+      "small14": false,
+      "small30": false
+     },
+     {
+      "key": "3+",
+      "label": "3+ offers",
+      "n": 203,
+      "k14": 10,
+      "k30": 66,
+      "share14": 0.0493,
+      "share30": 0.3251,
+      "small14": false,
+      "small30": false
+     }
+    ]
+   },
    "trend": {
     "or": 1.71,
     "lo": 1.14,
@@ -7255,7 +7327,29 @@
     "hunting_n": 123,
     "hunting_with_count": 28
    },
-   "dated_log": false
+   "dated_log": false,
+   "number_purchased": {
+    "early": {
+     "from": "2026-01",
+     "to": "2026-05",
+     "uc30": 30,
+     "n": 30,
+     "median": 6.0,
+     "p25": 4.0,
+     "p75": 9.0
+    },
+    "late": {
+     "from": "2026-06",
+     "to": "2026-09",
+     "uc30": 81,
+     "n": 74,
+     "median": 9.0,
+     "p25": 6.0,
+     "p75": 11.0
+    },
+    "field": "Jira Deal Number Purchased (deal_number_purchased)",
+    "window": 30
+   }
   },
   "matched_cohort": {
    "from": "2026-04-28",
@@ -16709,7 +16803,10 @@
    "henry_known_hunting": 8,
    "hunting": 108,
    "henry_known_with_uc": 433,
-   "with_uc": 493
+   "with_uc": 493,
+   "nce_date": "2026-05-27",
+   "not_recorded_before_nce": 425,
+   "not_recorded_total": 431
   },
   "months": [
    {
@@ -17421,7 +17518,17 @@
     }
    }
   ],
-  "explorer_view": "#budget"
+  "explorer_view": "#budget",
+  "explorer_jira": {
+   "fallout": {
+    "none": 479,
+    "ended": 43,
+    "second_entry": 32,
+    "documented": 12,
+    "returned": 4
+   },
+   "paused_fallthrough": 30
+  }
  },
  "reconcile": {
   "asof": "2026-11-16",
@@ -17534,7 +17641,7 @@
     "label": "October 2026 closings",
     "cj": 64,
     "explorer": 64,
-    "cash": null,
+    "cash": 64,
     "unit": "daily_client_activity (won deals) \u00b7 Jira issues dated in October: 65",
     "bridge": {
      "jira_issues": 65
@@ -17672,6 +17779,31 @@
     "bridge": {}
    },
    {
+    "key": "fall_pair",
+    "label": "Fall-through: documented \u00b7 contract ended without a purchase",
+    "fmt": "pair",
+    "cj": [
+     12,
+     43
+    ],
+    "explorer": [
+     12,
+     43
+    ],
+    "cash": null,
+    "unit": "searches known to have gone under contract (Jira, 12 Nov extract + 16 Nov statuses)",
+    "bridge": {}
+   },
+   {
+    "key": "paused_ft",
+    "label": "Paused searches with an ended contract or documented fall-through",
+    "cj": 30,
+    "explorer": 30,
+    "cash": 30,
+    "unit": "Paused Jira issues; the Cash Forecast's paused default uses the same count",
+    "bridge": {}
+   },
+   {
     "key": "net_cash",
     "label": "Forecast net cash (default assumptions)",
     "cj": null,
@@ -17714,7 +17846,7 @@
   "snapshots": {
    "reporting_layer": "2026-11-16"
   },
-  "built_at": "2026-11-19 00:01",
+  "built_at": "2026-11-19 02:19",
   "chapters": [
    "journey",
    "outcomes",
@@ -18612,7 +18744,7 @@
    "hard": true
   },
   {
-   "check": "First 14 days: under contract within 14 days and eligible clients equal the cohort table (3.3), months that differ",
+   "check": "First 14 days: under contract within 14 days and eligible clients equal the cohort table (3.4), months that differ",
    "page": 0,
    "explorer": 0,
    "ok": true,
@@ -18647,7 +18779,7 @@
    "hard": true
   },
   {
-   "check": "Budget: the UC-tomorrow groups (4.3) hold the same clients and recorded durations as the budget groups",
+   "check": "Budget: the UC-tomorrow groups (4.4) hold the same clients and recorded durations as the budget groups",
    "page": [
     [
      "Up to $250K",
@@ -19104,6 +19236,184 @@
    ],
    "ok": true,
    "hard": true
+  },
+  {
+   "check": "Paused: pause-duration bands and the contract-history groups both add up to the paused searches; fall-through evidence = chapter 6's paused counts",
+   "page": [
+    108,
+    108,
+    108,
+    2,
+    28,
+    49
+   ],
+   "explorer": [
+    108,
+    108,
+    108,
+    2,
+    28,
+    49
+   ],
+   "ok": true,
+   "hard": true
+  },
+  {
+   "check": "Goal pace: the best closing month's sale-month split adds up to its closings, and that month equals the Client Journey's closings for it",
+   "page": [
+    64,
+    64
+   ],
+   "explorer": [
+    64,
+    64
+   ],
+   "ok": true,
+   "hard": true
+  },
+  {
+   "check": "Goal pace: the planning estimate = 100 / (closed / won) over the stated historical window",
+   "page": [
+    159,
+    0.6275
+   ],
+   "explorer": [
+    159,
+    0.6275
+   ],
+   "ok": true,
+   "hard": true
+  },
+  {
+   "check": "5.1: all eligible starts (75+ days) = classified (fast, middle, slow, still hunting) + ended without a contract; the 30-day count is the same in both bases",
+   "page": [
+    679,
+    169,
+    203
+   ],
+   "explorer": [
+    679,
+    169,
+    203
+   ],
+   "ok": true,
+   "hard": true
+  },
+  {
+   "check": "5.5: prior-offer groups hold every matched start with 30 days of follow-up; day-14 contracts never exceed day-30 contracts, which never exceed the group",
+   "page": [
+    354,
+    true
+   ],
+   "explorer": [
+    354,
+    true
+   ],
+   "ok": true,
+   "hard": true
+  },
+  {
+   "check": "5.6: Deal Number Purchased: searches with a number never exceed the searches under contract by day 30, in both periods",
+   "page": true,
+   "explorer": true,
+   "ok": true,
+   "hard": true
+  },
+  {
+   "check": "5.3: missing budgets: those before the 27 May onboarding change never exceed all missing, and all missing = the groups' 'not recorded'",
+   "page": [
+    true,
+    431
+   ],
+   "explorer": [
+    true,
+    431
+   ],
+   "ok": true,
+   "hard": true
+  },
+  {
+   "check": "STR Cribs: first-purchase and later-purchase designer counts add up to the 19 first and 21 later purchases; both-times buyers never exceed first-time Cribs buyers",
+   "page": [
+    19,
+    21,
+    true
+   ],
+   "explorer": [
+    19,
+    21,
+    true
+   ],
+   "ok": true,
+   "hard": true
+  },
+  {
+   "check": "Fall-through: outcomes of the ended contracts add up to the ended count",
+   "page": 43,
+   "explorer": 43,
+   "ok": true,
+   "hard": true
+  },
+  {
+   "check": "Timing: the estimated medians' population is every confirmed start; unfinished = start - recorded milestones",
+   "page": [
+    825,
+    true
+   ],
+   "explorer": [
+    825,
+    true
+   ],
+   "ok": true,
+   "hard": true
+  },
+  {
+   "check": "5.5: by day 14 the no-offers and 3+ groups are level (within 2 points); by day 30 the 3+ group is at least 10 points ahead",
+   "page": [
+    true,
+    true
+   ],
+   "explorer": [
+    true,
+    true
+   ],
+   "ok": true,
+   "hard": false
+  },
+  {
+   "check": "5.5: the day-30 share rises 0 -> 1-2 -> 3+ offers on the same searches",
+   "page": true,
+   "explorer": true,
+   "ok": true,
+   "hard": false
+  },
+  {
+   "check": "5.6: the median Deal Number Purchased is higher for June-September starts than for January-May starts",
+   "page": true,
+   "explorer": true,
+   "ok": true,
+   "hard": false
+  },
+  {
+   "check": "2.3: fewer paused searches are both long-paused and past an ended contract than either alone",
+   "page": true,
+   "explorer": true,
+   "ok": true,
+   "hard": false
+  },
+  {
+   "check": "4.4: the scenario median (every hunting search under contract tomorrow) is below the estimated median that counts unfinished searches",
+   "page": true,
+   "explorer": true,
+   "ok": true,
+   "hard": false
+  },
+  {
+   "check": "3.2: the best closing month's June-August share is most of its closings ('52 of 64')",
+   "page": true,
+   "explorer": true,
+   "ok": true,
+   "hard": false
   },
   {
    "check": "Cash forecast: closings in the last 30 days are dated inside the window and sit in no more deals than were closed",

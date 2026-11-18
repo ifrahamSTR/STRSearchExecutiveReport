@@ -1,5 +1,5 @@
 """Lower-budget vs higher-budget clients (added 18 Nov 2026): the Business Data Explorer's budget findings, brought
-into the chapters where they answer a business question (2.4 where they stand, 3.3-3.4 monthly cohorts and the first 14 days,
+into the chapters where they answer a business question (2.4 where they stand, 3.4-3.5 monthly cohorts and the first 14 days,
 4.3 time to contract, 5.3 like-for-like).
 
 One calculation for both sites: this module runs the Explorer's own enrichment (pipeline/enrich.py) and budget reference
@@ -27,6 +27,7 @@ MONTH_WINDOWS = [14, 30, 60, 90]
 UC_W, CL_W, EARLY_W = [14, 30, 45, 60, 90], [60, 90, 120], [14, 30, 60, 90]
 EXPERIENCE = [("all", None, "All clients"), ("nce", "New Client Experience", "New Client Experience"), ("legacy", "Legacy", "Legacy")]
 CURVE_DAYS = 150
+NCE_DATE = "2026-05-27"                 # New Client Experience: Jira holds pre-sale prospects from this date; the onboarding budget answer is read for starts since
 
 
 def _explorer(ctx: C.Ctx):
@@ -50,6 +51,9 @@ def build(ctx: C.Ctx) -> dict:
     df["grp"] = df.budget_cmp.fillna("Not recorded")
     df["sm"] = df.start.dt.strftime("%Y-%m")
     asof = ctx.asof
+    ej = enr["jira"]                                   # the Explorer's own enriched Jira table: its stage and fall-through evidence per search
+    explorer_jira = {"fallout": {k: int(v) for k, v in ej.fallout.value_counts().items()},
+                     "paused_fallthrough": int((ej.stage.eq("paused") & ej.fallout.isin(["documented", "ended"])).sum())}
     groups = [{k: g[k] for k in ["label"] + KEEP} for g in ref["groups"]["cmp"]]
     strict = [{k: g[k] for k in ("label", "n", "uc14", "uc30", "rf30", "recorded", "stages")} for g in ref["groups"]["strict"]]
     mh = {k: [_mh(x) for x in v] for k, v in ref["mh"]["cmp"].items() if k in ("uc", "closed", "refunded")}
@@ -113,8 +117,9 @@ def build(ctx: C.Ctx) -> dict:
         "early": early,
         "field": E.BUDGET_FIELD, "measures": E.BUDGET_MEASURES, "threshold": E.BUDGET_THRESHOLD, "form_since": "2026-04-20",
         "population": ref["population"], "n": ref["n"], "groups": groups, "strict": strict, "mh": mh, "mh_strict": mh_strict,
-        "thin": B.THIN, "coverage": ref["coverage"], "months": months, "experience": exp, "profile": profile,
-        "explorer_view": "#budget",
+        "thin": B.THIN, "coverage": dict(ref["coverage"], nce_date=NCE_DATE, **{"not_recorded_before_nce": int((df.budget_cmp.isna() & (df.start < pd.Timestamp(NCE_DATE))).sum()),
+                                                                  "not_recorded_total": int(df.budget_cmp.isna().sum())}), "months": months, "experience": exp, "profile": profile,
+        "explorer_view": "#budget", "explorer_jira": explorer_jira,
     }
 
 

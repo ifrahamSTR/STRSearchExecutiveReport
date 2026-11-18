@@ -88,7 +88,7 @@
   }
 
   // 3.2 (reworked 18 Nov 2026) searches started vs Under Contract, paired by month, with the difference in an aligned strip around zero.
-  // Marked months (1 peak, 2 last full month, 3 the partial month) are explained beside the chart. Closed and the 90-day cohort share live in 3.1 and 3.3.
+  // Marked months (1 peak, 2 last full month, 3 the partial month) are explained beside the chart. Closed and the 90-day cohort share live in 3.2 and 3.4.
   function startsVsUc(node, pc, asof, st, marks) {
     return S.chart(node, t => {
       const rows = pc.monthly.filter(r => st.range === 'all' || r.month >= '2026-01'), n = rows.length, dense = n > 14, narrow = node.offsetWidth < 640;
@@ -148,6 +148,13 @@
   const dShort = iso => new Date(iso + 'T12:00:00').toLocaleDateString('en-GB', { day: 'numeric', month: 'short' });
   const span7 = r => `${dShort(r.first)}–${dShort(r.last)}`;
   const f1 = v => (v == null ? '–' : (Math.round(v * 10) / 10).toFixed(1));
+  /* the two reporting changes that make start-date cohorts before and after them not like for like (stated beside the charts that compare them) */
+  const changeNote = D => {
+    const cov = D.budgets.coverage, kl = D.pace.cohorts.kickoff_lag_median;
+    return `<div class="call chg"><span class="call-h">Two reporting changes affect cohort comparisons</span>
+      <p><b>27 May 2026, the onboarding change.</b> Clients now meet Acquisitions before they buy, and Jira opens an issue at that stage, so intake and the pool of signed searches changed. The onboarding budget question is also asked only from then: ${S.int(cov.not_recorded_before_nce)} of the ${S.int(cov.not_recorded_total)} missing budgets are for starts before 27 May.</p>
+      <p><b>1 June 2026, the start-date change.</b> Before June a search starts at its kickoff, a median ${S.d1(kl)} days after the sale; from June it starts on the won date. A start-month cohort from June therefore begins earlier in the client's journey than one from before June, so shares before and after June are not counted the same way. The won-date clock removes the shift; both are shown.</p></div>`;
+  };
 
   function goalChart(node, G, st) {
     return S.chart(node, t => {
@@ -235,6 +242,8 @@
     });
   }
 
+  const monthYear = iso => new Date(iso.slice(0, 7) + '-15T12:00:00').toLocaleDateString('en-GB', { month: 'short', year: 'numeric' });
+
   function goalScene(main, D, ch, of) {
     const G = D.pace.goal, st = { view: 'month', unit: 'per7', on: { sales: true, uc: true, closed: true } };
     const full = G.months.filter(r => !r.partial), cur = G.months.find(r => r.partial), bc = G.best.closed.month, bs = G.best.sales.month;
@@ -242,12 +251,15 @@
     const mon = k => new Date(k + '-15T12:00:00').toLocaleDateString('en-GB', { month: 'long' });
     const soldIn = Object.entries(G.best_close_sold.by_sale_month), wave = soldIn.filter(([m]) => m >= '2026-06' && m <= '2026-08').reduce((a, [, n]) => a + n, 0);
     const py = G.prev_year, lowest = cur && G.months.filter(r => r !== cur).every(r => r.sales_per7 > cur.sales_per7), cooled = last.sales_per7 < G.best.sales.month.per7 && (!cur || cur.sales_per7 < last.sales_per7);
+    const sold = G.best_close_sold.by_sale_month, before = Object.entries(sold).filter(([m]) => m < '2026-06').reduce((a, [, n]) => a + n, 0);
+    const lagSegs = [...(before ? [{ k: 'before', n: before, label: 'Before June', sub: 'won Dec 2025 – May 2026', c: 'var(--hold)' }] : []),
+      ...Object.entries(sold).filter(([m]) => m >= '2026-06').map(([m, n]) => ({ k: 'm' + m, n, label: `Won in ${mon(m)}`, sub: m <= '2026-08' ? 'the June–August sales wave' : 'later sales', c: m <= '2026-08' ? 'var(--sales)' : 'var(--sales-2)', lt: m > '2026-08' }))];
     const body = S.scene(main, { ch, step: 1, of, label: 'How close to 100 a month',
       title: `Closings peaked at ${bc.n} in ${mon(bc.at)}, ${S.pct(bc.n / G.goal_per_month)} of the 100-a-month goal; ${cooled ? `the sales that feed closings have slowed since ${mon(bs.at)}` : `sales peaked in ${mon(bs.at)}`}` });
     body.innerHTML = `<div class="figs qf">
         <div class="fig"><span class="v num">${bc.n}<span class="of">of 100</span></span><span class="l"><i style="background:var(--closed)"></i>closings in ${mon(bc.at)}, the best month: ${f1(bcRow.closed_per7)} per 7 days against the ${f1(G.benchmark_per7)} the goal needs ${S.ui.chip('rec')}</span></div>
         <div class="fig"><span class="v num">${f1(L4.closed_per7)}<small>a week</small></span><span class="l"><i style="background:var(--closed)"></i>closings over the last four full weeks (${dShort(L4.from)}–${dShort(L4.to)}): ${S.pct(L4.closed_per7 / G.benchmark_per7)} of the weekly rate; sales ${f1(L4.sales_per7)}, contracts ${f1(L4.uc_per7)}</span></div>
-        <div class="fig"><span class="v num">≈${S.int(cv.sales_needed)}<small>sales a month</small></span><span class="l"><i style="background:var(--sales)"></i>needed for 100 closings at today's conversion (${S.pct(cv.won_close)} of sales close; best month so far ${G.best.sales.month.n}), and ≈${S.int(cv.uc_needed)} contracts (best ${G.best.uc.month.n}) ${S.ui.chip('inf')}</span></div>
+        <div class="fig"><span class="v num">≈${S.int(cv.sales_needed)}<small>sales a month</small></span><span class="l"><i style="background:var(--sales)"></i><b>planning estimate</b> for 100 closings a month: ${S.int(cv.won_closed)} of the ${S.int(cv.won_n)} deals won ${monthYear(cv.won_from)}–${monthYear(cv.won_to)} have closed (${S.pct(cv.won_close, 1)}), so about ${S.int(cv.sales_needed)} sales a month; best month so far ${G.best.sales.month.n}. About ${S.int(cv.uc_needed)} contracts a month (best ${G.best.uc.month.n}) ${S.ui.chip('inf')}</span></div>
       </div>
       <div class="board" id="goalBoard">
         <div class="ptools"><div class="pl">${S.ui.seg('view', 'Period', [['month', 'Monthly'], ['week', 'Weekly (Sun–Sat)']], 'month')}${S.ui.seg('unit', 'Unit', [['per7', 'Per 7 days'], ['count', 'Monthly totals']], 'per7', 'only-chart hide-wk')}
@@ -255,10 +267,13 @@
         <div class="pv-chart"><div class="chart h-goal" id="goalChart" role="img" aria-label="Sales, Under Contract and Closed per month from April to ${S.date(G.asof)}: ${G.months.map(r => `${r.label}${r.partial ? ' (partial)' : ''} ${r.sales} / ${r.uc} / ${r.closed}`).join('; ')}. Goal 100 closings a month, ${G.benchmark_per7} per 7 days."></div>
           <div class="legend"><span><i class="dash" style="color:var(--closed)"></i>Goal: 100 closings a month = ${f1(G.benchmark_per7)} per 7 days</span><span><i class="hatch-uc"></i>Partial period (hatched): ${cur ? `1–${cur.days} ${cur.label.slice(0, 3)}` : ''}${G.weeks[G.weeks.length - 1].partial ? ` · last week ${G.weeks[G.weeks.length - 1].days} of 7 days` : ''}</span></div></div>
         <div class="pv-table tw" id="goalTable"></div>
+        <div class="lag" id="lagBoard"><p class="lag-h">The lag between a sale and a purchase <small>${mon(bc.at)}'s ${bc.n} closings, by the month the deal was won ${S.ui.chip('rec')}</small></p>
+          ${S.ui.stack(lagSegs, [{ from: 'm2026-06', to: 'm2026-08', text: `${wave} of ${bc.n} came from deals won in June–August`, sub: S.pct(wave / bc.n), lvl: 0 }], `${mon(bc.at)} closings by the month the deal was won: ${soldIn.map(([m, n]) => `${m} ${n}`).join(', ')}; ${wave} of ${bc.n} won in June to August.`)}
+          ${S.ui.keys(lagSegs.map(x => ({ n: x.n, of: S.pct(x.n / bc.n), label: x.label, sub: x.sub, c: x.c })), lagSegs.length)}</div>
         <p class="call"><span class="call-h">The change that matters most</span><b>The June sales surge has reached closings, and sales have since cooled.</b> Sales rose from ${f1(W.before.sales)} per 7 days in April–May to ${f1(W.surge.sales)} in June–September. Closings follow a sale by a median ${S.int(G.lag.sale_to_close)} days, so the surge arrived as closings from August: ${wave} of ${mon(bc.at)}'s ${bc.n} closings were sold in June–August. Sales slowed to ${f1(last.sales_per7)} per 7 days in ${mon(last.month)}${cur ? ` and ${f1(cur.sales_per7)} so far in ${mon(cur.month)} (1–${cur.days}), ${lowest ? 'the lowest rate of any month since April' : 'well below the summer'}` : ''}. ${py.length === 3 ? `A year earlier sales also fell from ${f1(py[0].sales_per7)} per 7 days in ${mon(py[0].month)} to ${f1(py[1].sales_per7)} in 1–${cur.days} ${mon(py[1].month)}, then recovered to ${f1(py[2].sales_per7)} in ${mon(py[2].month)}, so part of this is seasonal. ` : ''}At a median ${S.int(G.lag.sale_to_close)} days from sale to closing, ${cur ? mon(cur.month) : 'this month'}'s sales become closings in January and February.</p>
       </div>
       ${S.ui.ex('How is this number built?', [
-        `<p class="ex-h">Three series, one source</p><p><b>Sales</b> = won STR Search deals by Pipedrive won date. <b>Under Contract</b> = clients by the date of their latest valid contract. <b>Closed</b> = completed purchases by closing date, up to ${S.date(G.asof)}; ${S.int(D.speed.clock.scheduled_closings)} closings dated later are not counted until they happen (the Cash Forecast collects them on that date). All three are the reporting layer's daily_client_activity, the same daily counts as the Explorer's monthly table and chart 3.2.</p>
+        `<p class="ex-h">Three series, one source</p><p><b>Sales</b> = won STR Search deals by Pipedrive won date. <b>Under Contract</b> = clients by the date of their latest valid contract. <b>Closed</b> = completed purchases by closing date, up to ${S.date(G.asof)}; ${S.int(D.speed.clock.scheduled_closings)} closings dated later are not counted until they happen (the Cash Forecast collects them on that date). All three are the reporting layer's daily_client_activity, the same daily counts as the Explorer's monthly table and chart 3.3.</p>
          <p class="ex-h">Partial periods and the weekly rate</p><p>Per 7 days = count × 7 ÷ calendar days covered, so a 30-day month, a 31-day month, the partial month (1–${cur ? cur.days : ''} ${cur ? cur.label.slice(0, 3) : ''}) and a week all compare with one benchmark: 100 a month = 100 × 7 ÷ 30.44 = <b>${f1(G.benchmark_per7)}</b> per 7 days. Weeks run Sunday to Saturday; the first (29 Mar–4 Apr) includes three March days and the last covers ${G.weeks[G.weeks.length - 1].days} days.</p>`,
         `<p class="ex-h">What 100 a month needs</p><p>Of the <b>${S.int(cv.won_n)}</b> deals won from ${S.date(cv.won_from)} to ${S.date(cv.won_to)} (seven months or more to close), <b>${S.int(cv.won_closed)}</b> (${S.pct(cv.won_close)}) have closed, so 100 closings a month needs about 100 ÷ ${S.pct(cv.won_close)} ≈ <b>${S.int(cv.sales_needed)}</b> sales a month at steady state. Of ${S.int(cv.uc_n)} contracts at least ${cv.uc_days} days old (since June 2025), ${S.int(cv.uc_closed)} (${S.pct(cv.uc_close)}) closed: ≈ <b>${S.int(cv.uc_needed)}</b> contracts a month. These are recorded shares of past clients, not a forecast. Median days from sale: ${S.int(G.lag.sale_to_uc)} to the contract, ${S.int(G.lag.sale_to_close)} to the closing (2026 sales).</p>
          <p class="ex-h">Same figures elsewhere</p><p>The Explorer's Sales funnel applies Pipedrive's duplicate filter, so it shows one sale fewer in June and in November (${Object.entries(D.reconcile.rows.find(r => r.key === 'oct_sales').bridge.funnel_months_differ).map(([m, [a, b]]) => `${mon(m)} ${b} not ${a}`).join(', ')}). The ${D.cash.recent_closed.n} closings from ${dShort(D.cash.recent_closed.from)} to ${dShort(D.cash.recent_closed.to)} equal the Cash Forecast's.</p>`,
@@ -336,6 +351,7 @@
         <div class="pv-table tw" id="cohTable"></div>
         <div class="links">${S.ui.xl('#cohorts?preset=0', 'Explorer: Jul–Sep starts by budget in the cohort builder')}${S.ui.xl('#budget', 'Explorer: budget performance')}</div>
       </div>
+      ${changeNote(D)}
       ${S.ui.ex('How is this number built?', [
         `<p class="ex-h">The measure</p><p>Each start month's confirmed starts (won deals with a Jira start, ${S.int(D.speed.estimate.n)} in all) and how many reached Under Contract within 14, 30, 60 or 90 days of their start: <code>SUM(uc_within_Nd × eligible_Nd) ÷ SUM(eligible_Nd)</code>, the Explorer's matured-cohort rule. A window is <b>maturing</b> while some of the month's clients have had fewer than N days; the chart then shows the share so far. Under Contract is the latest valid contract. Refunded clients stay in (${S.int(C.refunded_included)}).</p>
          <p class="ex-h">Comparable months</p><p>Months whose whole window has passed, from January 2026: ${span(b14)} 2026 before the late-May changes, June 2026 on after. 2025 start months are in the table but not compared: ${S.int(oldK)} of their ${S.int(oldN)} clients closed without an Under Contract date. Cells resting on fewer than 5 clients are marked <sup>s</sup>.</p>
@@ -343,7 +359,7 @@
         `<p class="ex-h">Two clocks</p><p><b>From client start</b> (the reporting rule): before June the start is the kickoff, a median ${S.d1(C.kickoff_lag_median)} days after the sale; from 1 June it is the won date. So clients since June get about ${S.d1(C.kickoff_lag_median)} fewer search days inside the same window, which works against the newer months.</p>
          <p><b>From won date</b> counts every month from the sale. It removes that shift, but since 27 May clients meet Acquisitions in the Confidence Call before they buy, so part of their search can start before the won date. The true change in the first two weeks lies between the two readings: ${S.pct(b14.share)} → ${S.pct(a14.share)} and ${S.pct(pw.w14.before.share)} → ${S.pct(pw.w14.after.share)}.</p>`,
       ])}
-      <p class="cap">Confirmed starts by start month · bars show the selected window · the table shows every window with its numerator and eligible clients · the first 14 days also bring refunds: see 3.4.</p>`;
+      <p class="cap">Confirmed starts by start month · bars show the selected window · the table shows every window with its numerator and eligible clients · the first 14 days also bring refunds: see 3.5.</p>`;
     const board = S.$('#cohBoard', body), node = S.$('#cohChart', body), host = S.$('#cohTable', body);
     const cellOf = (r, w) => (w === 'todate' ? { k: r.to_date.k, el: r.to_date.n, mature: true, small: r.to_date.small } : { k: r[`w${w}`].k, el: r[`w${w}`].eligible, mature: r[`w${w}`].mature, small: r[`w${w}`].small });
     const budRows = () => B.months.filter(m => m.month >= '2026-05');
@@ -472,8 +488,9 @@
         <div class="pv-table tw" id="f14Table"></div>
         <p class="call"><span class="call-h">Why it matters</span>Refunds come early: a median ${S.int(D.outcomes.status.refunded.median_days)} days after the start, and ${S.int(D.outcomes.status.refunded.from_client_start)} refunded clients never reached their two-week check-in. The 30-day refund rate has risen with each start month since July. ${ye && ye.oct25 ? `A year earlier, October 2025 starters also refunded more often within 30 days (${ye.oct25.k} of ${ye.oct25.n}, ${S.pct(ye.oct25.k / ye.oct25.n)}) than January–September 2025 starters (${ye.rest25.k} of ${ye.rest25.n}, ${S.pct(ye.rest25.k / ye.rest25.n)}), consistent with refunds rising toward year-end; this year the rise is larger and began in September.` : ''} Up to $250K clients refund more often early (section 5.3), but the rise is in both groups.</p>
       </div>
+      ${changeNote(D)}
       ${S.ui.ex('How is this number built?', [
-        `<p class="ex-h">Same clients, same clock</p><p>For each start month, the confirmed starts with at least 14 (or 30) days since their client start date are <b>eligible</b>. Under contract within the window = latest valid Under Contract date − start ≤ the window (the cohort rule in 3.3, so the counts equal its table). Refunded within the window = refund date − start ≤ the window. A client can be in both (a contract that fell through, then a refund); that is rare.</p>
+        `<p class="ex-h">Same clients, same clock</p><p>For each start month, the confirmed starts with at least 14 (or 30) days since their client start date are <b>eligible</b>. Under contract within the window = latest valid Under Contract date − start ≤ the window (the cohort rule in 3.4, so the counts equal its table). Refunded within the window = refund date − start ≤ the window. A client can be in both (a contract that fell through, then a refund); that is rare.</p>
          <p>Since June the start is the won date, so 14 days means 14 days after the sale. The refund date is when the refund was recorded.</p>`,
         `<p class="ex-h">Reading the months</p><p>The latest month is <b>maturing</b> at 30 days (some clients have had fewer), so its share can still rise. 2025 months are context: their Under Contract dates are incomplete and few refunds were recorded, so they are dimmed and not compared. By budget, the comparison covers May–October 2026 starts with a matched onboarding answer; pooled: ${LO} ${BG[LO].uc14.k} under contract and ${BG[LO].rf14.k} refunded within 14 days of ${BG[LO].uc14.eligible}; ${HI} ${BG[HI].uc14.k} and ${BG[HI].rf14.k} of ${BG[HI].uc14.eligible}.</p>`,
       ])}
@@ -520,21 +537,36 @@
 
   S.chapter('pace', {
     n: 3, title: 'Are we keeping pace?',
+    order: ['pace-5', 'pace-1', 'pace-2', 'pace-3', 'pace-4'],       // displayed order; ids are stable keys (deep links)
     render(main, D, ch) {
       const pc = D.pace, w = pc.windows, co = pc.cohort, sc = pc.intake.since_change, asof = D.meta.asof, OF = 5;
       const last = pc.monthly[pc.monthly.length - 1], since = S.date(pc.change_date).replace(/ \d{4}$/, '');
 
-      // 3.1 the 100-a-month goal
+      // 3.1 (moved to the front of the chapter on 18 Nov 2026; its id pace-5 is kept so every earlier link still works): what enters Jira
+      let body = S.scene(main, { ch, step: 5, of: OF, label: 'What enters Jira',
+        title: `Jira intake jumped from about ${r10(w.intake.before)} to ${r10(w.intake.after)} a month: issues now open before the sale` });
+      body.innerHTML = `<div class="board">
+          <div class="chart h-l" id="intakeChart" role="img" aria-label="New Jira issues per month from ${pc.intake.monthly[0].label} to ${last.label}, by where each issue stands today. Before ${since} 2026 almost every issue is a signed client; from June 2026 intake rises to between ${Math.min(...w.after.map(m => pc.intake.monthly.find(r => r.month === m).total))} and ${Math.max(...w.after.map(m => pc.intake.monthly.find(r => r.month === m).total))} a month, most of them prospects."></div>
+          <div class="tally">
+            <div class="tally-h">Opened since ${since}: <b class="num">${S.int(sc.total)}</b> issues, by where they stand today</div>
+            <div class="tally-bar" aria-hidden="true">${KEYS.map(x => `<i class="${x.cls}" style="flex:${sc[x.k]} 1 0"></i>`).join('')}</div>
+            <div class="tally-keys">${KEYS.map(x => `<div class="tk"><span class="tk-v num">${S.int(sc[x.k])}</span><span class="tk-t"><i class="${x.cls}"></i>${x.k === 'signed' ? 'Signed clients' : x.name}</span><span class="tk-s">${S.pct(sc[x.k] / sc.total)} · ${x.sub}</span></div>`).join('')}</div>
+          </div></div>
+        ${changeNote(D)}
+        <p class="cap">New issues by month created, coloured by where each stands today, not by what happened that month · ${r10(w.intake.before)} → ${r10(w.intake.after)}: average of the five full months either side of ${since} · the pre-sale prospects here are not clients yet, so they are outside every count in chapters 2–4.</p>`;
+      intake(S.$('#intakeChart', body), pc, asof);
+
+      // 3.2 the 100-a-month goal
       goalScene(main, D, ch, OF);
 
-      // 3.2 (reworked 18 Nov 2026): the question, the three numbers that matter, the paired chart with marks explained beside it, then the detail
+      // 3.3 (reworked 18 Nov 2026): the question, the three numbers that matter, the paired chart with marks explained beside it, then the detail
       const g = pc.gap, gr = pc.growth, full = gr.rows.filter(r => !r.partial), lf = full[full.length - 1], pr = gr.rows.find(r => r.partial);
       const mrow = Object.fromEntries(pc.monthly.map(r => [r.month, r])), pk = mrow[g.peak_months[g.peak_months.length - 1]], day = new Date(asof + 'T12:00:00').getDate();
       const prevNeg = pc.monthly.filter(r => r.month >= g.from && !r.partial && r.gap < 0).slice(-1)[0];
       const trail = [pk.gap, ...g.tail.map(t => t.gap)].map(v => (v > 0 ? '+' : '') + v).join(' → ');
       const marks = [{ n: 1, month: pk.month }, { n: 2, month: lf.month }, ...(pr ? [{ n: 3, month: pr.month }] : [])];
       const lead = (r, w) => (r.gap > 0 ? `${r.gap} more searches started than contracts were signed` : r.gap < 0 ? `${-r.gap} more contracts were signed than searches started` : 'starts and contracts were level');
-      let body = S.scene(main, { ch, step: 2, of: OF, label: 'Starts vs contracts',
+      body = S.scene(main, { ch, step: 2, of: OF, label: 'Starts vs contracts',
         title: lf.diff > 0 && pr && pr.diff < 0 ? `Starts led contracts by less each month, from +${pk.gap} in ${fullMon(pk.month)} to +${lf.diff} in ${fullMon(lf.month)}; so far in ${fullMon(pr.month)} contracts lead by ${-pr.diff}`
           : lf.diff > 0 ? `Starts still outpace contracts${g.narrowing ? ', but by less each month' : ''}: ${phrase(lf.diff)} in ${fullMon(lf.month)}, against ${g.peak} in ${listMon(g.peak_months)}` : `Contracts caught up with starts in ${fullMon(lf.month)}: ${phrase(lf.diff)}` });
       body.innerHTML = `<div class="figs qf">
@@ -556,7 +588,7 @@
             <aside class="split-side" aria-label="How to read this chart">
               <div class="note"><span class="note-h">What to look at</span>
                 <ol class="marks">
-                  <li><i>1</i><div><b>${fullMon(pk.month)}: ${sgn(pk.gap)}.</b> ${pk.new} searches started and ${pk.uc} went under contract, the widest gap this year. Since 1 June a start is the sale date, so starts jumped with sales (3.1).</div></li>
+                  <li><i>1</i><div><b>${fullMon(pk.month)}: ${sgn(pk.gap)}.</b> ${pk.new} searches started and ${pk.uc} went under contract, the widest gap this year. Since 1 June a start is the sale date, so starts jumped with sales (3.2).</div></li>
                   <li><i>2</i><div><b>${fullMon(lf.month)}: ${sgn(lf.diff)}.</b> ${lf.starts} started, ${lf.uc} under contract. The gap has narrowed every month since ${fullMon(pk.month)}${g.narrowing ? ` (${trail})` : ''}: contracts are catching up.</div></li>
                   ${pr ? `<li><i>3</i><div><b>1–${day} ${pr.label.slice(0, 3)}: ${sgn(pr.diff)}.</b> ${pr.starts} started, ${pr.uc} under contract: ${lead(mrow[pr.month])}${prevNeg ? `, the first month with contracts ahead since ${fullMon(prevNeg.month)}` : ''}. Partial month: the last ${new Date(new Date(asof + 'T12:00:00').getFullYear(), new Date(asof + 'T12:00:00').getMonth() + 1, 0).getDate() - day} days are still to come.</div></li>` : ''}
                 </ol></div>
@@ -566,7 +598,7 @@
           </div>
         </div>
         ${S.ui.ex('How is this number built?', [
-          `<p class="ex-h">The two counts</p><p><b>Searches started</b> = confirmed client starts, dated by the client start date (from 1 June the Pipedrive won date, so starts and sales move together). <b>Under Contract</b> = clients by the date of their latest valid contract. Both are the reporting layer's daily_client_activity, the same daily counts as the Explorer's monthly table and the Won / Under Contract series in 3.1 (Won ${S.int(gr.rows.reduce((a, r) => a + r.won, 0))} since ${gr.rows[0].label}).</p>
+          `<p class="ex-h">The two counts</p><p><b>Searches started</b> = confirmed client starts, dated by the client start date (from 1 June the Pipedrive won date, so starts and sales move together). <b>Under Contract</b> = clients by the date of their latest valid contract. Both are the reporting layer's daily_client_activity, the same daily counts as the Explorer's monthly table and the Won / Under Contract series in 3.2 (Won ${S.int(gr.rows.reduce((a, r) => a + r.won, 0))} since ${gr.rows[0].label}).</p>
            <p><b>Started − Under Contract</b> (the net client change) compares two counts in the same month. It is calendar throughput, never added up: the backlog is the hunting count, <b>${S.int(gr.hunting)}</b>.</p>`,
           `<p class="ex-h">Partial month and 2025</p><p>${pr ? `The latest month runs 1–${day} ${pr.label.slice(0, 3)}; it is hatched and shaded, and in the table it is compared with the same ${day} days of the previous month and the year before.` : ''} 2025 contract counts are understated (${S.int(D.pace.cohort.no_uc_date.y2025.k)} of ${S.int(D.pace.cohort.no_uc_date.y2025.n)} clients who started in 2025 closed without a contract date), so the gap strip starts in ${S.monShort(g.from)} and 2025 contract bars are faded.</p>
            <ul>${Object.entries(NOTE).map(([k, l]) => `<li><b>${l}</b> ${gr.reasons[k]}</li>`).join('')}</ul>`,
@@ -588,22 +620,10 @@
         growthTable(gt, gr, gs.growth, gs.range);
       });
 
-      // 3.3 cohorts (with the budget split), 3.4 the first 14 days
+      // 3.4 cohorts (with the budget split), 3.5 the first 14 days
       cohortScene(main, D, ch, OF);
       firstScene(main, D, ch, OF);
 
-      // 3.5 (was 3.1) what enters Jira
-      body = S.scene(main, { ch, step: 5, of: OF, label: 'What enters Jira',
-        title: `Jira intake jumped from about ${r10(w.intake.before)} to ${r10(w.intake.after)} a month: issues now open before the sale` });
-      body.innerHTML = `<div class="board">
-          <div class="chart h-l" id="intakeChart" role="img" aria-label="New Jira issues per month from ${pc.intake.monthly[0].label} to ${last.label}, by where each issue stands today. Before ${since} 2026 almost every issue is a signed client; from June 2026 intake rises to between ${Math.min(...w.after.map(m => pc.intake.monthly.find(r => r.month === m).total))} and ${Math.max(...w.after.map(m => pc.intake.monthly.find(r => r.month === m).total))} a month, most of them prospects."></div>
-          <div class="tally">
-            <div class="tally-h">Opened since ${since}: <b class="num">${S.int(sc.total)}</b> issues, by where they stand today</div>
-            <div class="tally-bar" aria-hidden="true">${KEYS.map(x => `<i class="${x.cls}" style="flex:${sc[x.k]} 1 0"></i>`).join('')}</div>
-            <div class="tally-keys">${KEYS.map(x => `<div class="tk"><span class="tk-v num">${S.int(sc[x.k])}</span><span class="tk-t"><i class="${x.cls}"></i>${x.k === 'signed' ? 'Signed clients' : x.name}</span><span class="tk-s">${S.pct(sc[x.k] / sc.total)} · ${x.sub}</span></div>`).join('')}</div>
-          </div></div>
-        <p class="cap">New issues by month created, coloured by where each stands today, not by what happened that month · ${r10(w.intake.before)} → ${r10(w.intake.after)}: average of the five full months either side of ${since} · the pre-sale prospects here are not clients yet, so they are outside every count in chapters 2–4.</p>`;
-      intake(S.$('#intakeChart', body), pc, asof);
     },
   });
 })();

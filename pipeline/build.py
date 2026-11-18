@@ -173,7 +173,7 @@ def checks(ctx: C.Ctx, data: dict) -> list[dict]:
         (pa["dated"], rf["timed"], rf["dated"], pa["n"]))
     f14 = pc["first14"]
     cc14 = {r["month"]: r for r in pc["cohorts"]["clocks"]["start"]["rows"]}
-    chk("First 14 days: under contract within 14 days and eligible clients equal the cohort table (3.3), months that differ",
+    chk("First 14 days: under contract within 14 days and eligible clients equal the cohort table (3.4), months that differ",
         sum(1 for r in f14["rows"] if (r["uc14"], r["el14"]) != (cc14[r["month"]]["w14"]["k"], cc14[r["month"]]["w14"]["eligible"])), 0)
     chk("First 14 days: contracts and refunds never exceed eligible clients, eligible never exceeds the month",
         all(r[f"uc{w}"] <= r[f"el{w}"] and r[f"rf{w}"] <= r[f"el{w}"] <= r["n"] for r in f14["rows"] for w in (14, 30)), True)
@@ -190,12 +190,12 @@ def checks(ctx: C.Ctx, data: dict) -> list[dict]:
     chk("Budget: monthly cohort cells add up to each group's 14 / 30-day contracts and 14 / 30-day refunds",
         all(sum(r[lab][f"w{w}"]["k"] for r in bd["months"]) == bg[lab][f"uc{w}"]["k"] and sum(r[lab][f"w{w}"]["eligible"] for r in bd["months"]) == bg[lab][f"uc{w}"]["eligible"]
             and sum(r[lab][f"rf{w}"]["k"] for r in bd["months"]) == bg[lab][f"rf{w}"]["k"] for lab in ("Up to $250K", "Above $250K") for w in (14, 30)), True)
-    chk("Budget: the UC-tomorrow groups (4.3) hold the same clients and recorded durations as the budget groups",
+    chk("Budget: the UC-tomorrow groups (4.4) hold the same clients and recorded durations as the budget groups",
         [(c["label"], c["clients"], c["recorded"]["n"], c["recorded"]["median"]) for c in sp["scenario"]["cmp"]], [(g["label"], g["n"], g["recorded"]["n"], g["recorded"]["median"]) for g in bd["groups"]])
     chk("Budget: experience split adds up to the matched groups' 30-day refunds",
         all(sum(x["rf30"]["k"] for x in bd["experience"] if x["group"] == lab) == bg[lab]["rf30"]["k"] for lab in ("Up to $250K", "Above $250K")), True)
     rows = {r["key"]: r for r in data["reconcile"]["rows"]}
-    same = ["uc", "paused", "scheduled", "closed30", "oct_closed", "oct_sales", "uc_median", "budget14", "budget_rf30", "budget_paused", "starts_oct", "starts_nov", "hunting_status"]
+    same = ["uc", "paused", "scheduled", "closed30", "fall_pair", "paused_ft", "oct_closed", "oct_sales", "uc_median", "budget14", "budget_rf30", "budget_paused", "starts_oct", "starts_nov", "hunting_status"]
     chk("Reconciliation: figures that must be equal across the report, the Explorer and the Cash Forecast are equal",
         [k for k in same if not (rows[k]["cj"] == rows[k]["explorer"] and (rows[k]["cash"] is None or rows[k]["cash"] == rows[k]["cj"]))]
         + ([] if abs(rows["net_cash"]["explorer"] - rows["net_cash"]["cash"]) < 0.01 else ["net_cash"]), [])
@@ -309,6 +309,42 @@ def checks(ctx: C.Ctx, data: dict) -> list[dict]:
     bands = cf["noprop"]["timing"]["bands"]
     chk("Cash forecast: waiting bands add up to the clients still searching and their expected collections",
         (sum(b["n"] for b in bands), round(sum(b["collect"] for b in bands))), (cf["noprop"]["n"], round(cf["noprop"]["collect"])))
+    # ---- Workbook update (18 Nov 2026): searches, paused history, October lag, all-eligible 5.1, offers on day 14, deal numbers, missing budgets
+    pz = oc["status"]["paused"]
+    chk("Paused: pause-duration bands and the contract-history groups both add up to the paused searches; fall-through evidence = chapter 6's paused counts",
+        (sum(b["n"] for b in pz["bands"]) + (pz["n"] - pz["dated"]), pz["prior"]["evidence"] + pz["prior"]["none"], sum(pz["cross"].values()), pz["prior"]["documented"], pz["prior"]["ended"],
+         pz["over180"]),
+        (pz["n"], pz["n"], pz["n"], fo["documented"]["now"].get("paused", 0), fo["ended"]["now"].get("paused", 0), sum(b["n"] for b in pz["bands"] if b["lo"] > 180)))
+    bcs = gl["best_close_sold"]
+    chk("Goal pace: the best closing month's sale-month split adds up to its closings, and that month equals the Client Journey's closings for it",
+        (sum(bcs["by_sale_month"].values()), bcs["n"]), (gl["best"]["closed"]["month"]["n"], next(r["closed"] for r in gl["months"] if r["month"] == bcs["month"])))
+    chk("Goal pace: the planning estimate = 100 / (closed / won) over the stated historical window", (cv["sales_needed"], cv["won_close"]), (round(100 / (cv["won_closed"] / cv["won_n"])), round(cv["won_closed"] / cv["won_n"], 4)))
+    cmpn = dr["composition"]
+    chk("5.1: all eligible starts (75+ days) = classified (fast, middle, slow, still hunting) + ended without a contract; the 30-day count is the same in both bases",
+        (sum(g["n"] for g in cmpn["groups"]) + cmpn["stopped_no_contract"], cmpn["all_fast"], sum(cmpn["stopped_by_status"].values())),
+        (cmpn["all_eligible"], next(g["n"] for g in cmpn["groups"] if g["key"] == "fast"), cmpn["stopped_no_contract"]))
+    sc_ = dr["offers"]["same_clients"]
+    chk("5.5: prior-offer groups hold every matched start with 30 days of follow-up; day-14 contracts never exceed day-30 contracts, which never exceed the group",
+        (sum(r["n"] for r in sc_["rows"]), all(r["k14"] <= r["k30"] <= r["n"] for r in sc_["rows"])), (sc_["n"], True))
+    npd = dr["deals"]["number_purchased"]
+    chk("5.6: Deal Number Purchased: searches with a number never exceed the searches under contract by day 30, in both periods", all(x["n"] <= x["uc30"] and x["n"] > 0 for x in (npd["early"], npd["late"])), True)
+    cov = bd["coverage"]
+    chk("5.3: missing budgets: those before the 27 May onboarding change never exceed all missing, and all missing = the groups' 'not recorded'", (cov["not_recorded_before_nce"] <= cov["not_recorded_total"], cov["not_recorded_total"]),
+        (True, next(g["n"] for g in bd["groups"] if g["label"] == "Not recorded")))
+    cr_ = rp["cribs"]
+    chk("STR Cribs: first-purchase and later-purchase designer counts add up to the 19 first and 21 later purchases; both-times buyers never exceed first-time Cribs buyers",
+        (sum(cr_["first"].values()), sum(cr_["later"].values()), cr_["clients_both"] <= cr_["clients_first_cribs"]), (cr_["first_purchases"], cr_["later_purchases"], True))
+    chk("Fall-through: outcomes of the ended contracts add up to the ended count", sum(fo["ended"]["now"].values()), fo["ended"]["n"])
+    sp_ = sp["estimate"]
+    chk("Timing: the estimated medians' population is every confirmed start; unfinished = start - recorded milestones", (sp_["n"], sp_["events"]["closed"] == sp["observed"]["closed"]["n"]), (sc["all"]["clients"], True))
+    # statements the workbook update makes in words (warn only)
+    o0_, o3_ = (next(r for r in sc_["rows"] if r["key"] == k) for k in ("0", "3+"))
+    chk("5.5: by day 14 the no-offers and 3+ groups are level (within 2 points); by day 30 the 3+ group is at least 10 points ahead", (abs(o0_["share14"] - o3_["share14"]) < 0.02, o3_["share30"] - o0_["share30"] >= 0.10), (True, True), hard=False)
+    chk("5.5: the day-30 share rises 0 -> 1-2 -> 3+ offers on the same searches", [r["share30"] for r in sc_["rows"]] == sorted(r["share30"] for r in sc_["rows"]), True, hard=False)
+    chk("5.6: the median Deal Number Purchased is higher for June-September starts than for January-May starts", npd["late"]["median"] > npd["early"]["median"], True, hard=False)
+    chk("2.3: fewer paused searches are both long-paused and past an ended contract than either alone", pz["cross"]["long_evidence"] < min(pz["over180"], pz["prior"]["evidence"]), True, hard=False)
+    chk("4.4: the scenario median (every hunting search under contract tomorrow) is below the estimated median that counts unfinished searches", sc["all"]["scenario"]["median"] < sp["estimate"]["uc"]["median"], True, hard=False)
+    chk("3.2: the best closing month's June-August share is most of its closings ('52 of 64')", sum(n for m, n in bcs["by_sale_month"].items() if "2026-06" <= m <= "2026-08") / bcs["n"] > 0.5, True, hard=False)
     rc = cf["recent_closed"]
     chk("Cash forecast: closings in the last 30 days are dated inside the window and sit in no more deals than were closed",
         (rc["n"] == sum(rc["by_group"].values()), 0 < rc["n"] <= g["closed"]["n"] + g["refunded"]["n"] + g["scheduled"]["n"] + g["unverified_closing"]["n"] and rc["to"] == cf["asof"]), (True, True))

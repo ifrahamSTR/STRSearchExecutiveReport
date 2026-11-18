@@ -623,3 +623,86 @@ footer.foot .stage { display: flex; flex-wrap: wrap; gap: 6px 18px; justify-cont
 .pp-call .call-h + b, .pp-call p { margin: 0 0 8px; }
 .pp-call p:last-child { margin-bottom: 0; }
 .chart.h-pace2 { height: 600px; }
+
+/* timing guide (Chapter 4): the medians with the searches each one counts */
+.tguide { margin: 0 0 16px; }
+.tg-h { font: 650 14px/1.3 var(--f-body); color: var(--ink); margin: 0 0 8px; }
+.tg-h small { font-weight: 500; color: var(--muted); margin-left: 8px; }
+table.tg td { vertical-align: top; }
+table.tg td:first-child { min-width: 230px; }
+table.tg td small { display: block; font-size: 12px; color: var(--muted); margin-top: 2px; }
+table.tg td .bx { margin-left: 6px; }
+table.tg .num { font-size: 22px; }
+table.tg tr.tg-sce td { border-top: 1px dashed var(--line-2); }
+
+/* Chapter 2 (workbook update): emphasised figures, the no-start-date note and the paused contract-history strip */
+.figs .fig.emph { padding: 8px 12px 10px; margin: -8px -12px -10px; border: 1.5px solid color-mix(in srgb, var(--wait) 55%, var(--line)); border-radius: 12px; background: color-mix(in srgb, var(--wait) 7%, var(--surface)); }
+.figs .fig.emph.nodate { border-style: dashed; border-color: var(--hold); background: color-mix(in srgb, var(--hold) 8%, var(--surface)); }
+.nd-note { margin: 10px 0 0; padding: 8px 12px; border: 1px dashed var(--hold); border-radius: 10px; font-size: 13px; color: var(--ink-2); background: color-mix(in srgb, var(--hold) 6%, transparent); }
+.pstrip { margin-top: 14px; padding-top: 12px; border-top: 1px dashed var(--line-2); }
+.ps-bar { display: flex; gap: 2px; height: 26px; border-radius: 8px; overflow: hidden; margin: 4px 0 8px; }
+.ps-bar i, .ps-keys i { display: block; }
+.ps-doc { background: var(--uc); }
+.ps-end { background: var(--uc-2); box-shadow: inset 0 0 0 1.5px var(--uc); }
+.ps-none { background: repeating-linear-gradient(135deg, var(--hold-2) 0 4px, transparent 4px 8px); box-shadow: inset 0 0 0 1px var(--hold); }
+.ps-keys { display: flex; flex-wrap: wrap; gap: 4px 16px; font-size: 12.5px; color: var(--ink-2); }
+.ps-keys span { display: inline-flex; align-items: center; gap: 6px; }
+.ps-keys i { width: 11px; height: 11px; border-radius: 3px; }
+.ps-x { margin: 10px 0 0; font-size: 13px; color: var(--ink-2); line-height: 1.5; }
+.ps-x b { color: var(--ink); }
+
+/* Chapter 3 (workbook update): the sale-to-purchase lag and the reporting-change note */
+.lag { margin: 16px 0 6px; padding: 14px 16px 6px; border: 1px solid var(--line); border-radius: 14px; background: var(--surface); }
+.lag-h { font: 650 14px/1.3 var(--f-body); color: var(--ink); margin: 0 0 4px; }
+.lag-h small { font-weight: 500; color: var(--muted); margin-left: 8px; }
+.call.chg { margin-top: 14px; }
+.call.chg p { margin: 6px 0 0; }
+
+/* Chapter 3 (workbook update): the sale-to-purchase lag and the reporting-change note */
+.lag { margin: 16px 0 6px; padding: 14px 16px 6px; border: 1px solid var(--line); border-radius: 14px; background: var(--surface); }
+.lag-h { font: 650 14px/1.3 var(--f-body); color: var(--ink); margin: 0 0 4px; }
+.lag-h small { font-weight: 500; color: var(--muted); margin-left: 8px; }
+.call.chg { margin-top: 14px; }
+.call.chg p { margin: 6px 0 0; }
+
+/* Chapter 5 (workbook update): the narrower chart's base beside its share, and the Deal Number Purchased comparison */
+.mk-v .mk-of { font: 600 12px var(--f-body); color: var(--muted); margin-left: 6px; letter-spacing: 0; }
+.dnb { margin-top: 16px; }
+.dn-h { font: 600 14px/1.4 var(--f-body); color: var(--ink-2); margin: 0 0 12px; }
+.dn-h b { color: var(--ink); }
+.dn { position: relative; display: grid; gap: 14px; }
+.dn-row { display: grid; grid-template-columns: minmax(180px, 280px) minmax(0, 1fr) 120px; gap: 16px; align-items: center; }
+.dn-l { font: 600 14px/1.3 var(--f-body); color: var(--ink); }
+.dn-l small { display: block; font: 500 12px/1.4 var(--f-body); color: var(--muted); }
+.dn-track { position: relative; height: 26px; border-radius: 8px; background: var(--grid); }
+.dn-iqr { position: absolute; top: 4px; bottom: 4px; border-radius: 6px; opacity: .85; }
+.dn-med { position: absolute; top: -3px; bottom: -3px; width: 4px; margin-left: -2px; border-radius: 2px; background: var(--ink); }
+.dn-v { display: grid; gap: 1px; }
+.dn-v b { font: 700 28px/1 var(--f-display); }
+.dn-v small { font: 500 12px var(--f-body); color: var(--muted); }
+.dn-axisrow { margin-top: -6px; }
+.dn-ax { position: relative; height: 16px; }
+.dn-ax span { position: absolute; transform: translateX(-50%); font: 500 11.5px var(--f-mono); color: var(--muted); }
+@media (max-width: 900px) { .dn-row { grid-template-columns: 1fr; } .dn-axisrow { display: none; } }
+
+/* Chapter 6-7 (workbook update): the ended contracts zoomed in, and a neutral hatch for 'not recorded' */
+.fo43 { margin-top: 26px; padding-top: 18px; border-top: 1px solid var(--line); }
+.fo43-h { font: 600 14px/1.3 var(--f-body); color: var(--ink-2); margin: 0 0 10px; }
+.fo43-h small { font-weight: 500; color: var(--muted); margin-left: 8px; }
+.fo43-bar { display: flex; gap: 3px; height: 40px; }
+.fo43-bar i { display: flex; align-items: center; justify-content: center; min-width: 4px; border-radius: 4px; font: 700 14px/1 var(--f-display); font-style: normal; color: #fff; overflow: hidden; }
+.fo43-bar i:first-child { border-radius: 10px 4px 4px 10px; }
+.fo43-bar i:last-child { border-radius: 4px 10px 10px 4px; }
+.fo43-lab { position: relative; height: 22px; font-size: 12.5px; color: var(--ink-2); white-space: nowrap; }
+.fo43-lab span { position: absolute; }
+.fo43-lab b { color: var(--ink); margin-right: 3px; }
+.fo43-lab.top span { bottom: 4px; }
+.fo43-lab.bot span { top: 4px; }
+.hatch-neutral { background: repeating-linear-gradient(135deg, transparent 0 4px, var(--line-2) 4px 5.5px) !important; box-shadow: inset 0 0 0 1.5px var(--line-2); }
+.stack-bar i.hatch-neutral { color: var(--ink); text-shadow: 0 0 3px var(--surface), 0 0 3px var(--surface), 0 0 3px var(--surface); }
+.legend i.hatch-neutral { width: 12px; height: 12px; border-radius: 3px; display: inline-block; }
+
+.pv-chart .stack + .ob-h { margin-top: 22px; }
+.stack-bar i { white-space: nowrap; }
+.sum-cards > li.wide { grid-column: 1 / -1; }
+.sum-cards > li.wide .sc-k small { max-width: 32ch; }

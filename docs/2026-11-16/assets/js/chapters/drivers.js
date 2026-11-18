@@ -19,17 +19,17 @@
     const c = dr.composition, n = c.n, g = Object.fromEntries(c.groups.map(x => [x.key, x]));
     const reached = (g.fast.n + g.middle.n) / n;
     const sub = {
-      fast: `${S.int(g.fast.n)} clients · median ${g.fast.median_days} days`,
-      middle: `${S.int(g.middle.n)} clients · median ${g.middle.median_days} days`,
-      slow: `${S.int(g.slow.n)} clients · median ${g.slow.median_days} days`,
-      searching: `${S.int(g.searching.n)} clients · ${Math.round(g.searching.median_elapsed)} days in, median`,
+      fast: `${S.int(g.fast.n)} of ${S.int(n)} searches · median ${g.fast.median_days} days`,
+      middle: `${S.int(g.middle.n)} of ${S.int(n)} searches · median ${g.middle.median_days} days`,
+      slow: `${S.int(g.slow.n)} of ${S.int(n)} searches · median ${g.slow.median_days} days`,
+      searching: `${S.int(g.searching.n)} of ${S.int(n)} searches · ${Math.round(g.searching.median_elapsed)} days in, median`,
     };
     const aria = c.groups.map(x => `${KEY[x.key]}: ${S.pct(x.n / n)}`).join('; ');
-    return `<div class="mix" role="img" aria-label="${S.int(n)} clients with 75 or more days on the clock. ${aria}.">
+    return `<div class="mix" role="img" aria-label="${S.int(n)} searches that either reached a contract or are still hunting, with 75 or more days on the clock. ${aria}.">
         <div class="mix-brace" style="left:${(reached * 100).toFixed(2)}%;width:${((1 - reached) * 100).toFixed(2)}%"><span>no contract before day 75 · ${S.pct(1 - reached)}</span></div>
         <div class="mix-bar">${c.groups.map(x => `<i class="sp-${x.key}" style="flex:${x.n} 1 0"></i>`).join('')}</div>
       </div>
-      <div class="mix-keys">${c.groups.map(x => `<div class="mk ${x.key}"><span class="mk-v">${S.pct(x.n / n)}</span><span class="mk-t">${KEY[x.key]}</span><span class="mk-s">${sub[x.key]}</span></div>`).join('')}</div>`;
+      <div class="mix-keys">${c.groups.map(x => `<div class="mk ${x.key}"><span class="mk-v">${S.pct(x.n / n)}<small class="mk-of">of ${S.int(n)}</small></span><span class="mk-t">${KEY[x.key]}</span><span class="mk-s">${sub[x.key]}</span></div>`).join('')}</div>`;
   }
 
   /* 5.2 share under contract, at or above each capital cut-off (solid) vs below it (dashed) */
@@ -51,48 +51,23 @@
     });
   }
 
-  function offers(node, of, level75) {
-    const rows = of.rows;
-    S.chart(node, t => {
-      /* a bracket beside the open rings: every group ends up at about the same level by day 75 */
-      const bracket = api => {
-        const pts = rows.map((r, j) => api.coord([r.within75.share, j]));
-        const x = Math.max(...pts.map(q => q[0])) + 30, y1 = pts[0][1], y2 = pts[pts.length - 1][1];
-        return [
-          { type: 'polyline', shape: { points: [[x - 6, y1], [x, y1], [x, y2], [x - 6, y2]] }, style: { stroke: t.muted, lineWidth: 1.4, fill: 'none' } },
-          { type: 'text', style: { x: x + 12, y: (y1 + y2) / 2 - 10, text: 'level by day 75', textVerticalAlign: 'middle', font: `650 14px ${BODY}`, fill: t.ink } },
-          { type: 'text', style: { x: x + 12, y: (y1 + y2) / 2 + 10, text: `≈ ${S.pct(level75)} for every group`, textVerticalAlign: 'middle', font: `500 12.5px ${BODY}`, fill: t.muted } },
-        ];
-      };
-      return Object.assign(S.base(t), {
-      grid: { left: 8, right: 34, top: 40, bottom: 30, containLabel: true },
-      tooltip: Object.assign(S.base(t).tooltip, {
-        trigger: 'item',
-        formatter: p => {
-          const r = rows[p.data[0]];
-          return `<b>${r.label}</b><br>within 30 days: <b>${S.pct(r.within30.share)}</b> ${muted(`of ${r.within30.n} clients with 30+ days`)}<br>`
-            + `before day 75: <b>${S.pct(r.within75.share)}</b> ${muted(`of ${r.within75.n} with 75+ days`)}<br>median days to contract: ${r.median_days}`;
-        },
-      }),
-      xAxis: S.valAxis(t, { min: 0, max: 1, interval: 0.25, axisLabel: { color: t.label, fontSize: 12, formatter: v => S.pct(v) } }),
-      yAxis: { type: 'category', data: rows.map(r => r.label), inverse: true, axisLine: { show: false }, axisTick: { show: false },
-        axisLabel: { color: t.ink, fontSize: 14.5, fontWeight: 600, margin: 16 } },
-      series: [{
-        type: 'custom', encode: { x: [1, 2], y: 0 },
-        data: rows.map((r, i) => [i, r.within30.share, r.within75.share]),
-        renderItem: (p, api) => {
-          const i = api.value(0), a = api.coord([api.value(1), i]), b = api.coord([api.value(2), i]);
-          return { type: 'group', children: [
-            { type: 'line', shape: { x1: a[0], y1: a[1], x2: b[0], y2: b[1] }, style: { stroke: t.grid, lineWidth: 10, lineCap: 'round' } },
-            { type: 'circle', shape: { cx: b[0], cy: b[1], r: 8.5 }, style: { fill: t.surface, stroke: t.ink2, lineWidth: 3 } },
-            { type: 'circle', shape: { cx: a[0], cy: a[1], r: 11 }, style: { fill: t.sp1, stroke: t.surface, lineWidth: 2 } },
-            { type: 'text', style: { x: a[0], y: a[1] - 17, text: S.pct(api.value(1)), textAlign: 'center', textVerticalAlign: 'bottom', font: `700 22px ${DISPLAY}`, fill: t.ink } },
-            { type: 'text', style: { x: b[0], y: b[1] - 15, text: S.pct(api.value(2)), textAlign: 'center', textVerticalAlign: 'bottom', font: `600 14px ${BODY}`, fill: t.ink2 } },
-          ].concat(i === rows.length - 1 && p.coordSys.width > 560 ? bracket(api) : []) };
-        },
-      }],
-    });
-    });
+  /* 5.5 prior offers, day 14 and day 30 on the SAME clients (every matched start with 30+ days of follow-up): grouped bars, base under each group */
+  const pp1 = v => (v == null ? '–' : (v * 100).toFixed(1) + '%');
+  function offersChart(node, rows) {
+    S.chart(node, t => Object.assign(S.base(t), {
+      grid: { left: 8, right: 12, top: 34, bottom: 8, containLabel: true },
+      tooltip: Object.assign(S.base(t).tooltip, { trigger: 'axis', axisPointer: { type: 'shadow', shadowStyle: { color: t.grid, opacity: 0.6 } }, formatter: ps => {
+        const r = rows[ps[0].dataIndex];
+        return `<b>${r.label}</b> ${muted(`${r.n} searches with 30+ days of follow-up`)}<br>Under contract by day 14: <b>${pp1(r.share14)}</b> ${muted(r.small14 ? 'fewer than 5 searches' : `${r.k14} of ${r.n}`)}<br>By day 30: <b>${pp1(r.share30)}</b> ${muted(`${r.k30} of ${r.n}`)}`;
+      } }),
+      xAxis: { type: 'category', data: rows.map(r => `${r.label}\n{n|${r.n} searches}`), axisTick: { show: false }, axisLine: { lineStyle: { color: t.axis } },
+        axisLabel: { color: t.ink, fontSize: 14, fontWeight: 600, lineHeight: 20, interval: 0, rich: { n: { color: t.muted, fontSize: 12, fontWeight: 500, lineHeight: 18 } } } },
+      yAxis: S.valAxis(t, { min: 0, max: 0.4, interval: 0.1, axisLabel: { color: t.label, fontSize: 12, formatter: v => S.pct(v) } }),
+      series: [['By day 14', 'share14', t.sp2, 'small14'], ['By day 30', 'share30', t.sp1, 'small30']].map(([name, k, c, sm]) => ({
+        name, type: 'bar', barGap: '10%', barCategoryGap: '34%', barMaxWidth: 70, data: rows.map(r => ({ value: r[k], itemStyle: { color: c, borderRadius: [4, 4, 0, 0] } })),
+        label: { show: true, position: 'top', distance: 4, color: t.ink, fontWeight: 700, fontSize: 14, formatter: p => pp1(p.value) + (rows[p.dataIndex][sm] ? '*' : '') },
+      })),
+    }));
   }
 
   /* 5.4 deals seen before committing: one tile per deal (solid to the median, outlined to the upper quartile) */
@@ -208,6 +183,7 @@
         </div>
         <div class="pv-table tw" id="spdTable"></div>
       </div>
+      <p class="ctx"><span class="ctx-h">Missing budgets</span>${S.int(B.coverage.not_recorded_before_nce)} of the ${S.int(B.coverage.not_recorded_total)} confirmed starts without a recorded budget began before ${S.date(B.coverage.nce_date)}, when the onboarding changed; the budget question is answered only from then (the form went live ${S.date(B.form_since)}). They are left out of both groups.</p>
       <p class="ctx"><span class="ctx-h">Context: who the groups are</span>The groups rest on the <b>all-in onboarding budget</b> (down payment, closing costs, renovation, furniture and amenities), read at the upper end of the range the client chose. For scale, among clients <b>who have purchased</b> the median price was <b>${kK(P[LO].price.median)}</b> (${P[LO].price.n} purchases) up to $250K and <b>${kK(P[HI].price.median)}</b> (${P[HI].price.n}) above, and recorded out-of-pocket ${kK(P[LO].oop.median)} and ${kK(P[HI].oop.median)}. Purchase prices describe what buyers bought; they are not how the groups are defined, and clients still searching have no price yet.</p>
       ${S.ui.ex('How is this number built?', [
         `<p class="ex-h">Rates and windows</p><p>Confirmed starts with a matched onboarding budget: <b>${sa.n}</b> up to $250K and <b>${sb.n}</b> above (${S.int(B.coverage.not_recorded)} confirmed starts have no matched answer, mostly clients who started before the form went live on ${S.date(B.form_since)}, and are left out). For each window, <b>eligible</b> = clients with at least that many days since their client start date; the rate is the share of those who reached the milestone within the window. A longer window has fewer eligible clients because recent starters have not had it yet.</p>
@@ -336,16 +312,23 @@
   }
 
   S.chapter('drivers', {
-    n: 5, title: 'What distinguishes fast and slow clients?',
+    n: 5, title: 'What distinguishes faster and slower searches?',
     render(main, D, ch) {
       const dr = D.drivers, comp = Object.fromEntries(dr.composition.groups.map(x => [x.key, x])), n = dr.composition.n;
       const off = Object.fromEntries(dr.offers.rows.map(r => [r.key, r])), dl = dr.deals.groups, b = dr.bases;
       const OF = 7;
 
+      const cm = dr.composition, sb = cm.stopped_by_status, nEl = cm.all_eligible, nFast = cm.all_fast;
+      const stopPaused = sb.Paused || 0, stopRef = sb.Refunded || 0, stopPost = ['Content Pulled', 'Listed', 'CLOSED', 'Photography Shared'].reduce((a, k) => a + (sb[k] || 0), 0), stopOther = cm.stopped_no_contract - stopPaused - stopRef - stopPost;
       let body = S.scene(main, { ch, step: 1, of: OF, label: 'Who moves quickly',
-        title: `${S.pct(comp.fast.n / n)} of clients are under contract within 30 days; ${S.pct((comp.slow.n + comp.searching.n) / n)} have none before day 75` });
-      body.innerHTML = `<div class="board">${mixBoard(dr)}</div>
-        <p class="cap">All ${S.int(n)} confirmed starts with at least 75 days on the clock (started by ${S.date(dr.eligible_through)}), so every client had time to be slow · days to the latest valid Under Contract date · still hunting = no contract yet · ${S.int(dr.composition.stopped_no_contract)} more are paused, refunded or have no contract date and are not shown.</p>`;
+        title: `Of ${S.int(nEl)} starts with at least 75 days of follow-up, ${S.int(nFast)} (${S.pct(nFast / nEl)}) had reached a recorded contract by day 30` });
+      body.innerHTML = `<div class="figs qf">
+          <div class="fig emph"><span class="v num">${S.pct(nFast / nEl)}<span class="of">${S.int(nFast)} of ${S.int(nEl)}</span></span><span class="l"><i style="background:var(--sp-fast)"></i><b>every start</b> with 75+ days of follow-up (started by ${S.date(dr.eligible_through)}) that had a recorded contract by day 30 ${S.ui.chip('rec')}</span></div>
+          <div class="fig"><span class="v num">${S.pct(comp.fast.n / n)}<span class="of">${S.int(comp.fast.n)} of ${S.int(n)}</span></span><span class="l"><i style="background:var(--sp-fast)"></i>the narrower chart below: only the ${S.int(n)} searches that reached a contract or are still hunting</span></div>
+          <div class="fig"><span class="v num">${S.int(cm.stopped_no_contract)}</span><span class="l"><i style="background:var(--hold-2)"></i>left out of that chart: ended without a recorded contract (${S.int(stopPaused)} paused, ${S.int(stopRef)} refunded, ${S.int(stopPost)} post-close with no contract date, ${S.int(stopOther)} other)</span></div>
+        </div>
+        <div class="board">${mixBoard(dr)}</div>
+        <p class="cap">${S.int(nEl)} = ${S.int(n)} charted searches + ${S.int(cm.stopped_no_contract)} that ended without a contract · confirmed starts with at least 75 days on the clock, so every search had time to be slow · days to the latest valid Under Contract date · still hunting = no contract yet.</p>`;
 
       const cp = dr.capital.pipedrive, cf = dr.capital.form, cx = cp.cox || {}, cfx = cf.cox || {};
       const pc100 = v => (v >= 1 ? '+' : '−') + Math.abs(Math.round((v - 1) * 100)) + '%';
@@ -358,26 +341,50 @@
       speedScene(main, D, ch, OF);
       exitScene(main, D, ch, OF);
 
+      const sc5 = dr.offers.same_clients, orow = Object.fromEntries(sc5.rows.map(r => [r.key, r])), o0 = orow['0'], o3 = orow['3+'];
       body = S.scene(main, { ch, step: 5, of: OF, label: 'Offer experience',
-        title: `First-time offer-makers rarely sign within a month: ${S.pct(off['0'].within30.share)}, against ${S.pct(off['3+'].within30.share)} with 3+ offers` });
-      body.innerHTML = `<div class="board"><div class="chart h-s2" id="offChart" role="img" aria-label="Under contract within 30 days: ${dr.offers.rows.map(r => `${r.label} ${S.pct(r.within30.share)}`).join(', ')}. Before day 75 every group is near ${S.pct(b.d75.share)}."></div>
-          <div class="legend"><span><i class="dot" style="background:var(--sp-fast)"></i>under contract within 30 days</span><span><i class="hollow"></i>under contract before day 75</span></div></div>
-        <p class="cap">Source: onboarding questionnaire (Form Responses 2, column AA), the client’s own count of real-estate offers submitted before STRSearch, not offers made during the search · ${S.int(b.d30.matched)} matched clients with 30+ days on the clock (matched by e-mail or deal id) · ahead in the first month, level by day 75: a lead worth testing, not a proven driver.</p>`;
-      offers(S.$('#offChart', body), dr.offers, b.d75.share);
+        title: `Prior offer experience shows by day 30, not day 14: ${pp1(o0.share14)} against ${pp1(o3.share14)} under contract by day 14, ${pp1(o0.share30)} against ${pp1(o3.share30)} by day 30` });
+      body.innerHTML = `<div class="figs qf">
+          <div class="fig"><span class="v num"><span class="from">${pp1(o0.share14)}</span><span class="ar2">vs</span>${pp1(o3.share14)}</span><span class="l"><i style="background:var(--sp-mid)"></i>under contract by <b>day 14</b>: no prior offers (${o0.n} searches) against 3+ offers (${o3.n})${o0.small14 ? '. The no-offers rate rests on fewer than 5 searches' : ''}</span></div>
+          <div class="fig emph"><span class="v num"><span class="from">${pp1(o0.share30)}</span><span class="ar2">vs</span>${pp1(o3.share30)}</span><span class="l"><i style="background:var(--sp-fast)"></i>under contract by <b>day 30</b>: ${o0.k30} of ${o0.n} against ${o3.k30} of ${o3.n} ${S.ui.chip('rec')}</span></div>
+          <div class="fig"><span class="v num">${S.int(sc5.n)}</span><span class="l"><i style="background:var(--hold-2)"></i>the same searches in both windows: every start with an onboarding answer and 30+ days of follow-up (${S.date(sc5.from)} – ${S.date(sc5.to)} starts)</span></div>
+        </div>
+        <div class="board" id="offBoard">
+          <div class="ptools"><div class="pl"><span class="vt-l">Offers reported by clients <b>before they joined STR Search</b> · onboarding questionnaire, column AA</span></div><div class="pr">${S.ui.toggle()}</div></div>
+          <div class="pv-chart"><div class="chart h-s2" id="offChart" role="img" aria-label="Under contract by day 14 and by day 30, by offers the client reported submitting before joining STR Search: ${sc5.rows.map(r => `${r.label} (${r.n} searches) ${pp1(r.share14)} and ${pp1(r.share30)}`).join('; ')}."></div>
+            <div class="legend"><span><i style="background:var(--sp-mid)"></i>under contract by day 14</span><span><i style="background:var(--sp-fast)"></i>under contract by day 30</span>${sc5.rows.some(r => r.small14) ? '<span>* fewer than 5 searches behind the day-14 rate</span>' : ''}</div></div>
+          <div class="pv-table tw" id="offTable"></div>
+        </div>
+        <p class="cap">Offers are the client’s own count of real-estate offers submitted <b>before</b> STRSearch, not offers made during the search · ${S.int(sc5.n)} matched searches (e-mail or deal id) with 30+ days on the clock · on the narrower view of searches with 75+ days that reached a contract or are still hunting, every group ends near ${S.pct(b.d75.share)} by day 75: ahead in the first month, level later, a lead worth testing, not a proven driver.</p>`;
+      offersChart(S.$('#offChart', body), sc5.rows);
+      S.ui.table(S.$('#offTable', body), [
+        { k: 'label', label: 'Offers reported before joining', html: r => `${r.label}<small>${r.n} searches</small>` },
+        { k: 'd14', label: 'Under contract by day 14', num: true, sv: r => r.share14, html: r => `${pp1(r.share14)}<small>${r.small14 ? 'fewer than 5 searches' : `${r.k14} of ${r.n}`}</small>` },
+        { k: 'd30', label: 'Under contract by day 30', num: true, sv: r => r.share30, html: r => `${pp1(r.share30)}<small>${r.k30} of ${r.n}</small>` },
+      ], sc5.rows, { caption: 'Under contract by day 14 and day 30 by offers reported before joining STR Search (the same searches)', sortable: false });
+      S.ui.wire(S.$('#offBoard', body));
 
-      const dc = dr.deals.coverage;
+      const dc = dr.deals.coverage, dn = dr.deals.number_purchased;
       body = S.scene(main, { ch, step: 6, of: OF, label: 'Deals sent',
-        title: `Deals sent can’t yet test early momentum: the count only grows with a longer search` });
+        title: `Deals sent can’t yet test early momentum, but the deal number purchased has risen: a median ${S.med(dn.early.median)} for January–May starts, ${S.med(dn.late.median)} for June–September` });
       body.innerHTML = `<div class="board"><div class="chart h-d" id="dealChart" role="img" aria-label="Median deals sent before going under contract: within 30 days ${dl.fast.median}, 31 to 74 days ${dl.middle.median}, 75 days or more ${dl.slow.median}."></div>
           <div class="legend"><span><i style="background:var(--sp-mid)"></i>one deal · deals seen by the median client</span><span><i style="border:1.6px solid var(--sp-mid);background:none"></i>up to the top of the middle half</span></div></div>
         <p class="cap">Jira total_deals_sent for clients who reached a contract: ${dl.fast.median} for contracts within 30 days, ${dl.slow.median} for 75+ days · it is a cumulative total with no dates, filled for ${S.pct(dc.with_uc)} of clients with a contract but only ${S.int(dc.hunting_with_count)} of ${S.int(dc.hunting_n)} hunting clients · so properties sent in the first 14 days, and whether a slow early trickle dampens momentum, cannot be measured yet.</p>`;
       deals(S.$('#dealChart', body), dr.deals);
+      const mx = Math.max(dn.early.p75, dn.late.p75) + 2, at = v => (100 * v / mx).toFixed(2) + '%';
+      const dnRow = (x, lab, c) => `<div class="dn-row"><span class="dn-l">${lab}<small>${S.int(x.n)} searches with a number (of ${S.int(x.uc30)} under contract by day ${dn.window})</small></span>
+          <span class="dn-track" role="img" aria-label="${lab}: median ${x.median}, middle half ${x.p25} to ${x.p75}"><i class="dn-iqr" style="left:${at(x.p25)};width:calc(${at(x.p75)} - ${at(x.p25)});background:${c}"></i><i class="dn-med" style="left:${at(x.median)}"></i></span>
+          <span class="dn-v"><b class="num">${S.med(x.median)}</b><small>middle half ${S.med(x.p25)}–${S.med(x.p75)}</small></span></div>`;
+      body.insertAdjacentHTML('beforeend', `<div class="board dnb"><p class="dn-h">${dn.field}: <b>which of the deals STRSearch sent became the purchase</b> ${S.ui.chip('rec')}</p>
+        <div class="dn">${dnRow(dn.early, 'Started January–May 2026', 'var(--sp-mid)')}${dnRow(dn.late, 'Started June–September 2026', 'var(--sp-fast)')}
+          <div class="dn-row dn-axisrow" aria-hidden="true"><span></span><span class="dn-ax">${[0, 5, 10, 15, 20].filter(v => v <= mx).map(v => `<span style="left:${at(v)}">${v}</span>`).join('')}</span><span></span></div></div>
+        <p class="cap" style="margin-top:12px">Searches that reached a recorded contract by day ${dn.window}, by start month, with a value in the Jira field Deal Number Purchased (the number of the deal that was bought). A higher number means more deals were sent before the one that was bought. The running Deals Sent total above has no send dates, so this is the closest dated view of deal flow.</p></div>`);
 
       const BGd = Object.fromEntries(D.budgets.groups.map(g => [g.label, g])), r30d = D.budgets.mh.refunded.find(x => x.w === 30);
       body = S.scene(main, { ch, step: 7, of: OF, label: 'What we might learn', title: 'What STRSearch might take from this' });
       body.innerHTML = `<div class="board"><ol class="learn four">
           <li><b>Capital isn’t a speed signal.</b><span>Counting clients still waiting, stated capital shows no measurable link to time to contract; any effect of an extra $100K is small (${pc100(cx.lo)} to ${pc100(cx.hi)}).</span></li>
-          <li><b>Offer readiness may be.</b><span>Clients with no prior offers rarely sign in the first month, then catch up by day 75. Early offer preparation is worth testing.</span></li>
+          <li><b>Offer readiness may be.</b><span>Clients who reported no prior offers are slower to a first contract: ${pp1(o0.share30)} by day 30 against ${pp1(o3.share30)} with 3+ offers, though level at day 14. Early offer preparation is worth testing.</span></li>
           <li><b>Budget isn’t a speed signal either; early refunds are.</b><span>Clients up to $250K contract and close at the same pace as those above, but refund more often in their first month (${S.pct(BGd['Up to $250K'].rf30.k / BGd['Up to $250K'].rf30.eligible)} vs ${S.pct(BGd['Above $250K'].rf30.k / BGd['Above $250K'].rf30.eligible)}). Their first two weeks deserve a closer look, not a different search.</span></li>
           <li><b>Early deal flow needs its own record.</b><span>To test whether a slow trickle of properties in the first two weeks dampens momentum, log the date of every property sent.</span></li>
         </ol></div>

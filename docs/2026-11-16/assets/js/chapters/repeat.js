@@ -63,22 +63,24 @@
 
   function cribsScene(main, D, ch) {
     const C = D.repeat.cribs, tr = C.tracker_handed_off, ap = C.all_purchases;
-    const seg = (o, n) => DES.map(([k, l, c]) => ({ k, n: o[k], label: l, c, lt: k !== 'cribs' && k !== 'other', cls: k === 'unknown' ? 'unk' : '' })).filter(s => s.n);
+    const seg = (o, n) => DES.map(([k, l, c]) => ({ k, n: o[k], label: l, c, lt: k !== 'cribs' && k !== 'other', cls: k === 'unknown' ? 'hatch-neutral' : '', text: `${l} · ${o[k]}` })).filter(s => s.n);
+    // direct labels: the purchases on top, every designer group underneath (Not recorded is its own hatched group, never merged into Other designer)
+    const brk = (o, total, word) => { const sg = seg(o); return [{ from: sg[0].k, to: sg[sg.length - 1].k, text: `${S.int(total)} ${word}`, lvl: 0 }]; };
     const body = S.scene(main, { ch, step: 2, of: 2, label: 'STR Cribs on repeat purchases',
-      title: `${S.int(C.clients_later_cribs)} of ${S.int(C.clients)} repeat buyers chose STR Cribs again${C.clients_later_only === 0 ? ', and every one of them had chosen Cribs the first time' : ''}` });
+      title: `${S.int(C.clients_both)} of the ${S.int(C.clients_first_cribs)} repeat buyers who chose STR Cribs first have Cribs recorded again` });
     body.innerHTML = `<div class="figs qf">
-        <div class="fig"><span class="v num">${S.int(C.clients_first_cribs)}<span class="of">of ${S.int(C.clients)}</span></span><span class="l"><i style="background:var(--acq)"></i>chose STR Cribs on their first purchase · ${S.int(C.first.unknown)} not recorded ${S.ui.chip('rec')}</span></div>
-        <div class="fig"><span class="v num">${S.int(C.clients_both)}<span class="of">of ${S.int(C.clients)}</span></span><span class="l"><i style="background:var(--acq)"></i>chose STR Cribs both times · ${S.int(C.clients_first_cribs_not_later)} switched to another designer, ${S.int(C.clients_first_cribs_later_unknown)} later choice not recorded ${S.ui.chip('rec')}</span></div>
+        <div class="fig emph"><span class="v num">${S.int(C.clients_both)}<span class="of">of ${S.int(C.clients_first_cribs)}</span></span><span class="l"><i style="background:var(--acq)"></i><b>chose STR Cribs first and have Cribs recorded again</b> · ${S.int(C.clients_first_cribs_not_later)} switched to another designer, ${S.int(C.clients_first_cribs_later_unknown)} later choice not recorded ${S.ui.chip('rec')}</span></div>
+        <div class="fig"><span class="v num">${S.int(C.clients_first_cribs)}<span class="of">of ${S.int(C.clients)}</span></span><span class="l"><i style="background:var(--acq)"></i>repeat buyers chose STR Cribs on their first purchase · ${S.int(C.first.unknown)} first choices not recorded${C.clients_later_only === 0 ? '; no one chose Cribs only later' : ''}</span></div>
         <div class="fig"><span class="v num">${S.int(tr.first)}<span class="ar2">·</span>${S.int(tr.later)}</span><span class="l"><i style="background:var(--closed)"></i>Cribs projects handed to a project manager at the purchase address: first purchases · later purchases (Cribs tracker) ${S.ui.chip('inf')}</span></div>
       </div>
       <div class="board" id="crBoard">
         <div class="ptools"><div class="pl"><span class="vt-l">${S.int(C.clients)} clients with two or more completed purchases · ${S.int(C.purchases)} purchases</span></div><div class="pr">${S.ui.toggle()}</div></div>
         <div class="pv-chart">
           <div class="ob-h" style="margin-top:4px"><span class="t">First purchase</span><span class="s">${S.int(C.first_purchases)} purchases · recorded designer choice</span></div>
-          ${S.ui.stack(seg(C.first), [], `First purchases: ${DES.map(([k, l]) => `${l} ${C.first[k]}`).join(', ')}`)}
+          ${S.ui.stack(seg(C.first), brk(C.first, C.first_purchases, 'first purchases'), `First purchases: ${DES.map(([k, l]) => `${l} ${C.first[k]}`).join(', ')}`)}
           <div class="ob-h"><span class="t">Later purchases</span><span class="s">${S.int(C.later_purchases)} purchases (second or third) · recorded designer choice</span></div>
-          ${S.ui.stack(seg(C.later), [], `Later purchases: ${DES.map(([k, l]) => `${l} ${C.later[k]}`).join(', ')}`)}
-          <div class="legend">${DES.map(([k, l, c]) => `<span><i style="background:${c}${k === 'unknown' ? ';box-shadow:inset 0 0 0 1px var(--line-2)' : ''}"></i>${l}</span>`).join('')}</div>
+          ${S.ui.stack(seg(C.later), brk(C.later, C.later_purchases, 'later purchases'), `Later purchases: ${DES.map(([k, l]) => `${l} ${C.later[k]}`).join(', ')}`)}
+          <div class="legend">${DES.map(([k, l, c]) => `<span><i class="${k === 'unknown' ? 'hatch-neutral' : ''}" style="${k === 'unknown' ? '' : 'background:' + c}"></i>${l}${k === 'unknown' ? ' (blank in Jira)' : ''}</span>`).join('')}</div>
         </div>
         <div class="pv-table tw" id="crTable"></div>
       </div>

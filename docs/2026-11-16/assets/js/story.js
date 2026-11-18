@@ -66,12 +66,16 @@
   }, extra || {});
 
   /* scenes: slide-like blocks with a chapter eyebrow and a one-line headline */
+  /* A scene's id is its stable key (chapter-step, kept when scenes are reordered so every deep link still works); its displayed number is its
+     position in the chapter's `order` list (defaults to the step). S.pos(chapter, id) gives that number to anything that names a scene. */
+  S.pos = (ch, id) => { const i = ch.order ? ch.order.indexOf(id) : -1; return i >= 0 ? i + 1 : +id.split('-').pop(); };
   S.scene = (root, { ch, step, of, label, title }) => {
-    const sec = document.createElement('section');
-    sec.className = 'scene' + (step === 1 ? ' first' : '');
-    sec.id = `${ch.id}-${step}`;
+    const sec = document.createElement('section'), id = `${ch.id}-${step}`, pos = S.pos(ch, id);
+    sec.className = 'scene' + (pos === 1 ? ' first' : '');
+    sec.id = id;
     sec.dataset.chapter = ch.id;
-    sec.innerHTML = `<div class="stage"><header class="sh"><div class="sh-top"><span class="sh-ch">Chapter ${ch.n}</span><span class="sh-ct">${ch.title}</span>${label ? `<span class="sh-step">${of > 1 ? `${step}/${of} · ` : ''}${label}</span>` : ''}</div><h2>${title}</h2></header><div class="body"></div></div>`;
+    sec.dataset.pos = pos;
+    sec.innerHTML = `<div class="stage"><header class="sh"><div class="sh-top"><span class="sh-ch">Chapter ${ch.n}</span><span class="sh-ct">${ch.title}</span>${label ? `<span class="sh-step">${of > 1 ? `${pos}/${of} · ` : ''}${label}</span>` : ''}</div><h2>${title}</h2></header><div class="body"></div></div>`;
     root.append(sec);
     return sec.querySelector('.body');
   };
@@ -150,7 +154,7 @@
         const top = b.dn ? padT + BAR + 2 + lv * STEP : padT - 14 - lv * STEP;
         return `<div class="brk ${b.dn ? 'dn' : 'up'}${b.al ? ' al' : ''}${b.ar ? ' ar' : ''}" style="left:${(l * 100).toFixed(2)}%;width:${((r - l) * 100).toFixed(2)}%;top:${top}px"><span>${b.text}${b.sub ? `<em>${b.sub}</em>` : ''}</span></div>`;
       };
-      return `<div class="stack" role="img" aria-label="${aria}" style="padding:${padT}px 0 ${padB}px">${brackets.map(br).join('')}<div class="stack-bar" style="height:${BAR}px">${segs.map(s => `<i class="${s.cls || ''}${s.lt ? ' lt' : ''}" style="flex:${s.n} 1 0;background:${s.c}" title="${s.label}: ${S.int(s.n)}">${s.n / tot > 0.045 ? S.int(s.n) : ''}</i>`).join('')}</div></div>`;
+      return `<div class="stack" role="img" aria-label="${aria}" style="padding:${padT}px 0 ${padB}px">${brackets.map(br).join('')}<div class="stack-bar" style="height:${BAR}px">${segs.map(s => `<i class="${s.cls || ''}${s.lt ? ' lt' : ''}" style="flex:${s.n} 1 0;background:${s.c}" title="${s.label}: ${S.int(s.n)}">${s.n / tot > 0.045 ? (s.text || S.int(s.n)) : ''}</i>`).join('')}</div></div>`;
     },
     keys: (items, cols) => `<div class="stack-keys" style="--cols:${cols || items.length}">${items.map(x => `<div class="sk" style="--c:${x.c}"><span class="sk-v num">${S.int(x.n)}${x.of ? `<small>${x.of}</small>` : ''}</span><span class="sk-t">${x.label}</span>${x.sub ? `<span class="sk-s">${x.sub}</span>` : ''}</div>`).join('')}</div>`,
     bar: (label, n, max, c, note) => `<div class="ob-r${n ? '' : ' zero'}"><span>${label}${note ? `<small style="display:block;color:var(--muted);font-size:12px">${note}</small>` : ''}</span><span class="bar" style="--c:${c}"><i style="width:${max ? (100 * n / max).toFixed(1) : 0}%"></i></span><span class="n num">${S.int(n)}</span></div>`,

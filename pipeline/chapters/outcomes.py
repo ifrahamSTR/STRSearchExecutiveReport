@@ -98,6 +98,10 @@ def status(ctx: C.Ctx) -> dict:
     p = s[s.stage == "paused"]
     dp = (asof - pd.to_datetime(p.latest_status_date)).dt.days.where(p.latest_status.eq("Paused"))
     prev = p.previous_status.fillna("").str.strip().str.lower()
+    from chapters import fallout as FO          # prior contract history: Jira fall-out address / an ended contract (chapter 6's evidence)
+    grp = p.key.map(FO.classify(ctx).grp)
+    ev = grp.isin(["documented", "ended"])
+    long_ = dp > 180
     paused = {
         "n": int(len(p)), "dated": int(dp.notna().sum()), "median_days": float(dp.median()), "bands": _bands(dp, PAUSE_BANDS),
         "from": {"long_search": int(prev.eq("8 weeks").sum()), "earlier_search": int(prev.isin([x.lower() for x in SEARCH[:4]]).sum()),
@@ -105,6 +109,13 @@ def status(ctx: C.Ctx) -> dict:
                  "other": int((~prev.isin([x.lower() for x in SEARCH] + ["under contract", "passed inspection", ""])).sum()), "unknown": int(prev.eq("").sum())},
         "older_uc_date": int(p.uc.notna().sum()),
         "start_year": {str(int(k)): int(v) for k, v in p.start.dt.year.value_counts().sort_index().items()},
+        # two separate facts: how long the pause has lasted (pause date) and what the contract history shows (fall-out evidence)
+        "over180": int(long_.sum()),
+        "prior": {"documented": int((grp == "documented").sum()), "ended": int((grp == "ended").sum()), "evidence": int(ev.sum()),
+                  "none": int((~ev).sum())},
+        "cross": {"long_evidence": int((long_ & ev).sum()), "long_none": int((long_ & ~ev).sum()),
+                  "short_evidence": int((~long_ & dp.notna() & ev).sum()), "short_none": int((~long_ & dp.notna() & ~ev).sum()),
+                  "undated_evidence": int((dp.isna() & ev).sum()), "undated_none": int((dp.isna() & ~ev).sum())},
     }
     r = s[s.stage == "refunded"]
     dr = (r.refund_date - r.start).dt.days

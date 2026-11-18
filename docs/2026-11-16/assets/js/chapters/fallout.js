@@ -19,32 +19,38 @@
         { k: 'ended', n: G.ended.n, label: 'Contract ended, no purchase', sub: 'now hunting, paused, refunded or Additional Service', c: 'var(--wait)', cls: 'hatch-wait', basis: 'inf', shows: 'A contract is on record, but the client has no purchase and is back to a search, paused, refunded or on Additional Service. No fall-out address.' },
         { k: 'returned', n: G.returned.n, label: 'Back under contract after the search', sub: 'new contract; its property is not recorded', c: 'var(--uc)', basis: 'inf', shows: 'Under Contract entered twice, with a search status in between: a new contract after a fall-through.' },
         { k: 'second_entry', n: G.second_entry.n, label: 'Under Contract entered twice, then bought', sub: 'a new contract or the same one entered again', c: 'var(--uc-2)', lt: true, basis: 'rec', shows: 'Only the latest status change is kept, so the records cannot tell a replacement contract from a repeated status entry.' },
-        { k: 'none', n: G.none.n, label: 'No sign of a fall-through', sub: 'one contract on record', c: 'var(--grid)', lt: true, basis: 'rec', shows: 'One Under Contract entry and no fall-out address, or a purchase whose contract date is missing.' },
+        { k: 'none', n: G.none.n, label: 'No fall-through evidence recorded', sub: 'one contract on record, no fall-out address', c: 'var(--grid)', lt: true, text: `No fall-through evidence recorded · ${S.int(G.none.n)} (${S.pct(G.none.n / K.n)})`, basis: 'rec', shows: 'One Under Contract entry and no fall-out address, or a purchase whose contract date is missing.' },
       ];
       const body = S.scene(main, { ch, step: 1, of: 1, label: 'Contracts that fall through',
-        title: `${S.int(d.n)} of ${S.int(N)} clients who went under contract (${pc(d.n)}) have a documented fall-through, and none records a replacement property` });
+        title: `${S.int(d.n)} documented fall-throughs and ${S.int(e.n)} ended contracts without a recorded purchase, among ${S.int(N)} searches that went under contract` });
+      const EN = ['paused', 'hunting', 'refunded', 'additional'].filter(k => e.now[k]).map(k => ({ k, n: e.now[k], label: STAGE[k], c: STAGE_C[k] }));
+      let cum = 0; EN.forEach(x => { x.l = cum / e.n; cum += x.n; x.w = x.n / e.n; });
       body.innerHTML = `<div class="figs qf">
-          <div class="fig"><span class="v num">${pc(d.n)}<span class="of">${S.int(d.n)} of ${S.int(N)}</span></span><span class="l"><i style="background:var(--wait)"></i>documented fall-through: a fall-out address is recorded ${S.ui.chip('rec')}</span></div>
-          <div class="fig"><span class="v num">${S.pct(ft.share)}<span class="of">${S.int(ft.n)}</span></span><span class="l"><i class="hatch-wait"></i>counting status evidence too: + ${S.int(e.n)} contracts that ended without a purchase + ${S.int(rt.n)} back under contract after the search ${S.ui.chip('inf')}</span></div>
-          <div class="fig"><span class="v num">${S.int(ft.replacement_documented)}</span><span class="l"><i style="background:var(--uc)"></i>documented replacement properties · ${S.int(ft.new_contract)} new contracts by status, ${S.int(ft.without_property)} still without a property ${S.ui.chip('inf')}</span></div>
+          <div class="fig emph"><span class="v num">${S.int(d.n)}</span><span class="l"><i style="background:var(--wait)"></i><b>documented fall-through</b>: a fall-out address is recorded (${pc(d.n)} of ${S.int(N)}); none records a replacement property ${S.ui.chip('rec')}</span></div>
+          <div class="fig emph"><span class="v num">${S.int(e.n)}</span><span class="l"><i class="hatch-wait"></i><b>contract ended, no recorded purchase</b>: a contract on record, and the search is now hunting, paused, refunded or on Additional Service ${S.ui.chip('inf')}</span></div>
+          <div class="fig"><span class="v num">${S.pct(ft.share)}<span class="of">${S.int(ft.n)}</span></span><span class="l"><i style="background:var(--uc)"></i>with the ${S.int(rt.n)} back under contract after the search, the searches that fell through by any evidence; ${S.int(ft.without_property)} are still without a property</span></div>
         </div>
         <div class="board" id="foBoard">
-          <div class="ptools"><div class="pl"><span class="vt-l">Signed-up clients known to have gone under contract · ${S.int(N)}</span></div><div class="pr">${S.ui.toggle()}</div></div>
+          <div class="ptools"><div class="pl"><span class="vt-l">Searches (signed-up Jira records) known to have gone under contract · ${S.int(N)}</span></div><div class="pr">${S.ui.toggle()}</div></div>
           <div class="pv-chart">
             ${S.ui.stack(GR, [
               { from: 'documented', to: 'returned', text: `Fell through, by any evidence · ${S.int(ft.n)}`, sub: S.pct(ft.share), al: true },
-            ], `${N} clients known to have gone under contract: ${GR.map(g => `${g.label} ${g.n}`).join(', ')}.`)}
+            ], `${N} searches known to have gone under contract: ${GR.map(g => `${g.label} ${g.n}`).join(', ')}.`)}
             ${S.ui.keys(GR.map(g => ({ n: g.n, of: pc(g.n), label: g.label, sub: g.sub, c: g.cls ? 'repeating-linear-gradient(135deg,var(--wait) 0 4px,var(--wait-2) 4px 8px)' : g.c })))}
-            <div class="ob-grid" style="display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:22px 32px;margin-top:26px;padding-top:18px;border-top:1px solid var(--line)">
+            <div class="fo43" id="fo43" role="img" aria-label="The ${e.n} searches whose contract ended without a recorded purchase, by where they are now: ${EN.map(x => `${x.label} ${x.n}`).join(', ')}.">
+              <p class="fo43-h"><span class="duo-v">${S.int(e.n)}</span> ended contracts: where those searches are now <small>zoomed in from the bar above · status on ${S.date(D.meta.asof)}</small></p>
+              <div class="fo43-lab top">${EN.slice(0, 3).map(x => `<span style="left:${(x.l * 100).toFixed(2)}%"><b>${x.label}</b> ${x.n}</span>`).join('')}</div>
+              <div class="fo43-bar">${EN.map(x => `<i style="flex:${x.n} 1 0;background:${x.c}" title="${x.label}: ${x.n}">${x.n}</i>`).join('')}</div>
+              <div class="fo43-lab bot">${EN.slice(3).map(x => `<span class="r" style="right:${((1 - x.l - x.w) * 100).toFixed(2)}%"><b>${x.label}</b> ${x.n}</span>`).join('')}</div>
+              <p class="ob-note">None has a new contract yet · ${S.int(e.previous_status_search)} reached their current status from a search status.</p>
+            </div>
+            <div class="ob-grid" style="display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:22px 32px;margin-top:26px;padding-top:18px;border-top:1px solid var(--line)">
               <div class="ob"><div class="ob-h"><span class="v num">${S.int(d.n)}</span><span class="t">documented: where they are now</span></div>
                 ${S.ui.bar('Purchased the same address', d.now.purchased || 0, d.n, STAGE_C.purchased, 'the address that fell out is the one still on record')}
                 ${S.ui.bar('Paused', d.now.paused || 0, d.n, STAGE_C.paused)}
                 ${S.ui.bar('Hunting', d.now.hunting || 0, d.n, STAGE_C.hunting)}
                 ${S.ui.bar('Refunded', d.now.refunded || 0, d.n, STAGE_C.refunded)}
                 ${S.ui.bar('Replacement property documented', d.replacement_documented, d.n, STAGE_C.under_contract)}</div>
-              <div class="ob"><div class="ob-h"><span class="v num">${S.int(e.n)}</span><span class="t">contract ended, no purchase</span></div>
-                ${['hunting', 'paused', 'refunded', 'additional'].map(k => S.ui.bar(STAGE[k], e.now[k] || 0, e.n, STAGE_C[k])).join('')}
-                <p class="ob-note">None has a new contract yet · ${S.int(e.previous_status_search)} reached their current status from a search status.</p></div>
               <div class="ob"><div class="ob-h"><span class="v num">${S.int(rt.n)}</span><span class="t">back under contract after the search</span></div>
                 ${S.ui.bar('Under contract now', rt.now.under_contract || 0, Math.max(rt.n, 1), STAGE_C.under_contract, 'a new contract; the property is not recorded')}
                 <p class="ob-note">${S.int(G.second_entry.n)} more entered Under Contract twice and then bought (median ${S.med(F.second_entry.gap_median)} days between the first and latest entry): a replacement or the same contract entered again.</p></div>
@@ -63,7 +69,7 @@
       const host = S.$('#foTable', body), now = k => (k === 'documented' ? d.now : k === 'ended' ? e.now : F[k] ? F[k].now : {});
       S.ui.table(host, [
         { k: 'label', label: 'Evidence group', html: r => `<span class="sw" style="background:${r.cls ? 'repeating-linear-gradient(135deg,var(--wait) 0 2px,var(--wait-2) 2px 4px)' : r.c}"></span>${r.label}<small>${r.shows}</small>` },
-        { k: 'n', label: 'Clients', num: true, html: r => S.int(r.n) },
+        { k: 'n', label: 'Searches', num: true, html: r => S.int(r.n) },
         { k: 'share', label: `% of ${S.int(N)}`, num: true, sv: r => r.n, html: r => pc(r.n) },
         ...Object.keys(STAGE).map(s => ({ k: s, label: STAGE[s], num: true, sv: r => now(r.k)[s] || 0, html: r => S.int(now(r.k)[s] || 0) })),
         { k: 'basis', label: 'Basis', sort: false, html: r => S.ui.chip(r.basis) },

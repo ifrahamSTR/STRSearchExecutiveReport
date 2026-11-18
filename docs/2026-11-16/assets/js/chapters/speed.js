@@ -208,7 +208,7 @@
     body.innerHTML = `<div class="figs qf">
         <div class="fig"><span class="v num">${S.med(a.recorded.median)}<small>days</small></span><span class="l"><i style="background:var(--uc)"></i>median, recorded contracts · average ${S.d1(a.recorded.mean)} · ${S.int(a.recorded.n)} contracts ${S.ui.chip('rec')}</span></div>
         <div class="fig"><span class="v num">${S.med(a.scenario.median)}<small>days</small></span><span class="l"><i class="hatch-uc" style="background:var(--uc)"></i>median if the ${S.int(a.hunting)} hunting searches went under contract tomorrow · average ${S.d1(a.scenario.mean)} · ${S.int(a.scenario.n)} searches ${S.ui.chip('sce')}</span></div>
-        <div class="fig"><span class="v num">${S.med(a.km_median)}<small>days</small></span><span class="l"><i style="background:linear-gradient(90deg,var(--uc) 50%,var(--uc-2) 50%)"></i>Kaplan–Meier median, the statistical estimate for all ${S.int(a.clients)} searches (next scene) ${S.ui.chip('inf')}</span></div>
+        <div class="fig"><span class="v num">${S.med(a.km_median)}<small>days</small></span><span class="l"><i style="background:linear-gradient(90deg,var(--uc) 50%,var(--uc-2) 50%)"></i>Kaplan–Meier median, the statistical estimate for all ${S.int(a.clients)} searches (section 4.3) ${S.ui.chip('inf')}</span></div>
       </div>
       <div class="board" id="scnBoard">
         <div class="ptools"><div class="pl">${S.ui.seg('mode', 'Group', [['all', 'All clients'], ['cmp', 'Up to vs above $250K'], ['budget', 'Budget ranges']], 'all')}<span class="vt-l only-budget" hidden>Budget = upper end of the onboarding-form range</span></div><div class="pr">${S.ui.toggle()}</div></div>
@@ -221,7 +221,7 @@
         `<p class="ex-h">The scenario</p><p>Each of the <b>${S.int(a.hunting)}</b> hunting searches counts as reaching Under Contract on ${S.date(new Date(new Date(D.meta.asof + 'T12:00:00').getTime() + 864e5).toISOString())}, the day after the snapshot: its days = that date − its client start date (median ${S.med(a.waits.median)}, average ${S.d1(a.waits.mean)}). They are pooled with the <b>${S.int(a.scenario.n - a.hunting)}</b> recorded durations of every other search, so each search counts once: the ${S.int(a.hunting_with_older_uc)} hunting searches that still carry an older Under Contract date count as waiting, not with that date.</p>
          <p>Searches = won deals with a confirmed Jira start, as elsewhere in this chapter. Jira lists ${S.int(sc.jira_hunting)} hunting clients; ${S.int(sc.jira_hunting_not_confirmed)} have no confirmed start on a won deal (${why}). Counting them too, from their Jira start: average ${S.d1(sc.all_hunting_sensitivity.mean)}, median ${S.med(sc.all_hunting_sensitivity.median)}. Not in either figure: searches with no recorded contract that are not hunting (${Object.entries(lo).map(([k, v]) => `${k} ${v}`).join(', ')}; Closed and Post-close here are closings without an Under Contract date). ${sc.negative_excluded} contract dated before its start is left out.</p>`,
         `<p class="ex-h">Budget</p><p>The upper amount of the onboarding-form range <b>"${BR.field}"</b> (column ${BR.column}), carried into Jira as the interim rule until Acquisitions cleans the Jira budget field. It measures ${BR.measures}. Matched to ${S.int(BR.since_form_matched)} of the ${S.int(BR.since_form)} confirmed starts since the form went live on ${S.date(BR.form_since)} (e-mail first, the form's deal id as a fallback), using the answer given before the contract. <b>Not recorded</b> (${S.int(nr.clients)}) is mostly clients who started before the form existed, so their times reflect older periods, not their budget. Jira's own budget field is filled for ${S.int(BR.jira_budget_filled)} of ${S.int(BR.signed)} signed-up clients and is not used.</p>
-         <p class="ex-h">Three readings, three labels</p><p>${S.ui.chip('rec')} what has happened; ${S.ui.chip('sce')} an assumption that every hunting search ends tomorrow, so it is a floor for those searches; ${S.ui.chip('inf')} Kaplan–Meier, which lets unfinished searches progress as earlier ones did (next scene).</p>`,
+         <p class="ex-h">Three readings, three labels</p><p>${S.ui.chip('rec')} what has happened; ${S.ui.chip('sce')} an assumption that every hunting search ends tomorrow, so it is a floor for those searches; ${S.ui.chip('inf')} Kaplan–Meier, which lets unfinished searches progress as earlier ones did (section 4.3).</p>`,
       ])}
       <p class="cap">Days from client start date to the latest valid Under Contract date · confirmed starts · the scenario changes only the ${S.int(a.hunting)} hunting searches.</p>`;
     const board = S.$('#scnBoard', body), node = S.$('#scnChart', body), host = S.$('#scnTable', body);
@@ -264,13 +264,24 @@
 
   S.chapter('speed', {
     n: 4, title: 'How long does acquisition actually take?',
+    order: ['speed-1', 'speed-2', 'speed-4', 'speed-3'],       // displayed order; ids are stable keys (deep links)
     render(main, D, ch) {
       const sp = D.speed, ob = sp.observed, h = sp.hist, L = sp.lanes, est = sp.estimate;
 
       // 2.1
-      let body = S.scene(main, { ch, step: 1, of: 4, label: 'What has happened', title: `Recorded journeys: median ${S.med(ob.uc.median)} days to Under Contract, ${S.med(ob.closed.median)} to CLOSED` });
-      const ck = sp.clock;
-      body.innerHTML = `<div class="board">
+      let body = S.scene(main, { ch, step: 1, of: 4, label: 'What has happened', title: `Among searches with recorded milestones, the median is ${S.med(ob.uc.median)} days to Under Contract and ${S.med(ob.closed.median)} to CLOSED` });
+      const ck = sp.clock, sc0 = sp.scenario.all, other = sc0.scenario.n - sc0.hunting;
+      const guide = `<div class="tguide"><p class="tg-h">Five medians, three groups of searches <small>read each number with the group it counts</small></p>
+        <div class="tw"><table class="dt tg"><caption class="visually-hidden">The timing medians and the searches each one counts</caption>
+          <thead><tr><th scope="col">Measure</th><th scope="col" class="n">Under Contract</th><th scope="col" class="n">CLOSED</th><th scope="col">Searches counted</th></tr></thead><tbody>
+          <tr class="tg-rec"><td><b>Recorded</b>${S.ui.chip('rec')}<small>searches that reached the milestone</small></td><td class="n"><b class="num">${S.med(ob.uc.median)}</b> days</td><td class="n"><b class="num">${S.med(ob.closed.median)}</b> days</td>
+            <td>${S.int(ob.uc.n)} with a recorded contract, ${S.int(ob.closed.n)} with a recorded closing, out of ${S.int(est.n)} confirmed starts. Searches still waiting are left out, so these are the fastest journeys.</td></tr>
+          <tr class="tg-inf"><td><b>Estimated, unfinished included</b>${S.ui.chip('inf')}<small>Kaplan–Meier, every confirmed start</small></td><td class="n"><b class="num">${S.med(est.uc.median)}</b> days</td><td class="n"><b class="num">${S.med(est.closed.median)}</b> days</td>
+            <td>All ${S.int(est.n)} confirmed starts: ${S.int(est.n - est.events.uc)} without a contract and ${S.int(est.n - est.events.closed)} without a closing are counted as still waiting until the data date, then progress as earlier searches did.</td></tr>
+          <tr class="tg-sce"><td><b>Scenario: every hunting search goes under contract tomorrow</b>${S.ui.chip('sce')}<small>not a forecast</small></td><td class="n"><b class="num">${S.med(sc0.scenario.median)}</b> days</td><td class="n">–</td>
+            <td>The ${S.int(sc0.hunting)} eligible hunting searches, each counted at the days it will have waited tomorrow, pooled with ${S.int(other)} recorded contracts of other searches (${S.int(sc0.scenario.n)} in all). A floor for the hunting searches (section 4.4).</td></tr>
+        </tbody></table></div></div>`;
+      body.innerHTML = guide + `<div class="board">
           <div class="clock" aria-label="How the days are counted">
             <div class="clk"><i style="background:var(--uc)"></i><span><b>Days to Under Contract</b> = latest valid Under Contract date − <b>client start date</b></span></div>
             <div class="clk"><i style="background:var(--closed)"></i><span><b>Days to CLOSED</b> = closing date − <b>client start date</b> (closings up to the data date)</span></div>
@@ -291,10 +302,7 @@
         <p class="cap">${S.int(h.n)} recorded Under Contract milestones · 15-day bins.</p>`;
       histogram(S.$('#histChart', body), h);
 
-      // 4.3 (added 18 Nov 2026; the old 4.3 'who is still waiting' moved to 2.2-2.3 on the status-first counts)
-      scenarioScene(main, D, ch);
-
-      // 4.4
+      // 4.3 (id speed-4): the estimate that counts unfinished searches
       body = S.scene(main, { ch, step: 4, of: 4, label: 'What it means for the timeline', title: `Counting everyone still waiting: ${est.uc.median} days to Under Contract, ${est.closed.median} to CLOSED` });
       body.innerHTML = `<div class="board" style="margin-bottom:16px"><div class="chart h-s" id="extChart" role="img" aria-label="Recorded medians ${ob.uc.median} and ${ob.closed.median} days extend to ${est.uc.median} and ${est.closed.median} days when unfinished journeys are counted."></div></div>
         <div class="duo">
@@ -308,6 +316,9 @@
       extended(S.$('#extChart', body), [{ k: 'uc', name: 'Under Contract', obs: ob.uc.median, km: est.uc.median }, { k: 'closed', name: 'CLOSED', obs: ob.closed.median, km: est.closed.median }]);
       kmPanel(S.$('#kmUC', body), est.uc.curve, est.recorded_curve.uc, ob.uc.median, est.uc.median, 'uc');
       kmPanel(S.$('#kmCL', body), est.closed.curve, est.recorded_curve.closed, ob.closed.median, est.closed.median, 'closed');
+
+      // 4.4 (id speed-3, added 18 Nov 2026): the stated scenario, after the estimate it is compared with
+      scenarioScene(main, D, ch);
     },
   });
 })();

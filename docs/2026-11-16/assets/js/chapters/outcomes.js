@@ -50,50 +50,50 @@
     const noC = new Set(['hunting', 'paused', 'additional', 'refunded']), yet = new Set([...noC, 'under_contract']);
     const inact = st.paused + st.additional + st.refunded;
     const body = S.scene(main, { ch, step: 1, of, label: 'Who is where',
-      title: `${S.int(w.no_contract.n)} of ${S.int(N)} signed-up clients have no current contract or completed purchase; ${S.int(st.hunting)} of them are actively hunting` });
+      title: `${S.int(w.no_contract.n)} of ${S.int(N)} searches have no current contract or completed purchase: ${S.int(st.hunting)} hunting and ${S.int(inact)} inactive; a separate ${S.int(st.under_contract)} are under contract` });
     body.innerHTML = `<div class="figs qf four">
-        <div class="fig"><span class="v num">${S.int(w.no_contract.n)}<span class="of">${pc(w.no_contract.n)}</span></span><span class="l"><i style="background:var(--ink-2)"></i>no current contract or completed purchase: hunting + Inactive ${S.ui.chip('rec')}</span></div>
-        <div class="fig"><span class="v num">${S.int(st.hunting)}</span><span class="l"><i style="background:var(--wait)"></i>actively hunting; half have waited ${S.med(h.median)}+ days (section 2.2)</span></div>
-        <div class="fig"><span class="v num">${S.int(inact)}</span><span class="l"><i style="background:var(--paused)"></i>Inactive = Paused ${S.int(st.paused)} + Refunded ${S.int(st.refunded)} + Additional Service ${S.int(st.additional)}</span></div>
-        <div class="fig"><span class="v num">${S.int(st.under_contract)}</span><span class="l"><i style="background:var(--uc)"></i>under contract, not yet closed; ${S.int(w.under_contract.scheduled)} closings scheduled</span></div>
+        <div class="fig emph"><span class="v num">${S.int(w.no_contract.n)}<span class="of">${pc(w.no_contract.n)} of ${S.int(N)}</span></span><span class="l"><i style="background:var(--ink-2)"></i>searches with no current contract or completed purchase = ${S.int(st.hunting)} hunting + ${S.int(inact)} inactive ${S.ui.chip('rec')}</span></div>
+        <div class="fig"><span class="v num">${S.int(st.hunting)}</span><span class="l"><i style="background:var(--wait)"></i>hunting: still searching; half have waited ${S.med(h.median)}+ days (section 2.2)</span></div>
+        <div class="fig"><span class="v num">${S.int(inact)}</span><span class="l"><i style="background:var(--paused)"></i>inactive = Paused ${S.int(st.paused)} + Refunded ${S.int(st.refunded)} + Additional Service ${S.int(st.additional)}</span></div>
+        <div class="fig status"><span class="v num">${S.int(st.under_contract)}</span><span class="l"><i style="background:var(--uc)"></i>under contract, not yet closed: its own category, outside the ${S.int(w.no_contract.n)}; ${S.int(w.under_contract.scheduled)} closings scheduled</span></div>
       </div>
       <div class="board" id="waitBoard">
-        <div class="ptools"><div class="pl"><span class="vt-l">Jira, ${S.date(D.meta.asof)} snapshot · one row per search</span></div><div class="pr">${S.ui.toggle()}</div></div>
+        <div class="ptools"><div class="pl"><span class="vt-l">Jira, ${S.date(D.meta.asof)} snapshot · one row per search (a signed-up Jira record)</span></div><div class="pr">${S.ui.toggle()}</div></div>
         <div class="pv-chart">
           ${S.ui.stack(SEG, [
             { from: 'under_contract', to: 'refunded', text: `Yet to close · ${S.int(w.yet_to_close.n)}`, sub: pc(w.yet_to_close.n), lvl: 1 },
             { from: 'hunting', to: 'refunded', text: `No current contract or completed purchase · ${S.int(w.no_contract.n)}`, sub: pc(w.no_contract.n), lvl: 0, ar: true },
             { from: 'purchased', to: 'hunting', text: `Active · ${S.int(w.snapshot.active)}`, sub: 'purchased + under contract + hunting', dn: true },
             { from: 'paused', to: 'refunded', text: `Inactive · ${S.int(w.snapshot.inactive)}`, sub: 'Paused + Additional Service + Refunded', dn: true, ar: true },
-          ], `${N} signed-up clients: ${SEG.map(s => `${s.label} ${s.n}`).join(', ')}. No current contract or completed purchase ${w.no_contract.n} (hunting ${st.hunting} plus Inactive ${inact}); yet to close ${w.yet_to_close.n}; Inactive ${w.snapshot.inactive} = Paused ${st.paused} + Additional Service ${st.additional} + Refunded ${st.refunded}.`)}
+          ], `${N} searches: ${SEG.map(s => `${s.label} ${s.n}`).join(', ')}. No current contract or completed purchase ${w.no_contract.n} (hunting ${st.hunting} plus Inactive ${inact}); yet to close ${w.yet_to_close.n}; Inactive ${w.snapshot.inactive} = Paused ${st.paused} + Additional Service ${st.additional} + Refunded ${st.refunded}.`)}
           ${S.ui.keys(SEG.map(s => ({ n: s.n, of: pc(s.n), label: s.label, sub: s.sub, c: s.cls ? 'repeating-linear-gradient(135deg,var(--hold) 0 4px,var(--hold-2) 4px 8px)' : s.c })))}
         </div>
         <div class="pv-table tw" id="waitTable"></div>
       </div>
       ${S.ui.ex('How are these numbers built?', [
-        `<p class="ex-h">Denominator</p><p><b>${S.int(N)}</b> signed-up clients: Jira issues with the reporting layer's signed-up flag on ${S.date(D.meta.asof)}. One per search, so a client with two searches counts twice. Prospects (New Clients, Onboarding Completed, Services Declined) are not in it.</p>
-         <p class="ex-h">One stage per client, by current status</p><p><b>Completed purchase</b> = CLOSED or a post-close status (${S.int(P.post_close_status)}), or Under Contract / Passed Inspection with a closing date on or before the data date (${S.int(P.uc_status_closing_recorded)}). ${S.int(P.no_uc_date)} purchases have no Under Contract date recorded; they still count. ${S.int(P.status_only)} post-close records have no closing date and count by status.</p>
-         <p><b>Under contract</b> = Under Contract or Passed Inspection without a completed closing (${S.int(st.under_contract)}; ${S.int(w.under_contract.scheduled)} have a closing dated after the data date, which the Cash Forecast collects on that date but this report counts as a purchase only once it happens).</p>`,
-        `<p class="ex-h">The answers</p><p><b>No current contract or completed purchase</b> = Hunting ${S.int(st.hunting)} + Paused ${S.int(st.paused)} + Additional Service ${S.int(st.additional)} + Refunded ${S.int(st.refunded)} = <b>${S.int(w.no_contract.n)}</b> (${pc(w.no_contract.n)}). Leaving out refunded clients, who left: ${S.int(ex.no_contract)} (${S.pct(ex.no_contract_share)}).</p>
+        `<p class="ex-h">Denominator</p><p><b>${S.int(N)}</b> searches: Jira issues with the reporting layer's signed-up flag on ${S.date(D.meta.asof)}. One record per search, so a client with two searches counts twice. Prospects (New Clients, Onboarding Completed, Services Declined) are not in it.</p>
+         <p class="ex-h">One stage per search, by current status</p><p><b>Completed purchase</b> = CLOSED or a post-close status (${S.int(P.post_close_status)}), or Under Contract / Passed Inspection with a closing date on or before the data date (${S.int(P.uc_status_closing_recorded)}). ${S.int(P.no_uc_date)} purchases have no Under Contract date recorded; they still count. ${S.int(P.status_only)} post-close records have no closing date and count by status.</p>
+         <p><b>Under contract</b> (its own category: it has a contract, so it is not in the ${S.int(w.no_contract.n)}) = Under Contract or Passed Inspection without a completed closing (${S.int(st.under_contract)}; ${S.int(w.under_contract.scheduled)} have a closing dated after the data date, which the Cash Forecast collects on that date but this report counts as a purchase only once it happens).</p>`,
+        `<p class="ex-h">The answers</p><p><b>No current contract or completed purchase</b> = Hunting ${S.int(st.hunting)} + Inactive ${S.int(inact)} (Paused ${S.int(st.paused)} + Additional Service ${S.int(st.additional)} + Refunded ${S.int(st.refunded)}) = <b>${S.int(w.no_contract.n)}</b> (${pc(w.no_contract.n)}). Leaving out refunded searches, who left: ${S.int(ex.no_contract)} (${S.pct(ex.no_contract_share)}).</p>
          <p><b>Inactive</b> = Paused + Additional Service + Refunded = <b>${S.int(w.snapshot.inactive)}</b>, the reporting layer's inactive flag. <b>Active</b> = the rest (${S.int(w.snapshot.active)}), including clients who already bought. <b>Yet to close</b> = no current contract or purchase + under contract = ${S.int(w.yet_to_close.n)}.</p>
-         <p class="ex-h">Edge cases</p><p>${S.int(w.hunting_with_older_uc_date)} hunting clients still carry an older Under Contract date: that contract no longer stands, so they count as hunting. ${S.int(w.moved_back_with_closing_date.n)} clients have a closing date but their status moved back afterwards (${Object.entries(w.moved_back_with_closing_date.statuses).map(([k, v]) => `${k} ${v}`).join(', ')}); they count by status.</p>`,
+         <p class="ex-h">Edge cases</p><p>${S.int(w.hunting_with_older_uc_date)} hunting searches still carry an older Under Contract date: that contract no longer stands, so they count as hunting. ${S.int(w.moved_back_with_closing_date.n)} searches have a closing date but their status moved back afterwards (${Object.entries(w.moved_back_with_closing_date.statuses).map(([k, v]) => `${k} ${v}`).join(', ')}); they count by status.</p>`,
       ])}
-      <p class="cap">Jira, one row per search, by status on ${S.date(D.meta.asof)} · shares of the ${S.int(N)} signed-up clients · the Cash Forecast counts won deals instead: the Executive Summary reconciles the two.</p>`;
+      <p class="cap">Jira, one row per search, by status on ${S.date(D.meta.asof)} · shares of the ${S.int(N)} searches · the Cash Forecast counts won deals instead: the Executive Summary reconciles the two.</p>`;
     const board = S.$('#waitBoard', body);
     S.ui.table(S.$('#waitTable', body), [
       { k: 'label', label: 'Stage', html: r => `<span class="sw" style="background:${r.c}"></span>${r.label}<small>${r.status}</small>` },
-      { k: 'n', label: 'Clients', num: true, html: r => S.int(r.n) },
+      { k: 'n', label: 'Searches', num: true, html: r => S.int(r.n) },
       { k: 'share', label: `% of ${S.int(N)}`, num: true, sv: r => r.n, html: r => pc(r.n) },
       { k: 'group', label: 'Active / Inactive' },
       { k: 'noC', label: 'No current contract or purchase', html: r => (noC.has(r.k) ? '✓' : ''), sort: false },
       { k: 'yet', label: 'Yet to close', html: r => (yet.has(r.k) ? '✓' : ''), sort: false },
     ], SEG.map(s => Object.assign({}, s, { c: s.cls ? 'repeating-linear-gradient(135deg,var(--hold) 0 2px,var(--hold-2) 2px 4px)' : s.c })), {
-      caption: 'Signed-up clients by stage', sortable: false,
+      caption: 'Searches by stage', sortable: false,
       total: [
         { label: '<b>No current contract or completed purchase</b><small>Hunting + Paused + Additional Service + Refunded</small>', n: w.no_contract.n, group: '', status: '' },
         { label: '<b>Inactive</b><small>Paused + Additional Service + Refunded</small>', n: w.snapshot.inactive, group: '', status: '' },
         { label: '<b>Yet to close</b><small>the first row + under contract</small>', n: w.yet_to_close.n, group: '', status: '' },
-        { label: '<b>Signed-up clients</b>', n: N, group: '', status: '' },
+        { label: '<b>Searches (signed-up Jira records)</b>', n: N, group: '', status: '' },
       ].map(t => Object.assign(t, { c: 'transparent' })),
     });
     S.ui.wire(board);
@@ -133,18 +133,19 @@
     const WHY = { 'No deal link': 'no deal linked', 'Pipedrive deal lost': 'deal lost in Pipedrive', 'Pipedrive deal still open': 'deal still open in Pipedrive', 'Deal not in base': 'deal outside the reporting base' };
     const why = Object.entries(h.no_start_why).map(([k, v]) => `${v} ${WHY[k] || k}`).join(', ');
     const body = S.scene(main, { ch, step: 2, of, label: 'How long hunting clients have waited',
-      title: `Half of the hunting clients have waited ${S.med(h.median)} days or more; ${S.int(h.over90)} have waited over 90 days` });
+      title: `Half of the hunting searches have waited ${S.med(h.median)} days or more; ${S.int(h.over90)} have waited over 90 days` });
     body.innerHTML = `<div class="figs qf four">
-        <div class="fig"><span class="v num">${S.med(h.median)}<small>days</small></span><span class="l"><i style="background:var(--wait)"></i>median wait of the ${S.int(h.with_start)} hunting clients with a start date (average ${S.d1(h.mean)}) ${S.ui.chip('rec')}</span></div>
-        <div class="fig"><span class="v num">${S.int(h.over90)}</span><span class="l"><i style="background:var(--wait)"></i>have waited over 90 days, ${S.int(h.over180)} of them over 180</span></div>
+        <div class="fig"><span class="v num">${S.med(h.median)}<small>days</small></span><span class="l"><i style="background:var(--wait)"></i>median wait. <b>${S.int(h.with_start)} of ${S.int(h.n)}</b> hunting searches have a start date (average ${S.d1(h.mean)} days) ${S.ui.chip('rec')}</span></div>
+        <div class="fig emph"><span class="v num">${S.int(h.over90)}</span><span class="l"><i style="background:var(--wait)"></i><b>over 90 days</b>, ${S.int(h.over180)} of them over 180</span></div>
         <div class="fig"><span class="v num">${S.int(h.started_last_90)}</span><span class="l"><i style="background:var(--wait-2)"></i>of the ${S.int(h.with_start)} started in the last 90 days, after sales rose in June: a young pool</span></div>
-        <div class="fig"><span class="v num">${S.int(h.no_start)}</span><span class="l"><i style="background:var(--hold-2)"></i>hunting with no start date: no won deal linked to the Jira issue</span></div>
+        <div class="fig emph nodate"><span class="v num">${S.int(h.no_start)}</span><span class="l"><i style="background:var(--hold-2)"></i><b>no start date</b>, so counted but not aged: no won deal linked to the Jira issue</span></div>
       </div>
       <div class="board" id="huntBoard">
         <div class="ptools"><div class="pl">${S.ui.seg('view', 'View', [['days', 'By days waited'], ['month', 'By start month']], 'days', 'only-chart')}</div><div class="pr">${S.ui.toggle()}</div></div>
-        <div class="pv-chart"><div class="chart h-wait" id="huntDays" role="img" aria-label="${h.with_start} hunting clients by days since their start: median ${h.median}; ${h.over90} over 90 days; ${h.bands.map(b => `${band(b)} days ${b.n}`).join(', ')}."></div>
+        <div class="pv-chart"><div class="chart h-wait" id="huntDays" role="img" aria-label="${h.with_start} of ${h.n} hunting searches by days since their start: median ${h.median}; ${h.over90} over 90 days; ${h.no_start} have no start date; ${h.bands.map(b => `${band(b)} days ${b.n}`).join(', ')}."></div>
           <div class="chart h-wait" id="huntMonths" hidden role="img" aria-label="Hunting clients by start month: ${months.map(m => `${m.label} ${m.n}`).join(', ')}."></div>
-          <div class="legend"><span><i class="dot" style="background:var(--wait-2);border:1px solid var(--wait)"></i>one hunting client, up to 90 days</span><span><i class="dot" style="background:var(--wait)"></i>over 90 days</span><span><i class="line" style="background:var(--ink)"></i>median wait</span><span><i class="dash" style="color:var(--uc)"></i>recorded median to Under Contract (${S.med(h.recorded_median_to_uc)} days)</span></div></div>
+          <div class="legend"><span><i class="dot" style="background:var(--wait-2);border:1px solid var(--wait)"></i>one hunting search, up to 90 days</span><span><i class="dot" style="background:var(--wait)"></i>over 90 days</span><span><i class="line" style="background:var(--ink)"></i>median wait</span><span><i class="dash" style="color:var(--uc)"></i>recorded median to Under Contract (${S.med(h.recorded_median_to_uc)} days)</span></div>
+          <p class="nd-note"><b>${S.int(h.no_start)} hunting searches are not in the chart:</b> they have no start date, so their wait cannot be measured (${why}).</p></div>
         <div class="pv-table tw" id="huntTable"></div>
       </div>
       ${S.ui.ex('How is this number built?', [
@@ -153,16 +154,16 @@
         `<p class="ex-h">Reading it</p><p>Half of past clients were under contract by day ${S.med(h.recorded_median_to_uc)}; ${S.int(h.past_recorded_median)} of the ${S.int(h.with_start)} hunting clients have already waited longer. Jira statuses run with time: the ${S.int(h.by_status['8 Weeks'].n)} at "8 Weeks" have waited a median ${S.med(h.by_status['8 Weeks'].median)} days. ${S.int(h.older_uc_date)} hunting clients carry an older Under Contract date from a contract that fell through.</p>
          <p>Same figure in the <a href="${D.meta.source}#questions" target="_blank" rel="noopener">Explorer's backlog callout</a> (median ${S.med(h.median)} days, ${S.int(h.over90)} over 90). The ${S.int(D.cash.noprop.n)} "No property yet" in the Cash Forecast count won deals; the Executive Summary reconciles them.</p>`,
       ])}
-      <p class="cap">One dot per hunting client with a start date, by days since that date · 10-day columns · 180+ days together.</p>`;
+      <p class="cap">One dot per hunting search with a start date (${S.int(h.with_start)} of ${S.int(h.n)}), by days since that date · 10-day columns · 180+ days together.</p>`;
     const nodeD = S.$('#huntDays', body), nodeM = S.$('#huntMonths', body);
     waitStrip(nodeD, h);
     let recM = null;
     S.ui.table(S.$('#huntTable', body), [
       { k: 'label', label: 'Group', html: r => `${r.label}${r.sub ? `<small>${r.sub}</small>` : ''}` },
-      { k: 'n', label: 'Hunting clients', num: true, html: r => S.int(r.n) },
+      { k: 'n', label: 'Hunting searches', num: true, html: r => S.int(r.n) },
       { k: 'median', label: 'Median days waited', num: true, html: r => (r.median == null ? '–' : S.med(r.median)) },
     ], [
-      { _group: 'By time waited (clients with a start date)' },
+      { _group: 'By time waited (searches with a start date)' },
       ...h.bands.map(b => ({ label: `${band(b)} days`, n: b.n, median: null })),
       { _group: 'By Jira status' },
       ...Object.entries(h.by_status).map(([k, v]) => ({ label: k, n: v.n, median: v.median })),
@@ -171,7 +172,7 @@
       { _group: 'No start date' },
       ...Object.entries(h.no_start_why).map(([k, v]) => ({ label: k, sub: 'no won Pipedrive deal linked', n: v, median: null })),
     ], { caption: 'Hunting clients by time waited, status and start month', sortable: false,
-      total: [{ label: 'All hunting clients', n: h.n, median: h.median }] });
+      total: [{ label: 'All hunting searches', n: h.n, median: h.median }] });
     S.ui.wire(S.$('#huntBoard', body), (name, v) => {
       st[name] = v;
       nodeD.hidden = v !== 'days'; nodeM.hidden = v !== 'month';
@@ -188,44 +189,53 @@
     const recent = r.by_month.filter(m => m.month >= '2026-01'), peak = r.by_month.reduce((a, m) => (m.n > a.n ? m : a), { n: -1 });
     const fullMon = k => new Date(k + '-15T12:00:00').toLocaleDateString('en-GB', { month: 'long', year: 'numeric' });
     const body = S.scene(main, { ch, step: 3, of, label: 'Where the others stand',
-      title: `Most paused clients have been paused for months; most refunds come within two weeks of the start` });
+      title: `Of ${S.int(p.n)} paused searches, ${S.int(p.over180)} have been paused over six months and ${S.int(p.prior.evidence)} show an ended contract or documented fall-through` });
     body.innerHTML = `<div class="figs qf four">
-        <div class="fig"><span class="v num">${S.int(p.n)}</span><span class="l"><i style="background:var(--paused)"></i>Paused: a median ${Math.round(p.median_days)} days in pause; ${S.int(p.from.long_search)} paused after 8+ weeks of searching</span></div>
-        <div class="fig"><span class="v num">${S.int(r.n)}</span><span class="l"><i style="background:var(--refund)"></i>Refunded: a median ${S.med(r.median_days)} days after the start; ${S.int(r.within14)} within 14 days; ${S.int(peak.n)} in ${fullMon(peak.month)} alone</span></div>
-        <div class="fig"><span class="v num">${S.int(u.n)}</span><span class="l"><i style="background:var(--uc)"></i>Under contract: a median ${S.med(u.median_days_since)} days since the contract; ${S.int(u.scheduled)} closings scheduled</span></div>
-        <div class="fig"><span class="v num">${S.int(w.additional)}</span><span class="l"><i style="background:var(--hold-2)"></i>Additional Service (Inactive)</span></div>
+        <div class="fig"><span class="v num">${S.int(p.n)}</span><span class="l"><i style="background:var(--paused)"></i>paused searches; a median ${Math.round(p.median_days)} days in pause ${S.ui.chip('rec')}</span></div>
+        <div class="fig emph"><span class="v num">${S.int(p.over180)}</span><span class="l"><i style="background:var(--paused)"></i><b>paused over six months</b> (181+ days): ${S.int(p.bands.find(b => b.lo === 366).n)} of them over a year. A fact about <b>how long</b>, from the pause date</span></div>
+        <div class="fig emph"><span class="v num">${S.int(p.prior.evidence)}</span><span class="l"><i style="background:var(--uc)"></i><b>show an ended contract or documented fall-through</b>: ${S.int(p.prior.ended)} ended, ${S.int(p.prior.documented)} documented. A fact about <b>what happened before</b>, from the contract history</span></div>
+        <div class="fig"><span class="v num">${S.int(r.n)}</span><span class="l"><i style="background:var(--refund)"></i>refunded: a median ${S.med(r.median_days)} days after the start; ${S.int(r.within14)} within 14 days; ${S.int(peak.n)} in ${fullMon(peak.month)} alone</span></div>
       </div>
       <div class="board" id="othBoard">
         <div class="ptools"><div class="pl">${S.ui.seg('rf', 'Refunds', [['days', 'Refunds by days after start'], ['month', 'Refunds by month']], 'days', 'only-chart')}</div><div class="pr">${S.ui.toggle()}</div></div>
         <div class="pv-chart"><div class="duo">
-          <div><p class="duo-h"><span class="duo-v">${S.int(p.n)}</span>Paused, by time in pause <small>days since the pause began</small></p><div class="chart h-duo" id="pauseChart" role="img" aria-label="Paused clients by days in pause: ${p.bands.map(b => `${band(b)} ${b.n}`).join(', ')}."></div></div>
+          <div><p class="duo-h"><span class="duo-v">${S.int(p.n)}</span>Paused, by time in pause <small>days since the pause began · over six months darker</small></p><div class="chart h-duo" id="pauseChart" role="img" aria-label="Paused searches by days in pause: ${p.bands.map(b => `${band(b)} ${b.n}`).join(', ')}."></div>
+            <div class="pstrip" id="pauseHistory" role="img" aria-label="Contract history of the ${p.n} paused searches: ${p.prior.documented} documented fall-through, ${p.prior.ended} contract ended without a purchase, ${p.prior.none} no evidence; ${p.cross.long_evidence} of the ${p.over180} paused over six months show an ended contract or documented fall-through.">
+              <p class="duo-h"><span class="duo-v">${S.int(p.prior.evidence)}</span>of the ${S.int(p.n)} show an ended contract <small>contract history, not pause length</small></p>
+              <div class="ps-bar"><i class="ps-doc" style="flex:${p.prior.documented} 1 0"></i><i class="ps-end" style="flex:${p.prior.ended} 1 0"></i><i class="ps-none" style="flex:${p.prior.none} 1 0"></i></div>
+              <div class="ps-keys"><span><i class="ps-doc"></i><b>${S.int(p.prior.documented)}</b> documented fall-through</span><span><i class="ps-end"></i><b>${S.int(p.prior.ended)}</b> contract ended, no purchase</span><span><i class="ps-none"></i><b>${S.int(p.prior.none)}</b> no evidence of a contract that ended</span></div>
+              <p class="ps-x"><b>Both facts together:</b> ${S.int(p.cross.long_evidence)} of the ${S.int(p.over180)} paused over six months also show an ended contract or documented fall-through (${S.int(p.cross.short_evidence + p.cross.undated_evidence)} of the other ${S.int(p.n - p.over180)}).</p>
+            </div></div>
           <div><p class="duo-h"><span class="duo-v">${S.int(r.n)}</span><span id="rfHead">Refunded, by days from start to refund</span> <small id="rfSub">client start date to refund date</small></p>
-            <div class="chart h-duo" id="refundDays" role="img" aria-label="Refunded clients by days from start to refund: ${r.bands.map(b => `${band(b)} ${b.n}`).join(', ')}."></div>
+            <div class="chart h-duo" id="refundDays" role="img" aria-label="Refunded searches by days from start to refund: ${r.bands.map(b => `${band(b)} ${b.n}`).join(', ')}."></div>
             <div class="chart h-duo" id="refundMonths" hidden role="img" aria-label="Refunds by month: ${recent.map(m => `${S.monShort(m.month)} ${m.n}`).join(', ')}."></div></div>
         </div>
         <p class="call"><span class="call-h">Cash link</span>Paused clients have paid <b>${money(cg.paid)}</b> up front. At the Cash Forecast's default (${pc}% of paused and Additional Service deals close, the other ${100 - pc}% are refunded in full), <b>${money(pausedRefund)}</b> of the <b>${money(br.refunds)}</b> projected refunds come from them: the paused group is the largest single swing in forecast cash. The Cash Forecast tab models these flows.</p></div>
         <div class="pv-table tw" id="othTable"></div>
       </div>
       ${S.ui.ex('How is this number built?', [
-        `<p class="ex-h">Paused</p><p>Time in pause = ${S.date(D.meta.asof)} − the date the client entered Paused, from the 12 Nov 2026 Jira extract (latest_status_date, data as of 11 Nov), known for ${S.int(p.dated)} of ${S.int(p.n)}. The status before the pause (previous_status): 8 Weeks ${S.int(p.from.long_search)}, an earlier search status ${S.int(p.from.earlier_search)}, Under Contract / Passed Inspection ${S.int(p.from.contract)}, other ${S.int(p.from.other)}, not recorded ${S.int(p.from.unknown)}. ${S.int(p.older_uc_date)} paused clients carry an Under Contract date from a contract that did not close.</p>`,
+        `<p class="ex-h">Paused: two separate facts</p><p><b>Pause length</b> and <b>contract history</b> come from different records. The contract history is chapter 6's evidence: a documented fall-out address (${S.int(p.prior.documented)}) or a contract on record that ended without a purchase (${S.int(p.prior.ended)}). A search can be paused for years with no sign of a contract, or paused for weeks after one fell through. Time in pause = ${S.date(D.meta.asof)} − the date the client entered Paused, from the 12 Nov 2026 Jira extract (latest_status_date, data as of 11 Nov), known for ${S.int(p.dated)} of ${S.int(p.n)}. The status before the pause (previous_status): 8 Weeks ${S.int(p.from.long_search)}, an earlier search status ${S.int(p.from.earlier_search)}, Under Contract / Passed Inspection ${S.int(p.from.contract)}, other ${S.int(p.from.other)}, not recorded ${S.int(p.from.unknown)}. ${S.int(p.older_uc_date)} paused clients carry an Under Contract date from a contract that did not close.</p>`,
         `<p class="ex-h">Refunded</p><p>Days to refund = refund date − client start date (${S.int(r.timed)} of ${S.int(r.n)} with both dates). The refund date is when the refund was recorded, so the decision came a little earlier. ${S.int(r.from_client_start)} refunded clients went straight from Client Start, before their first two-week check-in. The first refund in these records is dated ${fullMon(r.by_month.find(m => m.n).month)}, and 2025 has few, so compare recent months with care.</p>
          <p class="ex-h">Under contract</p><p>Days since contract = ${S.date(D.meta.asof)} − the latest valid Under Contract date; past contracts closed a median ${S.med(D.speed.uc_to_close.median)} days after Under Contract. ${S.int(u.passed_inspection)} have passed inspection.</p>`,
       ])}
-      <p class="cap">Jira, status on ${S.date(D.meta.asof)} · the same ${S.int(p.n)} paused, ${S.int(r.n)} refunded and ${S.int(u.n)} under contract as in 2.1 · the first 14 days by start month are in section 3.4.</p>`;
-    bars(S.$('#pauseChart', body), p.bands.map(b => ({ label: band(b), n: b.n })), 'paused', { name: 'days in pause', tip: x => `<b>${x.label} days</b> in pause: ${x.n} clients` });
+      <p class="cap">Jira, status on ${S.date(D.meta.asof)} · the same ${S.int(p.n)} paused, ${S.int(r.n)} refunded and ${S.int(u.n)} under contract (a median ${S.med(u.median_days_since)} days since the contract; ${S.int(u.scheduled)} closings scheduled) as in 2.1 · the first 14 days by start month are in section 3.5.</p>`;
+    bars(S.$('#pauseChart', body), p.bands.map(b => ({ label: band(b), n: b.n, hl: b.lo > 180 ? 'ink2' : null })), 'paused', { name: 'days in pause', tip: x => `<b>${x.label} days</b> in pause: ${x.n} searches` });
     bars(S.$('#refundDays', body), r.bands.map(b => ({ label: band(b), n: b.n, hl: b.lo === 0 ? 'refund' : null })), 'refund2', { name: 'days from start to refund', tip: x => `<b>${x.label} days</b> after the start: ${x.n} refunds` });
     let recM = null;
     const nodeRD = S.$('#refundDays', body), nodeRM = S.$('#refundMonths', body);
     S.ui.table(S.$('#othTable', body), [
       { k: 'label', label: 'Group', html: x => `${x.label}${x.sub ? `<small>${x.sub}</small>` : ''}` },
-      { k: 'n', label: 'Clients', num: true, html: x => S.int(x.n) },
+      { k: 'n', label: 'Searches', num: true, html: x => S.int(x.n) },
     ], [
       { _group: `Paused (${p.n}) by days in pause` }, ...p.bands.map(b => ({ label: `${band(b)} days`, n: b.n })), ...(p.n - p.dated ? [{ label: 'Pause date not recorded', n: p.n - p.dated }] : []),
+      { _group: 'Paused by contract history (separate from pause length)' }, { label: 'Documented fall-through', n: p.prior.documented }, { label: 'Contract ended, no purchase recorded', n: p.prior.ended }, { label: 'No evidence of a contract that ended', n: p.prior.none },
+      { _group: 'Pause length and contract history together' }, { label: 'Paused over six months, contract ended or fell through', n: p.cross.long_evidence }, { label: 'Paused over six months, no such evidence', n: p.cross.long_none },
+      { label: 'Paused six months or less (or undated), contract ended or fell through', n: p.cross.short_evidence + p.cross.undated_evidence }, { label: 'Paused six months or less (or undated), no such evidence', n: p.cross.short_none + p.cross.undated_none },
       { _group: 'Paused by the status before the pause' }, { label: '8 Weeks (long search)', n: p.from.long_search }, { label: 'Client Start to 6 Weeks', n: p.from.earlier_search }, { label: 'Under Contract / Passed Inspection', n: p.from.contract }, { label: 'Other', n: p.from.other }, { label: 'Not recorded', n: p.from.unknown },
       { _group: `Refunded (${r.n}) by days from start to refund` }, ...r.bands.map(b => ({ label: `${band(b)} days`, n: b.n })), ...(r.n - r.timed ? [{ label: 'Start or refund date missing', n: r.n - r.timed }] : []),
       { _group: 'Refunds by month recorded (2026)' }, ...recent.map(m => ({ label: fullMon(m.month), n: m.n })),
       { _group: 'Under contract' }, { label: 'Under contract, not yet closed', sub: `median ${S.med(u.median_days_since)} days since the contract`, n: u.n }, { label: 'of which closing scheduled after the data date', n: u.scheduled },
-    ], { caption: 'Paused, refunded and under-contract clients', sortable: false });
+    ], { caption: 'Paused, refunded and under-contract searches', sortable: false });
     S.ui.wire(S.$('#othBoard', body), (name, v) => {
       st[name] = v;
       nodeRD.hidden = v !== 'days'; nodeRM.hidden = v !== 'month';
@@ -287,7 +297,7 @@
   }
 
   S.chapter('outcomes', {
-    n: 2, title: 'Where are our clients today?',
+    n: 2, title: 'Where are our searches today?',
     render(main, D, ch) {
       const OF = 5, at = D.outcomes.attainment;
       stages(main, D, ch, OF);

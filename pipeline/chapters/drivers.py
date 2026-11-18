@@ -338,18 +338,41 @@ def build(ctx: C.Ctx, onboarding_path=None) -> dict:
              "dated_log": False}
 
     lag = (pd.to_datetime(m75.ts) - m75.start).dt.days
+    # prior offers on day 14 and day 30, the SAME clients: every matched start with at least 30 days of follow-up (no outcome filter), so both
+    # windows share one denominator; the day-14 count can rest on fewer than 5 searches (marked small, published as a rate with its base)
+    mm = co[co.matched & (co.elapsed >= FAST)]
+    offers_d = []
+    for key, lab in OFFERS:
+        g = mm[mm.offers == key]
+        k14, k30 = int(g.days_uc.between(0, 14).sum()), int(g.days_uc.between(0, FAST).sum())
+        offers_d.append({"key": key, "label": lab, "n": int(len(g)), "k14": k14, "k30": k30,
+                         "share14": round(k14 / len(g), 4) if len(g) else None, "share30": round(k30 / len(g), 4) if len(g) else None,
+                         "small14": bool(0 < k14 < MIN_CELL), "small30": bool(0 < k30 < MIN_CELL)})
+    # Jira Deal Number Purchased (which deal STRSearch sent became the purchase), searches under contract by day 30, by start period
+    sm = co.start.dt.strftime("%Y-%m")
+    u30 = co[co.days_uc.between(0, FAST)]
+    def _num(lo, hi):
+        g = u30[(sm.loc[u30.index] >= lo) & (sm.loc[u30.index] <= hi)]
+        v = pd.to_numeric(g.deal_number_purchased, errors="coerce").dropna()
+        return {"from": lo, "to": hi, "uc30": int(len(g)), "n": int(len(v)), "median": float(v.median()) if len(v) else None,
+                "p25": float(v.quantile(.25)) if len(v) else None, "p75": float(v.quantile(.75)) if len(v) else None}
+    deals["number_purchased"] = {"early": _num("2026-01", "2026-05"), "late": _num("2026-06", "2026-09"),
+                                 "field": "Jira Deal Number Purchased (deal_number_purchased)", "window": FAST}
     return {
         "form_from": form.ts.min().strftime("%Y-%m-%d"), "min_days": MIN_DAYS, "fast_days": FAST,
         "eligible_through": (ctx.asof - pd.Timedelta(days=MIN_DAYS)).strftime("%Y-%m-%d"),
         "population": "won engagements with a confirmed Jira start",
-        "composition": {"n": int(len(e75)), "groups": composition, "stopped_no_contract": int(len(stopped))},
+        "composition": {"n": int(len(e75)), "groups": composition, "stopped_no_contract": int(len(stopped)),
+                        "all_eligible": int((co.elapsed >= MIN_DAYS).sum()), "all_fast": int((co[co.elapsed >= MIN_DAYS].days_uc.between(0, FAST)).sum()),
+                        "stopped_by_status": {k: int(v) for k, v in stopped.status.value_counts().items()}},
         "bases": {"d30": {"eligible": int(len(e30)), "matched": int(len(m30)), "share": round(float(m30.within30.mean()), 4) if len(m30) else None},
                   "d75": {"eligible": int(len(e75)), "matched": int(len(m75)), "share": round(float(m75.within75.mean()), 4) if len(m75) else None}},
         "matching": dict(match_info, answer_lag_days={"median": float(lag.median()) if len(lag) else None, "max": float(lag.max()) if len(lag) else None},
                          cohort_matched=int(co.matched.sum()), cohort_n=int(len(co)),
                          answers_after_uc_used=int((co.matched & co.uc.notna() & (pd.to_datetime(co.ts).dt.normalize() >= co.uc)).sum())),
         "capital": {"pipedrive": pd_surv, "form": form_surv, "everyone_from": 200, "top_option": 500},
-        "offers": {"rows": offers, "trend": trend30, "gap_3plus_vs_0": off_gap,
+        "offers": {"rows": offers, "same_clients": {"n": int(len(mm)), "from": mm.start.min().strftime("%Y-%m-%d"), "to": mm.start.max().strftime("%Y-%m-%d"), "rows": offers_d},
+                   "trend": trend30, "gap_3plus_vs_0": off_gap,
                    "logrank_p": round(float(lr[1]), 3) if lr[1] is not None else None,
                    "source": "Onboarding questionnaire (Form Responses 2), column AA: self-reported experience submitting real-estate offers before STRSearch"},
         "tested": tested,

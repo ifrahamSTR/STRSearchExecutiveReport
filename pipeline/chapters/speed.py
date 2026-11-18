@@ -134,7 +134,7 @@ def build(ctx: C.Ctx) -> dict:
     first50 = lambda k: float(k[k.cum >= 0.5].t.iloc[0])  # noqa: E731
     estimate = {"uc": {"median": q1["km_uc"], "curve": C.daily(k_uc, CURVE_DAYS), "check": first50(k_uc)},
                 "closed": {"median": q1["km_closed"], "curve": C.daily(k_cl, CURVE_DAYS), "check": first50(k_cl)},
-                "n": int(len(s)),
+                "n": int(len(s)), "events": {"uc": int(s.uc.notna().sum()), "closed": int(s.closed.notna().sum())},
                 "recorded_curve": {"uc": C.daily(C.ecdf(s.days_uc), CURVE_DAYS), "closed": C.daily(C.ecdf(s.days_closed), CURVE_DAYS)}}
     gap = s.days_uc_to_close.dropna()
     rules = ("due", "created+4", "won")
