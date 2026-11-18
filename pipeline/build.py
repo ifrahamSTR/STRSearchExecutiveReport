@@ -195,7 +195,7 @@ def checks(ctx: C.Ctx, data: dict) -> list[dict]:
     chk("Budget: experience split adds up to the matched groups' 30-day refunds",
         all(sum(x["rf30"]["k"] for x in bd["experience"] if x["group"] == lab) == bg[lab]["rf30"]["k"] for lab in ("Up to $250K", "Above $250K")), True)
     rows = {r["key"]: r for r in data["reconcile"]["rows"]}
-    same = ["uc", "paused", "scheduled", "closed30", "oct_closed", "oct_sales", "uc_median", "budget14"]
+    same = ["uc", "paused", "scheduled", "closed30", "oct_closed", "oct_sales", "uc_median", "budget14", "budget_rf30", "budget_paused", "starts_oct", "starts_nov", "hunting_status"]
     chk("Reconciliation: figures that must be equal across the report, the Explorer and the Cash Forecast are equal",
         [k for k in same if not (rows[k]["cj"] == rows[k]["explorer"] and (rows[k]["cash"] is None or rows[k]["cash"] == rows[k]["cj"]))]
         + ([] if abs(rows["net_cash"]["explorer"] - rows["net_cash"]["cash"]) < 0.01 else ["net_cash"]), [])
@@ -213,6 +213,26 @@ def checks(ctx: C.Ctx, data: dict) -> list[dict]:
     chk("Capital: Cox 95% CI for capital includes 1 (Pipedrive capital)", cx.get("lo", 2) <= 1 <= cx.get("hi", 0), True, hard=False)
     of = [r["within30"]["share"] for r in dr["offers"]["rows"]]
     chk("Offer experience: share within 30 days rises 0 -> 1-2 -> 3+ offers", None not in of and of == sorted(of), True, hard=False)
+    # ---- budget scenes 5.3-5.4 (18 Nov 2026)
+    ea = bd["early"]
+    LO_, HI_ = "Up to $250K", "Above $250K"
+    if pub:
+        pgrp = {g["label"]: g for g in pub["budget"]["groups"]["cmp"]}
+        mism = sum(1 for lab in (LO_, HI_) for key, ws in (("uc", ea["windows"]["uc"]), ("cl", ea["windows"]["closed"]), ("rf", ea["windows"]["early"])) for w in ws
+                   if (ea["sets"]["all"][lab][f"{key}{w}"]["k"], ea["sets"]["all"][lab][f"{key}{w}"]["eligible"]) != (pgrp[lab][f"{key}{w}"]["k"], pgrp[lab][f"{key}{w}"]["eligible"]))
+        chk("Budget scenes: every window count (contracts 14-90 days, closings 60-120, refunds 14-90) = the published Explorer's budget groups, cells that differ", mism, 0)
+        chk("Budget scenes: survival curves cross 50% where the Explorer's Kaplan-Meier medians are (contracts, closings, both groups)",
+            tuple(ea["curves"][f][lab]["half"] for f in ("uc", "closed") for lab in (LO_, HI_)), tuple(pgrp[lab][k] for k in ("km_uc", "km_closed") for lab in (LO_, HI_)))
+        chk("Budget scenes: paused-today counts = the Explorer's stage counts", tuple(ea["sets"]["all"][lab]["paused_now"] for lab in (LO_, HI_)), tuple(pgrp[lab]["stages"].get("paused", 0) for lab in (LO_, HI_)))
+    keys_ = [f"{k}{w}" for k, ws in (("uc", ea["windows"]["uc"]), ("cl", ea["windows"]["closed"]), ("rf", ea["windows"]["early"]), ("pa", ea["windows"]["early"]), ("ex", ea["windows"]["early"])) for w in ws]
+    chk("Budget scenes: New Client Experience + Legacy add up to all matched clients in every window, both groups (counts and eligible)",
+        all(ea["sets"]["nce"][lab][k][f] + ea["sets"]["legacy"][lab][k][f] == ea["sets"]["all"][lab][k][f] for lab in (LO_, HI_) for k in keys_ for f in ("k", "eligible")), True)
+    chk("Budget scenes: refunded-or-paused is never below either alone nor above their sum (every window, both groups)",
+        all(max(ea["sets"]["all"][lab][f"rf{w}"]["k"], ea["sets"]["all"][lab][f"pa{w}"]["k"]) <= ea["sets"]["all"][lab][f"ex{w}"]["k"] <= ea["sets"]["all"][lab][f"rf{w}"]["k"] + ea["sets"]["all"][lab][f"pa{w}"]["k"]
+            and ea["sets"]["all"][lab][f"ex{w}"]["eligible"] == ea["sets"]["all"][lab][f"rf{w}"]["eligible"] for lab in (LO_, HI_) for w in ea["windows"]["early"]), True)
+    chk("Budget scenes: dated pauses never exceed paused clients; no timed pause count exceeds the paused-today count", all(ea["sets"]["all"][lab]["pause_dated"] <= ea["sets"]["all"][lab]["paused_now"]
+        and all(ea["sets"]["all"][lab][f"pa{w}"]["k"] <= ea["sets"]["all"][lab]["pause_dated"] for w in ea["windows"]["early"]) for lab in (LO_, HI_)), True)
+    chk("Budget scenes: every like-for-like difference carries a 95% interval that contains it", all(m["lo"] <= m["diff"] <= m["hi"] for fam in ea["mh"].values() for ms in fam.values() for m in ms if m["diff"] is not None), True)
     # L10 update: statements the chapters and the Executive Summary make in words (warn only)
     gm = [r for r in gl["months"] if not r["partial"]]
     cur = next((r for r in gl["months"] if r["partial"]), None)
@@ -227,6 +247,13 @@ def checks(ctx: C.Ctx, data: dict) -> list[dict]:
     chk("5.3: no contract or closing window differs like for like (every 95% interval includes zero)",
         all(x["lo"] <= 0 <= x["hi"] for k in ("uc", "closed") for x in bd["mh"][k]), True, hard=False)
     chk("5.3: refunds within 30 days are higher up to $250K, interval clear of zero", bd["mh"]["refunded"][1]["w"] == 30 and bd["mh"]["refunded"][1]["lo"] > 0, True, hard=False)
+    unadj = ea["sets"]["all"][LO_]["rf30"]["k"] / ea["sets"]["all"][LO_]["rf30"]["eligible"] - ea["sets"]["all"][HI_]["rf30"]["k"] / ea["sets"]["all"][HI_]["rf30"]["eligible"]
+    chk("5.4: the like-for-like refund gap within 30 days is within 1.5 points of the unadjusted gap ('timing and mix do not explain it')", abs(ea["mh"]["all"]["rf"][1]["diff"] - unadj) < 0.015, True, hard=False)
+    chk("5.4: no pause begins inside the first 14 days ('the first 14 days contain none')", min(ea["sets"]["all"][lab]["pause_days"]["min"] for lab in (LO_, HI_)) > 14, True, hard=False)
+    chk("5.4: by day 90 refunded-or-paused shares are close (95% interval includes zero)", ea["mh"]["all"]["ex"][3]["lo"] <= 0 <= ea["mh"]["all"]["ex"][3]["hi"], True, hard=False)
+    chk("5.3: no contract or closing window is clear of zero, like for like", all(m["lo"] <= 0 <= m["hi"] for k in ("uc", "cl") for m in ea["mh"]["all"][k]), True, hard=False)
+    prm = [r for r in pc["monthly"] if r["partial"]]
+    chk("3.2: the partial month has more contracts than starts, and the gap narrowed every full month after its peak", (bool(prm) and prm[0]["gap"] < 0, pc["gap"]["narrowing"]), (True, True), hard=False)
     br_ = data["reconcile"]["cash_bridge"]
     pd_ = data["cash"]["defaults"]["paused_defaults"]
     chk("2.3 / Summary: paused clients carry most of the projected refunds at the default assumptions",

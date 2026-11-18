@@ -18,11 +18,15 @@ import numpy as np
 import pandas as pd
 
 import core as C
+from chapters import records as R
 
 GROUPS = ["Up to $250K", "Above $250K", "Not recorded"]
 KEEP = ["n", "uc14", "uc30", "uc45", "uc60", "uc90", "cl60", "cl90", "cl120", "rf14", "rf30", "rf60", "rf90", "recorded", "uc_to_close",
         "scenario", "km_uc", "km_closed", "stages", "closed", "hunting", "hunting_wait"]
 MONTH_WINDOWS = [14, 30, 60, 90]
+UC_W, CL_W, EARLY_W = [14, 30, 45, 60, 90], [60, 90, 120], [14, 30, 60, 90]
+EXPERIENCE = [("all", None, "All clients"), ("nce", "New Client Experience", "New Client Experience"), ("legacy", "Legacy", "Legacy")]
+CURVE_DAYS = 150
 
 
 def _explorer(ctx: C.Ctx):
@@ -104,9 +108,72 @@ def build(ctx: C.Ctx) -> dict:
             "offers": {k: int(off.get(k, 0)) for k in ("No offers before", "1–2 offers before", "3+ offers before")},
             "experience": {k: int(v) for k, v in g.experience.fillna("Not tagged").value_counts().items()},
         })
+    early = _early(ctx, B, df)
     return {
+        "early": early,
         "field": E.BUDGET_FIELD, "measures": E.BUDGET_MEASURES, "threshold": E.BUDGET_THRESHOLD, "form_since": "2026-04-20",
         "population": ref["population"], "n": ref["n"], "groups": groups, "strict": strict, "mh": mh, "mh_strict": mh_strict,
         "thin": B.THIN, "coverage": ref["coverage"], "months": months, "experience": exp, "profile": profile,
         "explorer_view": "#budget",
     }
+
+
+def _cell(g: pd.DataFrame, col: str, w: int) -> dict:
+    """Clients with at least w days on the clock (eligible) and how many had the event within w days."""
+    el = g.elapsed >= w
+    return {"k": int((el & g[col].between(0, w)).sum()), "eligible": int(el.sum())}
+
+
+def _early(ctx: C.Ctx, B, df: pd.DataFrame) -> dict:
+    """Chapter 5 budget scenes (18 Nov 2026): windowed rates and like-for-like differences for up to / above $250K, overall and by
+    client experience, plus survival curves.
+      uc / closed   as the Explorer's #budget view (contract and closing within N days)
+      refunded      refund date - client start date, within N days
+      paused        the client's CURRENT pause began within N days of the start. Dates come from the 12 Nov 2026 Jira extract
+                    (latest_status_date, data as of 11 Nov); a pause that ended (resumed, closed, refunded) leaves no date, so this
+                    counts pauses still in effect, a lower bound on all pauses.
+      exit          refunded, or paused and still paused (whichever came first)
+    Status snapshots (paused / refunded today) use the 16 Nov status, as 2.1 does."""
+    j12 = R.jira12(ctx.explorer)
+    key = df.jira_key.astype("string").str.upper()
+    lst = pd.Series(key.map(j12.latest_status).values, index=df.index)
+    lsd = pd.to_datetime(pd.Series(key.map(j12.latest_status_date).values, index=df.index))
+    now = df.stage.eq("paused")
+    df["d_pause"] = (lsd - df.start).dt.days.where(now & lst.eq("Paused"))
+    df["d_exit"] = pd.concat([df.d_rf, df.d_pause], axis=1).min(axis=1)
+    m = df[df.budget_cmp.notna()]
+    lo, hi = "Up to $250K", "Above $250K"
+    sets, mh = {}, {}
+    for key_, exp, _ in EXPERIENCE:
+        sub = m if exp is None else m[m.experience == exp]
+        sets[key_] = {}
+        for lab in (lo, hi):
+            g = sub[sub.budget_cmp == lab]
+            r = {"n": int(len(g)), "paused_now": int(g.stage.eq("paused").sum()), "refunded_now": int(g.stage.eq("refunded").sum()),
+                 "pause_dated": int(g.d_pause.notna().sum()),
+                 "pause_days": {"median": float(g.d_pause.median()) if g.d_pause.notna().any() else None, "min": float(g.d_pause.min()) if g.d_pause.notna().any() else None}}
+            for w in UC_W:
+                r[f"uc{w}"] = _cell(g, "d_uc", w)
+            for w in CL_W:
+                r[f"cl{w}"] = _cell(g, "d_cl", w)
+            for w in EARLY_W:
+                r[f"rf{w}"] = _cell(g, "d_rf", w)
+                r[f"pa{w}"] = _cell(g, "d_pause", w)
+                r[f"ex{w}"] = _cell(g, "d_exit", w)
+            sets[key_][lab] = r
+        mh[key_] = {fam: [_mh(B.mh(sub, "budget_cmp", lo, hi, col, w)) for w in ws]
+                    for fam, col, ws in (("rf", "d_rf", EARLY_W), ("pa", "d_pause", EARLY_W), ("ex", "d_exit", EARLY_W))}
+    g_all = {lab: m[m.budget_cmp == lab] for lab in (lo, hi)}
+    for fam, col, ws in (("uc", "d_uc", UC_W), ("cl", "d_cl", CL_W)):
+        mh["all"][fam] = [_mh(B.mh(m, "budget_cmp", lo, hi, col, w)) for w in ws]
+    # survival curves: share reaching the milestone by day N, every confirmed start included (unfinished journeys censored)
+    curves = {"days": CURVE_DAYS, "uc": {}, "closed": {}}
+    for lab, g in g_all.items():
+        for fam, ev, dd in (("uc", g.uc, g.days_to_uc), ("closed", g.closed, g.d_cl)):
+            t = np.where(ev.notna(), dd, g.elapsed)
+            k = C.km_curve(t, ev.notna().values)
+            curves[fam][lab] = {"curve": C.daily(k, CURVE_DAYS), "n": int((np.asarray(t) >= 0).sum()), "events": int((ev.notna() & (pd.Series(dd, index=g.index) >= 0)).sum()),
+                                "half": (int(k[k.cum >= 0.5].t.iloc[0]) if (k.cum >= 0.5).any() else None)}
+    return {"asof_status": ctx.asof.strftime("%Y-%m-%d"), "asof_pause_dates": "2026-11-11", "groups": [lo, hi],
+            "windows": {"uc": UC_W, "closed": CL_W, "early": EARLY_W}, "sets": sets, "mh": mh, "curves": curves,
+            "experience": [{"key": k, "label": lab} for k, _, lab in EXPERIENCE]}

@@ -44,6 +44,7 @@ def reconcile(ctx: C.Ctx, data: dict) -> dict:
         return int(((e.g == group) & ~e.stage.isin(stages)).sum())
 
     goal = data["pace"]["goal"]
+    pm = {r["month"]: r for r in data["pace"]["monthly"]}
     oct_m = next(r for r in goal["months"] if r["month"] == "2026-10")
     q3 = {r["month"]: r for r in ex["q3"]}
     jira_oct = int(ctx.jira.closed.dt.strftime("%Y-%m").eq("2026-10").sum())
@@ -91,11 +92,28 @@ def reconcile(ctx: C.Ctx, data: dict) -> dict:
          "unit": "daily_client_activity (won deals) · Jira issues dated in October: " + str(jira_oct), "bridge": {"jira_issues": jira_oct}},
         {"key": "oct_sales", "label": "October 2026 sales", "cj": oct_m["sales"], "explorer": q3["2026-10"]["won"], "cash": None,
          "unit": "Pipedrive won date (daily_client_activity) · Explorer Sales funnel uses the official filter", "bridge": {"funnel_months_differ": won_diff}},
+        {"key": "starts_oct", "label": "October 2026: searches started · under contract · difference", "fmt": "trio",
+         "cj": [pm["2026-10"]["new"], pm["2026-10"]["uc"], pm["2026-10"]["gap"]], "explorer": [q3["2026-10"]["started"], q3["2026-10"]["uc"], q3["2026-10"]["net_client_change"]], "cash": None,
+         "unit": "daily_client_activity (client starts by client start date, contracts by latest valid contract date)", "bridge": {}},
+        {"key": "starts_nov", "label": "1–16 Nov 2026 (partial): searches started · under contract · difference", "fmt": "trio",
+         "cj": [pm["2026-11"]["new"], pm["2026-11"]["uc"], pm["2026-11"]["gap"]], "explorer": [q3["2026-11"]["started"], q3["2026-11"]["uc"], q3["2026-11"]["net_client_change"]], "cash": None,
+         "unit": "the same daily counts up to the data date; the month is still filling", "bridge": {}},
+        {"key": "hunting_status", "label": "Hunting on 16 Nov (the backlog, a status count)", "cj": data["outcomes"]["waiting"]["stages"]["hunting"], "explorer": ex["jira"]["hunting"], "cash": None,
+         "unit": "Jira issues by status; not the sum of the monthly starts − contracts", "bridge": {}},
         {"key": "uc_median", "label": "Median days to Under Contract (recorded)", "cj": data["speed"]["observed"]["uc"]["median"], "explorer": ex["q1"]["uc"]["median"], "cash": None,
          "unit": "confirmed starts, client start date to latest valid contract", "bridge": {}},
         {"key": "budget14", "label": "Under contract within 14 days, up to / above $250K", "cj": [bud[0]["uc14"]["k"], bud[0]["uc14"]["eligible"], bud[1]["uc14"]["k"], bud[1]["uc14"]["eligible"]],
          "explorer": [pb["Up to $250K"]["uc14"]["k"], pb["Up to $250K"]["uc14"]["eligible"], pb["Above $250K"]["uc14"]["k"], pb["Above $250K"]["uc14"]["eligible"]], "cash": None,
          "unit": "confirmed starts with a matched onboarding budget, eligible = 14 days on the clock", "bridge": {}},
+        {"key": "budget_rf30", "label": "Refunded within 30 days, up to / above $250K",
+         "cj": [data["budgets"]["early"]["sets"]["all"][g]["rf30"][k] for g in ("Up to $250K", "Above $250K") for k in ("k", "eligible")],
+         "explorer": [pb[g]["rf30"][k] for g in ("Up to $250K", "Above $250K") for k in ("k", "eligible")], "cash": None,
+         "unit": "refund date - client start date within 30 days, eligible = 30 days on the clock", "bridge": {}},
+        {"key": "budget_paused", "label": "Paused on 16 Nov, up to / above $250K",
+         "cj": [data["budgets"]["early"]["sets"]["all"]["Up to $250K"]["paused_now"], data["budgets"]["early"]["sets"]["all"]["Up to $250K"]["n"],
+                data["budgets"]["early"]["sets"]["all"]["Above $250K"]["paused_now"], data["budgets"]["early"]["sets"]["all"]["Above $250K"]["n"]],
+         "explorer": [pb["Up to $250K"]["stages"].get("paused", 0), pb["Up to $250K"]["n"], pb["Above $250K"]["stages"].get("paused", 0), pb["Above $250K"]["n"]], "cash": None,
+         "unit": "status snapshot (Jira, 16 Nov), all matched clients in each group", "bridge": {}},
         {"key": "net_cash", "label": "Forecast net cash (default assumptions)", "cj": None, "explorer": pub["views"]["cash_bridge"]["expected"]["net"], "cash": bridge["net"],
          "unit": "service + affiliate − future refunds, Cash Forecast defaults", "bridge": {k: bridge[k] for k in ("service", "affiliate", "refunds")}},
     ]

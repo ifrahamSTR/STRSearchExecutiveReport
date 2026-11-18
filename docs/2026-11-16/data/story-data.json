@@ -13712,6 +13712,1969 @@
   }
  },
  "budgets": {
+  "early": {
+   "asof_status": "2026-11-16",
+   "asof_pause_dates": "2026-11-11",
+   "groups": [
+    "Up to $250K",
+    "Above $250K"
+   ],
+   "windows": {
+    "uc": [
+     14,
+     30,
+     45,
+     60,
+     90
+    ],
+    "closed": [
+     60,
+     90,
+     120
+    ],
+    "early": [
+     14,
+     30,
+     60,
+     90
+    ]
+   },
+   "sets": {
+    "all": {
+     "Up to $250K": {
+      "n": 198,
+      "paused_now": 15,
+      "refunded_now": 31,
+      "pause_dated": 15,
+      "pause_days": {
+       "median": 64.0,
+       "min": 25.0
+      },
+      "uc14": {
+       "k": 13,
+       "eligible": 194
+      },
+      "uc30": {
+       "k": 45,
+       "eligible": 178
+      },
+      "uc45": {
+       "k": 68,
+       "eligible": 167
+      },
+      "uc60": {
+       "k": 78,
+       "eligible": 144
+      },
+      "uc90": {
+       "k": 64,
+       "eligible": 102
+      },
+      "cl60": {
+       "k": 28,
+       "eligible": 144
+      },
+      "cl90": {
+       "k": 39,
+       "eligible": 102
+      },
+      "cl120": {
+       "k": 41,
+       "eligible": 61
+      },
+      "rf14": {
+       "k": 16,
+       "eligible": 194
+      },
+      "pa14": {
+       "k": 0,
+       "eligible": 194
+      },
+      "ex14": {
+       "k": 16,
+       "eligible": 194
+      },
+      "rf30": {
+       "k": 22,
+       "eligible": 178
+      },
+      "pa30": {
+       "k": 2,
+       "eligible": 178
+      },
+      "ex30": {
+       "k": 24,
+       "eligible": 178
+      },
+      "rf60": {
+       "k": 14,
+       "eligible": 144
+      },
+      "pa60": {
+       "k": 6,
+       "eligible": 144
+      },
+      "ex60": {
+       "k": 20,
+       "eligible": 144
+      },
+      "rf90": {
+       "k": 12,
+       "eligible": 102
+      },
+      "pa90": {
+       "k": 5,
+       "eligible": 102
+      },
+      "ex90": {
+       "k": 17,
+       "eligible": 102
+      }
+     },
+     "Above $250K": {
+      "n": 196,
+      "paused_now": 20,
+      "refunded_now": 20,
+      "pause_dated": 18,
+      "pause_days": {
+       "median": 72.5,
+       "min": 27.0
+      },
+      "uc14": {
+       "k": 12,
+       "eligible": 191
+      },
+      "uc30": {
+       "k": 50,
+       "eligible": 176
+      },
+      "uc45": {
+       "k": 62,
+       "eligible": 158
+      },
+      "uc60": {
+       "k": 65,
+       "eligible": 138
+      },
+      "uc90": {
+       "k": 66,
+       "eligible": 106
+      },
+      "cl60": {
+       "k": 27,
+       "eligible": 138
+      },
+      "cl90": {
+       "k": 44,
+       "eligible": 106
+      },
+      "cl120": {
+       "k": 37,
+       "eligible": 64
+      },
+      "rf14": {
+       "k": 13,
+       "eligible": 191
+      },
+      "pa14": {
+       "k": 0,
+       "eligible": 191
+      },
+      "ex14": {
+       "k": 13,
+       "eligible": 191
+      },
+      "rf30": {
+       "k": 11,
+       "eligible": 176
+      },
+      "pa30": {
+       "k": 1,
+       "eligible": 176
+      },
+      "ex30": {
+       "k": 12,
+       "eligible": 176
+      },
+      "rf60": {
+       "k": 6,
+       "eligible": 138
+      },
+      "pa60": {
+       "k": 6,
+       "eligible": 138
+      },
+      "ex60": {
+       "k": 12,
+       "eligible": 138
+      },
+      "rf90": {
+       "k": 8,
+       "eligible": 106
+      },
+      "pa90": {
+       "k": 12,
+       "eligible": 106
+      },
+      "ex90": {
+       "k": 20,
+       "eligible": 106
+      }
+     }
+    },
+    "nce": {
+     "Up to $250K": {
+      "n": 120,
+      "paused_now": 7,
+      "refunded_now": 20,
+      "pause_dated": 7,
+      "pause_days": {
+       "median": 64.0,
+       "min": 41.0
+      },
+      "uc14": {
+       "k": 10,
+       "eligible": 118
+      },
+      "uc30": {
+       "k": 29,
+       "eligible": 107
+      },
+      "uc45": {
+       "k": 41,
+       "eligible": 100
+      },
+      "uc60": {
+       "k": 43,
+       "eligible": 80
+      },
+      "uc90": {
+       "k": 30,
+       "eligible": 50
+      },
+      "cl60": {
+       "k": 20,
+       "eligible": 80
+      },
+      "cl90": {
+       "k": 22,
+       "eligible": 50
+      },
+      "cl120": {
+       "k": 16,
+       "eligible": 24
+      },
+      "rf14": {
+       "k": 12,
+       "eligible": 118
+      },
+      "pa14": {
+       "k": 0,
+       "eligible": 118
+      },
+      "ex14": {
+       "k": 12,
+       "eligible": 118
+      },
+      "rf30": {
+       "k": 18,
+       "eligible": 107
+      },
+      "pa30": {
+       "k": 0,
+       "eligible": 107
+      },
+      "ex30": {
+       "k": 18,
+       "eligible": 107
+      },
+      "rf60": {
+       "k": 8,
+       "eligible": 80
+      },
+      "pa60": {
+       "k": 3,
+       "eligible": 80
+      },
+      "ex60": {
+       "k": 11,
+       "eligible": 80
+      },
+      "rf90": {
+       "k": 7,
+       "eligible": 50
+      },
+      "pa90": {
+       "k": 2,
+       "eligible": 50
+      },
+      "ex90": {
+       "k": 9,
+       "eligible": 50
+      }
+     },
+     "Above $250K": {
+      "n": 102,
+      "paused_now": 9,
+      "refunded_now": 14,
+      "pause_dated": 8,
+      "pause_days": {
+       "median": 59.5,
+       "min": 27.0
+      },
+      "uc14": {
+       "k": 9,
+       "eligible": 98
+      },
+      "uc30": {
+       "k": 25,
+       "eligible": 85
+      },
+      "uc45": {
+       "k": 30,
+       "eligible": 75
+      },
+      "uc60": {
+       "k": 31,
+       "eligible": 63
+      },
+      "uc90": {
+       "k": 26,
+       "eligible": 39
+      },
+      "cl60": {
+       "k": 13,
+       "eligible": 63
+      },
+      "cl90": {
+       "k": 16,
+       "eligible": 39
+      },
+      "cl120": {
+       "k": 8,
+       "eligible": 12
+      },
+      "rf14": {
+       "k": 10,
+       "eligible": 98
+      },
+      "pa14": {
+       "k": 0,
+       "eligible": 98
+      },
+      "ex14": {
+       "k": 10,
+       "eligible": 98
+      },
+      "rf30": {
+       "k": 8,
+       "eligible": 85
+      },
+      "pa30": {
+       "k": 1,
+       "eligible": 85
+      },
+      "ex30": {
+       "k": 9,
+       "eligible": 85
+      },
+      "rf60": {
+       "k": 3,
+       "eligible": 63
+      },
+      "pa60": {
+       "k": 4,
+       "eligible": 63
+      },
+      "ex60": {
+       "k": 7,
+       "eligible": 63
+      },
+      "rf90": {
+       "k": 4,
+       "eligible": 39
+      },
+      "pa90": {
+       "k": 5,
+       "eligible": 39
+      },
+      "ex90": {
+       "k": 9,
+       "eligible": 39
+      }
+     }
+    },
+    "legacy": {
+     "Up to $250K": {
+      "n": 78,
+      "paused_now": 8,
+      "refunded_now": 11,
+      "pause_dated": 8,
+      "pause_days": {
+       "median": 65.5,
+       "min": 25.0
+      },
+      "uc14": {
+       "k": 3,
+       "eligible": 76
+      },
+      "uc30": {
+       "k": 16,
+       "eligible": 71
+      },
+      "uc45": {
+       "k": 27,
+       "eligible": 67
+      },
+      "uc60": {
+       "k": 35,
+       "eligible": 64
+      },
+      "uc90": {
+       "k": 34,
+       "eligible": 52
+      },
+      "cl60": {
+       "k": 8,
+       "eligible": 64
+      },
+      "cl90": {
+       "k": 17,
+       "eligible": 52
+      },
+      "cl120": {
+       "k": 25,
+       "eligible": 37
+      },
+      "rf14": {
+       "k": 4,
+       "eligible": 76
+      },
+      "pa14": {
+       "k": 0,
+       "eligible": 76
+      },
+      "ex14": {
+       "k": 4,
+       "eligible": 76
+      },
+      "rf30": {
+       "k": 4,
+       "eligible": 71
+      },
+      "pa30": {
+       "k": 2,
+       "eligible": 71
+      },
+      "ex30": {
+       "k": 6,
+       "eligible": 71
+      },
+      "rf60": {
+       "k": 6,
+       "eligible": 64
+      },
+      "pa60": {
+       "k": 3,
+       "eligible": 64
+      },
+      "ex60": {
+       "k": 9,
+       "eligible": 64
+      },
+      "rf90": {
+       "k": 5,
+       "eligible": 52
+      },
+      "pa90": {
+       "k": 3,
+       "eligible": 52
+      },
+      "ex90": {
+       "k": 8,
+       "eligible": 52
+      }
+     },
+     "Above $250K": {
+      "n": 94,
+      "paused_now": 11,
+      "refunded_now": 6,
+      "pause_dated": 10,
+      "pause_days": {
+       "median": 89.0,
+       "min": 35.0
+      },
+      "uc14": {
+       "k": 3,
+       "eligible": 93
+      },
+      "uc30": {
+       "k": 25,
+       "eligible": 91
+      },
+      "uc45": {
+       "k": 32,
+       "eligible": 83
+      },
+      "uc60": {
+       "k": 34,
+       "eligible": 75
+      },
+      "uc90": {
+       "k": 40,
+       "eligible": 67
+      },
+      "cl60": {
+       "k": 14,
+       "eligible": 75
+      },
+      "cl90": {
+       "k": 28,
+       "eligible": 67
+      },
+      "cl120": {
+       "k": 29,
+       "eligible": 52
+      },
+      "rf14": {
+       "k": 3,
+       "eligible": 93
+      },
+      "pa14": {
+       "k": 0,
+       "eligible": 93
+      },
+      "ex14": {
+       "k": 3,
+       "eligible": 93
+      },
+      "rf30": {
+       "k": 3,
+       "eligible": 91
+      },
+      "pa30": {
+       "k": 0,
+       "eligible": 91
+      },
+      "ex30": {
+       "k": 3,
+       "eligible": 91
+      },
+      "rf60": {
+       "k": 3,
+       "eligible": 75
+      },
+      "pa60": {
+       "k": 2,
+       "eligible": 75
+      },
+      "ex60": {
+       "k": 5,
+       "eligible": 75
+      },
+      "rf90": {
+       "k": 4,
+       "eligible": 67
+      },
+      "pa90": {
+       "k": 7,
+       "eligible": 67
+      },
+      "ex90": {
+       "k": 11,
+       "eligible": 67
+      }
+     }
+    }
+   },
+   "mh": {
+    "all": {
+     "rf": [
+      {
+       "w": 14,
+       "strata": 13,
+       "diff": 0.0177,
+       "lo": -0.0333,
+       "hi": 0.0688,
+       "a": [
+        16,
+        190
+       ],
+       "b": [
+        12,
+        187
+       ],
+       "thin": false
+      },
+      {
+       "w": 30,
+       "strata": 13,
+       "diff": 0.0593,
+       "lo": 0.0009,
+       "hi": 0.1177,
+       "a": [
+        22,
+        174
+       ],
+       "b": [
+        10,
+        172
+       ],
+       "thin": false
+      },
+      {
+       "w": 60,
+       "strata": 11,
+       "diff": 0.0587,
+       "lo": 0.0043,
+       "hi": 0.1131,
+       "a": [
+        14,
+        140
+       ],
+       "b": [
+        5,
+        134
+       ],
+       "thin": false
+      },
+      {
+       "w": 90,
+       "strata": 9,
+       "diff": 0.0506,
+       "lo": -0.0252,
+       "hi": 0.1264,
+       "a": [
+        12,
+        98
+       ],
+       "b": [
+        7,
+        102
+       ],
+       "thin": false
+      }
+     ],
+     "pa": [
+      {
+       "w": 14,
+       "strata": 13,
+       "diff": 0.0,
+       "lo": 0.0,
+       "hi": 0.0,
+       "a": [
+        0,
+        190
+       ],
+       "b": [
+        0,
+        187
+       ],
+       "thin": false
+      },
+      {
+       "w": 30,
+       "strata": 13,
+       "diff": 0.0003,
+       "lo": -0.0171,
+       "hi": 0.0177,
+       "a": [
+        1,
+        174
+       ],
+       "b": [
+        1,
+        172
+       ],
+       "thin": false
+      },
+      {
+       "w": 60,
+       "strata": 11,
+       "diff": -0.0115,
+       "lo": -0.0593,
+       "hi": 0.0364,
+       "a": [
+        5,
+        140
+       ],
+       "b": [
+        6,
+        134
+       ],
+       "thin": false
+      },
+      {
+       "w": 90,
+       "strata": 9,
+       "diff": -0.0849,
+       "lo": -0.1585,
+       "hi": -0.0114,
+       "a": [
+        4,
+        98
+       ],
+       "b": [
+        12,
+        102
+       ],
+       "thin": false
+      }
+     ],
+     "ex": [
+      {
+       "w": 14,
+       "strata": 13,
+       "diff": 0.0177,
+       "lo": -0.0333,
+       "hi": 0.0688,
+       "a": [
+        16,
+        190
+       ],
+       "b": [
+        12,
+        187
+       ],
+       "thin": false
+      },
+      {
+       "w": 30,
+       "strata": 13,
+       "diff": 0.0596,
+       "lo": -0.0011,
+       "hi": 0.1203,
+       "a": [
+        23,
+        174
+       ],
+       "b": [
+        11,
+        172
+       ],
+       "thin": false
+      },
+      {
+       "w": 60,
+       "strata": 11,
+       "diff": 0.0472,
+       "lo": -0.0235,
+       "hi": 0.1179,
+       "a": [
+        19,
+        140
+       ],
+       "b": [
+        11,
+        134
+       ],
+       "thin": false
+      },
+      {
+       "w": 90,
+       "strata": 9,
+       "diff": -0.0343,
+       "lo": -0.1361,
+       "hi": 0.0675,
+       "a": [
+        16,
+        98
+       ],
+       "b": [
+        19,
+        102
+       ],
+       "thin": false
+      }
+     ],
+     "uc": [
+      {
+       "w": 14,
+       "strata": 13,
+       "diff": 0.0034,
+       "lo": -0.0468,
+       "hi": 0.0536,
+       "a": [
+        13,
+        190
+       ],
+       "b": [
+        12,
+        187
+       ],
+       "thin": false
+      },
+      {
+       "w": 30,
+       "strata": 13,
+       "diff": -0.0416,
+       "lo": -0.1316,
+       "hi": 0.0485,
+       "a": [
+        44,
+        174
+       ],
+       "b": [
+        49,
+        172
+       ],
+       "thin": false
+      },
+      {
+       "w": 45,
+       "strata": 12,
+       "diff": 0.0187,
+       "lo": -0.0863,
+       "hi": 0.1238,
+       "a": [
+        67,
+        163
+       ],
+       "b": [
+        60,
+        153
+       ],
+       "thin": false
+      },
+      {
+       "w": 60,
+       "strata": 11,
+       "diff": 0.0583,
+       "lo": -0.0536,
+       "hi": 0.1703,
+       "a": [
+        76,
+        140
+       ],
+       "b": [
+        63,
+        134
+       ],
+       "thin": false
+      },
+      {
+       "w": 90,
+       "strata": 9,
+       "diff": -0.0005,
+       "lo": -0.1295,
+       "hi": 0.1286,
+       "a": [
+        62,
+        98
+       ],
+       "b": [
+        64,
+        102
+       ],
+       "thin": false
+      }
+     ],
+     "cl": [
+      {
+       "w": 60,
+       "strata": 11,
+       "diff": -0.0042,
+       "lo": -0.0965,
+       "hi": 0.0881,
+       "a": [
+        28,
+        140
+       ],
+       "b": [
+        25,
+        134
+       ],
+       "thin": false
+      },
+      {
+       "w": 90,
+       "strata": 9,
+       "diff": -0.0132,
+       "lo": -0.1389,
+       "hi": 0.1125,
+       "a": [
+        39,
+        98
+       ],
+       "b": [
+        41,
+        102
+       ],
+       "thin": false
+      },
+      {
+       "w": 120,
+       "strata": 7,
+       "diff": 0.0977,
+       "lo": -0.0547,
+       "hi": 0.2501,
+       "a": [
+        39,
+        57
+       ],
+       "b": [
+        34,
+        60
+       ],
+       "thin": false
+      }
+     ]
+    },
+    "nce": {
+     "rf": [
+      {
+       "w": 14,
+       "strata": 5,
+       "diff": 0.0075,
+       "lo": -0.0703,
+       "hi": 0.0853,
+       "a": [
+        12,
+        117
+       ],
+       "b": [
+        10,
+        98
+       ],
+       "thin": false
+      },
+      {
+       "w": 30,
+       "strata": 5,
+       "diff": 0.0781,
+       "lo": -0.0133,
+       "hi": 0.1696,
+       "a": [
+        18,
+        106
+       ],
+       "b": [
+        8,
+        85
+       ],
+       "thin": false
+      },
+      {
+       "w": 60,
+       "strata": 4,
+       "diff": 0.0524,
+       "lo": -0.03,
+       "hi": 0.1349,
+       "a": [
+        8,
+        79
+       ],
+       "b": [
+        3,
+        63
+       ],
+       "thin": false
+      },
+      {
+       "w": 90,
+       "strata": 3,
+       "diff": 0.0447,
+       "lo": -0.0891,
+       "hi": 0.1785,
+       "a": [
+        7,
+        49
+       ],
+       "b": [
+        4,
+        39
+       ],
+       "thin": false
+      }
+     ],
+     "pa": [
+      {
+       "w": 14,
+       "strata": 5,
+       "diff": 0.0,
+       "lo": 0.0,
+       "hi": 0.0,
+       "a": [
+        0,
+        117
+       ],
+       "b": [
+        0,
+        98
+       ],
+       "thin": false
+      },
+      {
+       "w": 30,
+       "strata": 5,
+       "diff": -0.0113,
+       "lo": -0.0329,
+       "hi": 0.0104,
+       "a": [
+        0,
+        106
+       ],
+       "b": [
+        1,
+        85
+       ],
+       "thin": false
+      },
+      {
+       "w": 60,
+       "strata": 4,
+       "diff": -0.0231,
+       "lo": -0.0959,
+       "hi": 0.0496,
+       "a": [
+        3,
+        79
+       ],
+       "b": [
+        4,
+        63
+       ],
+       "thin": false
+      },
+      {
+       "w": 90,
+       "strata": 3,
+       "diff": -0.0955,
+       "lo": -0.216,
+       "hi": 0.0249,
+       "a": [
+        2,
+        49
+       ],
+       "b": [
+        5,
+        39
+       ],
+       "thin": false
+      }
+     ],
+     "ex": [
+      {
+       "w": 14,
+       "strata": 5,
+       "diff": 0.0075,
+       "lo": -0.0703,
+       "hi": 0.0853,
+       "a": [
+        12,
+        117
+       ],
+       "b": [
+        10,
+        98
+       ],
+       "thin": false
+      },
+      {
+       "w": 30,
+       "strata": 5,
+       "diff": 0.0669,
+       "lo": -0.0267,
+       "hi": 0.1605,
+       "a": [
+        18,
+        106
+       ],
+       "b": [
+        9,
+        85
+       ],
+       "thin": false
+      },
+      {
+       "w": 60,
+       "strata": 4,
+       "diff": 0.0293,
+       "lo": -0.078,
+       "hi": 0.1366,
+       "a": [
+        11,
+        79
+       ],
+       "b": [
+        7,
+        63
+       ],
+       "thin": false
+      },
+      {
+       "w": 90,
+       "strata": 3,
+       "diff": -0.0508,
+       "lo": -0.2241,
+       "hi": 0.1225,
+       "a": [
+        9,
+        49
+       ],
+       "b": [
+        9,
+        39
+       ],
+       "thin": false
+      }
+     ]
+    },
+    "legacy": {
+     "rf": [
+      {
+       "w": 14,
+       "strata": 8,
+       "diff": 0.0316,
+       "lo": -0.026,
+       "hi": 0.0892,
+       "a": [
+        4,
+        73
+       ],
+       "b": [
+        2,
+        89
+       ],
+       "thin": false
+      },
+      {
+       "w": 30,
+       "strata": 8,
+       "diff": 0.0352,
+       "lo": -0.0281,
+       "hi": 0.0985,
+       "a": [
+        4,
+        68
+       ],
+       "b": [
+        2,
+        87
+       ],
+       "thin": false
+      },
+      {
+       "w": 60,
+       "strata": 7,
+       "diff": 0.0656,
+       "lo": -0.0037,
+       "hi": 0.1349,
+       "a": [
+        6,
+        61
+       ],
+       "b": [
+        2,
+        71
+       ],
+       "thin": false
+      },
+      {
+       "w": 90,
+       "strata": 6,
+       "diff": 0.0554,
+       "lo": -0.0287,
+       "hi": 0.1395,
+       "a": [
+        5,
+        49
+       ],
+       "b": [
+        3,
+        63
+       ],
+       "thin": false
+      }
+     ],
+     "pa": [
+      {
+       "w": 14,
+       "strata": 8,
+       "diff": 0.0,
+       "lo": 0.0,
+       "hi": 0.0,
+       "a": [
+        0,
+        73
+       ],
+       "b": [
+        0,
+        89
+       ],
+       "thin": false
+      },
+      {
+       "w": 30,
+       "strata": 8,
+       "diff": 0.0151,
+       "lo": -0.0133,
+       "hi": 0.0435,
+       "a": [
+        1,
+        68
+       ],
+       "b": [
+        0,
+        87
+       ],
+       "thin": false
+      },
+      {
+       "w": 60,
+       "strata": 7,
+       "diff": 0.0014,
+       "lo": -0.0591,
+       "hi": 0.062,
+       "a": [
+        2,
+        61
+       ],
+       "b": [
+        2,
+        71
+       ],
+       "thin": false
+      },
+      {
+       "w": 90,
+       "strata": 6,
+       "diff": -0.0763,
+       "lo": -0.1669,
+       "hi": 0.0142,
+       "a": [
+        2,
+        49
+       ],
+       "b": [
+        7,
+        63
+       ],
+       "thin": false
+      }
+     ],
+     "ex": [
+      {
+       "w": 14,
+       "strata": 8,
+       "diff": 0.0316,
+       "lo": -0.026,
+       "hi": 0.0892,
+       "a": [
+        4,
+        73
+       ],
+       "b": [
+        2,
+        89
+       ],
+       "thin": false
+      },
+      {
+       "w": 30,
+       "strata": 8,
+       "diff": 0.0503,
+       "lo": -0.0191,
+       "hi": 0.1197,
+       "a": [
+        5,
+        68
+       ],
+       "b": [
+        2,
+        87
+       ],
+       "thin": false
+      },
+      {
+       "w": 60,
+       "strata": 7,
+       "diff": 0.0671,
+       "lo": -0.0229,
+       "hi": 0.157,
+       "a": [
+        8,
+        61
+       ],
+       "b": [
+        4,
+        71
+       ],
+       "thin": false
+      },
+      {
+       "w": 90,
+       "strata": 6,
+       "diff": -0.021,
+       "lo": -0.1405,
+       "hi": 0.0985,
+       "a": [
+        7,
+        49
+       ],
+       "b": [
+        10,
+        63
+       ],
+       "thin": false
+      }
+     ]
+    }
+   },
+   "curves": {
+    "days": 150,
+    "uc": {
+     "Up to $250K": {
+      "curve": [
+       0.0,
+       0.0,
+       0.0,
+       0.0,
+       0.0,
+       0.0,
+       0.0,
+       0.0102,
+       0.0102,
+       0.0203,
+       0.0305,
+       0.0406,
+       0.0457,
+       0.0508,
+       0.0713,
+       0.0867,
+       0.1073,
+       0.1124,
+       0.1124,
+       0.1229,
+       0.144,
+       0.16,
+       0.16,
+       0.1812,
+       0.2185,
+       0.2344,
+       0.2398,
+       0.2398,
+       0.2452,
+       0.2452,
+       0.2619,
+       0.2841,
+       0.2953,
+       0.2953,
+       0.3009,
+       0.3178,
+       0.3291,
+       0.3405,
+       0.3576,
+       0.3748,
+       0.4035,
+       0.4035,
+       0.4035,
+       0.4093,
+       0.4093,
+       0.4152,
+       0.4152,
+       0.4275,
+       0.4337,
+       0.44,
+       0.4589,
+       0.4653,
+       0.4653,
+       0.4653,
+       0.4653,
+       0.472,
+       0.4929,
+       0.5074,
+       0.5146,
+       0.5146,
+       0.5146,
+       0.5293,
+       0.5293,
+       0.5448,
+       0.5448,
+       0.5525,
+       0.5602,
+       0.5602,
+       0.5602,
+       0.5602,
+       0.5679,
+       0.5679,
+       0.5839,
+       0.5919,
+       0.6001,
+       0.6001,
+       0.6082,
+       0.6082,
+       0.6082,
+       0.6169,
+       0.6256,
+       0.6256,
+       0.6256,
+       0.6256,
+       0.6256,
+       0.6256,
+       0.6346,
+       0.6346,
+       0.6346,
+       0.6437,
+       0.6528,
+       0.6528,
+       0.662,
+       0.662,
+       0.662,
+       0.662,
+       0.662,
+       0.662,
+       0.6722,
+       0.6835,
+       0.6835,
+       0.6835,
+       0.6835,
+       0.6835,
+       0.6835,
+       0.6835,
+       0.6835,
+       0.6835,
+       0.6835,
+       0.6835,
+       0.6835,
+       0.6835,
+       0.6993,
+       0.6993,
+       0.7152,
+       0.7152,
+       0.7152,
+       0.7152,
+       0.7152,
+       0.7152,
+       0.7152,
+       0.7152,
+       0.7152,
+       0.7152,
+       0.7152,
+       0.7152,
+       0.7152,
+       0.7152,
+       0.7152,
+       0.7152,
+       0.7152,
+       0.7152,
+       0.7411,
+       0.7411,
+       0.7411,
+       0.7411,
+       0.7411,
+       0.7411,
+       0.7411,
+       0.7411,
+       0.7411,
+       0.7411,
+       0.7411,
+       0.7411,
+       0.7411,
+       0.7411,
+       0.7411,
+       0.7411,
+       0.7411,
+       0.7411,
+       0.7411
+      ],
+      "n": 198,
+      "events": 116,
+      "half": 57
+     },
+     "Above $250K": {
+      "curve": [
+       0.0,
+       0.0,
+       0.0,
+       0.0,
+       0.0,
+       0.0,
+       0.0052,
+       0.0155,
+       0.0155,
+       0.0155,
+       0.0259,
+       0.0363,
+       0.0415,
+       0.0519,
+       0.0623,
+       0.0781,
+       0.1043,
+       0.1095,
+       0.12,
+       0.1412,
+       0.1571,
+       0.1624,
+       0.1786,
+       0.1947,
+       0.2108,
+       0.227,
+       0.2378,
+       0.2433,
+       0.2601,
+       0.2657,
+       0.2828,
+       0.2886,
+       0.3001,
+       0.3059,
+       0.3059,
+       0.3118,
+       0.3118,
+       0.3238,
+       0.3297,
+       0.3359,
+       0.3483,
+       0.3545,
+       0.3608,
+       0.3798,
+       0.3861,
+       0.3924,
+       0.3924,
+       0.4054,
+       0.4054,
+       0.4254,
+       0.4388,
+       0.4454,
+       0.4454,
+       0.4454,
+       0.4454,
+       0.4454,
+       0.4525,
+       0.4596,
+       0.4596,
+       0.4667,
+       0.4809,
+       0.4809,
+       0.4955,
+       0.5028,
+       0.5102,
+       0.5175,
+       0.5321,
+       0.5469,
+       0.5469,
+       0.5548,
+       0.5548,
+       0.5626,
+       0.5626,
+       0.5705,
+       0.5705,
+       0.5705,
+       0.5785,
+       0.595,
+       0.595,
+       0.595,
+       0.595,
+       0.6038,
+       0.6126,
+       0.6126,
+       0.6214,
+       0.6214,
+       0.6302,
+       0.6302,
+       0.6302,
+       0.6302,
+       0.6392,
+       0.6392,
+       0.6392,
+       0.6392,
+       0.6392,
+       0.6392,
+       0.6392,
+       0.6392,
+       0.6392,
+       0.6495,
+       0.6599,
+       0.6702,
+       0.6702,
+       0.6702,
+       0.6702,
+       0.6702,
+       0.6702,
+       0.6702,
+       0.6702,
+       0.6702,
+       0.6702,
+       0.6702,
+       0.6702,
+       0.6852,
+       0.6852,
+       0.6852,
+       0.6852,
+       0.6852,
+       0.7001,
+       0.7001,
+       0.7001,
+       0.7001,
+       0.7001,
+       0.7001,
+       0.7001,
+       0.7001,
+       0.7001,
+       0.7001,
+       0.7001,
+       0.7001,
+       0.7001,
+       0.7001,
+       0.7001,
+       0.7001,
+       0.7001,
+       0.7159,
+       0.7159,
+       0.7159,
+       0.7159,
+       0.7159,
+       0.7159,
+       0.7159,
+       0.7159,
+       0.7159,
+       0.7159,
+       0.7159,
+       0.7159,
+       0.7159,
+       0.7159,
+       0.7159,
+       0.7159
+      ],
+      "n": 196,
+      "events": 110,
+      "half": 63
+     }
+    },
+    "closed": {
+     "Up to $250K": {
+      "curve": [
+       0.0,
+       0.0,
+       0.0,
+       0.0,
+       0.0,
+       0.0,
+       0.0,
+       0.0,
+       0.0,
+       0.0,
+       0.0,
+       0.0,
+       0.0,
+       0.0,
+       0.0,
+       0.0,
+       0.0,
+       0.0,
+       0.0,
+       0.0,
+       0.0,
+       0.0,
+       0.0,
+       0.0,
+       0.0,
+       0.0,
+       0.0,
+       0.0,
+       0.0,
+       0.0,
+       0.0,
+       0.0,
+       0.0,
+       0.0,
+       0.0,
+       0.0,
+       0.0,
+       0.0,
+       0.0,
+       0.0,
+       0.0,
+       0.0,
+       0.0,
+       0.0,
+       0.0118,
+       0.0298,
+       0.0481,
+       0.0481,
+       0.0544,
+       0.0544,
+       0.0734,
+       0.099,
+       0.1118,
+       0.1118,
+       0.1182,
+       0.1182,
+       0.125,
+       0.1458,
+       0.1597,
+       0.1877,
+       0.1877,
+       0.1877,
+       0.1949,
+       0.2094,
+       0.2094,
+       0.2167,
+       0.2314,
+       0.2387,
+       0.2461,
+       0.2461,
+       0.2461,
+       0.285,
+       0.2928,
+       0.2928,
+       0.3007,
+       0.3088,
+       0.3329,
+       0.3412,
+       0.3412,
+       0.3412,
+       0.3497,
+       0.3668,
+       0.3668,
+       0.3757,
+       0.3847,
+       0.3847,
+       0.3847,
+       0.3847,
+       0.3941,
+       0.4035,
+       0.4035,
+       0.4225,
+       0.4319,
+       0.4319,
+       0.4319,
+       0.4515,
+       0.4515,
+       0.4515,
+       0.4621,
+       0.4621,
+       0.4733,
+       0.4957,
+       0.4957,
+       0.5071,
+       0.5071,
+       0.5189,
+       0.5309,
+       0.5429,
+       0.555,
+       0.555,
+       0.555,
+       0.555,
+       0.555,
+       0.555,
+       0.555,
+       0.5698,
+       0.5698,
+       0.6029,
+       0.6029,
+       0.6194,
+       0.6194,
+       0.6194,
+       0.6385,
+       0.6385,
+       0.6765,
+       0.6765,
+       0.6765,
+       0.6765,
+       0.6981,
+       0.6981,
+       0.6981,
+       0.6981,
+       0.6981,
+       0.6981,
+       0.6981,
+       0.6981,
+       0.7213,
+       0.7213,
+       0.7213,
+       0.7213,
+       0.7213,
+       0.7213,
+       0.7213,
+       0.7213,
+       0.7213,
+       0.7213,
+       0.7213,
+       0.7213,
+       0.7213,
+       0.7213,
+       0.7213
+      ],
+      "n": 198,
+      "events": 79,
+      "half": 103
+     },
+     "Above $250K": {
+      "curve": [
+       0.0,
+       0.0,
+       0.0,
+       0.0,
+       0.0,
+       0.0,
+       0.0,
+       0.0,
+       0.0,
+       0.0,
+       0.0,
+       0.0,
+       0.0,
+       0.0,
+       0.0,
+       0.0,
+       0.0,
+       0.0,
+       0.0,
+       0.0,
+       0.0,
+       0.0,
+       0.0,
+       0.0,
+       0.0,
+       0.0,
+       0.0,
+       0.0,
+       0.0,
+       0.0,
+       0.0,
+       0.0,
+       0.0,
+       0.0,
+       0.0,
+       0.0059,
+       0.0059,
+       0.0178,
+       0.0178,
+       0.0301,
+       0.0363,
+       0.0363,
+       0.0425,
+       0.0425,
+       0.0425,
+       0.0488,
+       0.0551,
+       0.0551,
+       0.0683,
+       0.0881,
+       0.0881,
+       0.0881,
+       0.0881,
+       0.1019,
+       0.1228,
+       0.1228,
+       0.144,
+       0.1513,
+       0.173,
+       0.1948,
+       0.1948,
+       0.2021,
+       0.2096,
+       0.217,
+       0.2246,
+       0.2322,
+       0.2474,
+       0.255,
+       0.2627,
+       0.2865,
+       0.2865,
+       0.2945,
+       0.3025,
+       0.3431,
+       0.3674,
+       0.3674,
+       0.3674,
+       0.3674,
+       0.3763,
+       0.3763,
+       0.3763,
+       0.3763,
+       0.3763,
+       0.3763,
+       0.3944,
+       0.3944,
+       0.3944,
+       0.3944,
+       0.4036,
+       0.4036,
+       0.413,
+       0.413,
+       0.4233,
+       0.4233,
+       0.4233,
+       0.4233,
+       0.4338,
+       0.4338,
+       0.4659,
+       0.4768,
+       0.4768,
+       0.4768,
+       0.4768,
+       0.4879,
+       0.4879,
+       0.5123,
+       0.5123,
+       0.5248,
+       0.5498,
+       0.5631,
+       0.5631,
+       0.5631,
+       0.5631,
+       0.5631,
+       0.5631,
+       0.5631,
+       0.5631,
+       0.5781,
+       0.5781,
+       0.5781,
+       0.5781,
+       0.5781,
+       0.5781,
+       0.5781,
+       0.5781,
+       0.5781,
+       0.6094,
+       0.6094,
+       0.6094,
+       0.625,
+       0.625,
+       0.625,
+       0.6413,
+       0.6413,
+       0.6413,
+       0.6413,
+       0.6576,
+       0.6576,
+       0.6576,
+       0.6739,
+       0.6911,
+       0.6911,
+       0.6911,
+       0.6911,
+       0.6911,
+       0.6911,
+       0.6911,
+       0.6911,
+       0.6911,
+       0.6911,
+       0.6911
+      ],
+      "n": 196,
+      "events": 77,
+      "half": 105
+     }
+    }
+   },
+   "experience": [
+    {
+     "key": "all",
+     "label": "All clients"
+    },
+    {
+     "key": "nce",
+     "label": "New Client Experience"
+    },
+    {
+     "key": "legacy",
+     "label": "Legacy"
+    }
+   ]
+  },
   "field": "Total out-of-pocket capital available (all-in)",
   "measures": "down payment + closing costs + renovation + furniture + amenities: all-in capital, not the purchase price",
   "threshold": 250,
@@ -15321,6 +17284,51 @@
     }
    },
    {
+    "key": "starts_oct",
+    "label": "October 2026: searches started \u00b7 under contract \u00b7 difference",
+    "fmt": "trio",
+    "cj": [
+     68,
+     55,
+     13
+    ],
+    "explorer": [
+     68,
+     55,
+     13
+    ],
+    "cash": null,
+    "unit": "daily_client_activity (client starts by client start date, contracts by latest valid contract date)",
+    "bridge": {}
+   },
+   {
+    "key": "starts_nov",
+    "label": "1\u201316 Nov 2026 (partial): searches started \u00b7 under contract \u00b7 difference",
+    "fmt": "trio",
+    "cj": [
+     10,
+     26,
+     -16
+    ],
+    "explorer": [
+     10,
+     26,
+     -16
+    ],
+    "cash": null,
+    "unit": "the same daily counts up to the data date; the month is still filling",
+    "bridge": {}
+   },
+   {
+    "key": "hunting_status",
+    "label": "Hunting on 16 Nov (the backlog, a status count)",
+    "cj": 123,
+    "explorer": 123,
+    "cash": null,
+    "unit": "Jira issues by status; not the sum of the monthly starts \u2212 contracts",
+    "bridge": {}
+   },
+   {
     "key": "uc_median",
     "label": "Median days to Under Contract (recorded)",
     "cj": 37.5,
@@ -15346,6 +17354,44 @@
     ],
     "cash": null,
     "unit": "confirmed starts with a matched onboarding budget, eligible = 14 days on the clock",
+    "bridge": {}
+   },
+   {
+    "key": "budget_rf30",
+    "label": "Refunded within 30 days, up to / above $250K",
+    "cj": [
+     22,
+     178,
+     11,
+     176
+    ],
+    "explorer": [
+     22,
+     178,
+     11,
+     176
+    ],
+    "cash": null,
+    "unit": "refund date - client start date within 30 days, eligible = 30 days on the clock",
+    "bridge": {}
+   },
+   {
+    "key": "budget_paused",
+    "label": "Paused on 16 Nov, up to / above $250K",
+    "cj": [
+     15,
+     198,
+     20,
+     196
+    ],
+    "explorer": [
+     15,
+     198,
+     20,
+     196
+    ],
+    "cash": null,
+    "unit": "status snapshot (Jira, 16 Nov), all matched clients in each group",
     "bridge": {}
    },
    {
@@ -15387,7 +17433,7 @@
   "snapshots": {
    "reporting_layer": "2026-11-16"
   },
-  "built_at": "2026-11-18 16:23",
+  "built_at": "2026-11-18 18:24",
   "chapters": [
    "journey",
    "outcomes",
@@ -16432,6 +18478,71 @@
    "hard": false
   },
   {
+   "check": "Budget scenes: every window count (contracts 14-90 days, closings 60-120, refunds 14-90) = the published Explorer's budget groups, cells that differ",
+   "page": 0,
+   "explorer": 0,
+   "ok": true,
+   "hard": true
+  },
+  {
+   "check": "Budget scenes: survival curves cross 50% where the Explorer's Kaplan-Meier medians are (contracts, closings, both groups)",
+   "page": [
+    57,
+    63,
+    103,
+    105
+   ],
+   "explorer": [
+    57,
+    63,
+    103,
+    105
+   ],
+   "ok": true,
+   "hard": true
+  },
+  {
+   "check": "Budget scenes: paused-today counts = the Explorer's stage counts",
+   "page": [
+    15,
+    20
+   ],
+   "explorer": [
+    15,
+    20
+   ],
+   "ok": true,
+   "hard": true
+  },
+  {
+   "check": "Budget scenes: New Client Experience + Legacy add up to all matched clients in every window, both groups (counts and eligible)",
+   "page": true,
+   "explorer": true,
+   "ok": true,
+   "hard": true
+  },
+  {
+   "check": "Budget scenes: refunded-or-paused is never below either alone nor above their sum (every window, both groups)",
+   "page": true,
+   "explorer": true,
+   "ok": true,
+   "hard": true
+  },
+  {
+   "check": "Budget scenes: dated pauses never exceed paused clients; no timed pause count exceeds the paused-today count",
+   "page": true,
+   "explorer": true,
+   "ok": true,
+   "hard": true
+  },
+  {
+   "check": "Budget scenes: every like-for-like difference carries a 95% interval that contains it",
+   "page": true,
+   "explorer": true,
+   "ok": true,
+   "hard": true
+  },
+  {
    "check": "Summary: the best closing month is the most closings of any month on record",
    "page": true,
    "explorer": true,
@@ -16477,6 +18588,47 @@
    "check": "5.3: refunds within 30 days are higher up to $250K, interval clear of zero",
    "page": true,
    "explorer": true,
+   "ok": true,
+   "hard": false
+  },
+  {
+   "check": "5.4: the like-for-like refund gap within 30 days is within 1.5 points of the unadjusted gap ('timing and mix do not explain it')",
+   "page": true,
+   "explorer": true,
+   "ok": true,
+   "hard": false
+  },
+  {
+   "check": "5.4: no pause begins inside the first 14 days ('the first 14 days contain none')",
+   "page": true,
+   "explorer": true,
+   "ok": true,
+   "hard": false
+  },
+  {
+   "check": "5.4: by day 90 refunded-or-paused shares are close (95% interval includes zero)",
+   "page": true,
+   "explorer": true,
+   "ok": true,
+   "hard": false
+  },
+  {
+   "check": "5.3: no contract or closing window is clear of zero, like for like",
+   "page": true,
+   "explorer": true,
+   "ok": true,
+   "hard": false
+  },
+  {
+   "check": "3.2: the partial month has more contracts than starts, and the gap narrowed every full month after its peak",
+   "page": [
+    true,
+    true
+   ],
+   "explorer": [
+    true,
+    true
+   ],
    "ok": true,
    "hard": false
   },

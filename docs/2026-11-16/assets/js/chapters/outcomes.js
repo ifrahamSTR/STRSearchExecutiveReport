@@ -53,7 +53,7 @@
       title: `${S.int(w.no_contract.n)} of ${S.int(N)} signed-up clients have no current contract or completed purchase; ${S.int(st.hunting)} of them are actively hunting` });
     body.innerHTML = `<div class="figs qf four">
         <div class="fig"><span class="v num">${S.int(w.no_contract.n)}<span class="of">${pc(w.no_contract.n)}</span></span><span class="l"><i style="background:var(--ink-2)"></i>no current contract or completed purchase: hunting + Inactive ${S.ui.chip('rec')}</span></div>
-        <div class="fig"><span class="v num">${S.int(st.hunting)}</span><span class="l"><i style="background:var(--wait)"></i>actively hunting; half have waited ${S.med(h.median)}+ days (<a href="#outcomes-2">2.2</a>)</span></div>
+        <div class="fig"><span class="v num">${S.int(st.hunting)}</span><span class="l"><i style="background:var(--wait)"></i>actively hunting; half have waited ${S.med(h.median)}+ days (section 2.2)</span></div>
         <div class="fig"><span class="v num">${S.int(inact)}</span><span class="l"><i style="background:var(--paused)"></i>Inactive = Paused ${S.int(st.paused)} + Refunded ${S.int(st.refunded)} + Additional Service ${S.int(st.additional)}</span></div>
         <div class="fig"><span class="v num">${S.int(st.under_contract)}</span><span class="l"><i style="background:var(--uc)"></i>under contract, not yet closed; ${S.int(w.under_contract.scheduled)} closings scheduled</span></div>
       </div>
@@ -203,7 +203,7 @@
             <div class="chart h-duo" id="refundDays" role="img" aria-label="Refunded clients by days from start to refund: ${r.bands.map(b => `${band(b)} ${b.n}`).join(', ')}."></div>
             <div class="chart h-duo" id="refundMonths" hidden role="img" aria-label="Refunds by month: ${recent.map(m => `${S.monShort(m.month)} ${m.n}`).join(', ')}."></div></div>
         </div>
-        <p class="call"><span class="call-h">Cash link</span>Paused clients have paid <b>${money(cg.paid)}</b> up front. At the Cash Forecast's default (${pd.resume}% resume, ${pd.refund}% refunded, ${pd.remain}% stay paused), <b>${money(pausedRefund)}</b> of the <b>${money(br.refunds)}</b> projected refunds come from them: the paused group is the largest single swing in forecast cash. <a href="cash.html">Open the Cash Forecast →</a></p></div>
+        <p class="call"><span class="call-h">Cash link</span>Paused clients have paid <b>${money(cg.paid)}</b> up front. At the Cash Forecast's default (${pd.resume}% resume, ${pd.refund}% refunded, ${pd.remain}% stay paused), <b>${money(pausedRefund)}</b> of the <b>${money(br.refunds)}</b> projected refunds come from them: the paused group is the largest single swing in forecast cash. The Cash Forecast tab models these flows.</p></div>
         <div class="pv-table tw" id="othTable"></div>
       </div>
       ${S.ui.ex('How is this number built?', [
@@ -211,7 +211,7 @@
         `<p class="ex-h">Refunded</p><p>Days to refund = refund date − client start date (${S.int(r.timed)} of ${S.int(r.n)} with both dates). The refund date is when the refund was recorded, so the decision came a little earlier. ${S.int(r.from_client_start)} refunded clients went straight from Client Start, before their first two-week check-in. The first refund in these records is dated ${fullMon(r.by_month.find(m => m.n).month)}, and 2025 has few, so compare recent months with care.</p>
          <p class="ex-h">Under contract</p><p>Days since contract = ${S.date(D.meta.asof)} − the latest valid Under Contract date; past contracts closed a median ${S.med(D.speed.uc_to_close.median)} days after Under Contract. ${S.int(u.passed_inspection)} have passed inspection.</p>`,
       ])}
-      <p class="cap">Jira, status on ${S.date(D.meta.asof)} · the same ${S.int(p.n)} paused, ${S.int(r.n)} refunded and ${S.int(u.n)} under contract as in 2.1 · the first 14 days by start month are in <a href="#pace-4">3.4</a>.</p>`;
+      <p class="cap">Jira, status on ${S.date(D.meta.asof)} · the same ${S.int(p.n)} paused, ${S.int(r.n)} refunded and ${S.int(u.n)} under contract as in 2.1 · the first 14 days by start month are in section 3.4.</p>`;
     bars(S.$('#pauseChart', body), p.bands.map(b => ({ label: band(b), n: b.n })), 'paused', { name: 'days in pause', tip: x => `<b>${x.label} days</b> in pause: ${x.n} clients` });
     bars(S.$('#refundDays', body), r.bands.map(b => ({ label: band(b), n: b.n, hl: b.lo === 0 ? 'refund' : null })), 'refund2', { name: 'days from start to refund', tip: x => `<b>${x.label} days</b> after the start: ${x.n} refunds` });
     let recM = null;
@@ -255,7 +255,7 @@
         <div class="pv-chart"><div class="chart h-bst" id="bstChart" role="img" aria-label="Where clients stand today by budget. Up to $250K (${lo.n}): ${KEYS.map(([k, l]) => `${l} ${val(lo, k)}`).join(', ')}. Above $250K (${hi.n}): ${KEYS.map(([k, l]) => `${l} ${val(hi, k)}`).join(', ')}."></div>
           <div class="legend">${KEYS.map(([k, l, c]) => `<span><i style="background:var(--${c === 'hold2' ? 'hold-2' : c})"></i>${l}</span>`).join('')}</div></div>
         <div class="pv-table tw" id="bstTable"></div>
-        <div class="links">${S.ui.go('pace-3', 'Monthly cohorts by budget (3.3)')}${S.ui.go('pace-4', 'First 14 days (3.4)')}${S.ui.go('drivers-3', 'Like for like (5.3)')}${S.ui.xl('#budget', 'Explorer: budget performance')}</div>
+        <div class="links">${S.ui.xl('#budget', 'Explorer: budget performance')}</div>
       </div>
       ${S.ui.ex('How is this number built?', [
         `<p class="ex-h">Budget</p><p>The onboarding form's <b>"${B.field}"</b> (column M, live since ${S.date(B.form_since)}), read at the upper end of the chosen range: up to $250K = the range ends at $250K or below. It measures ${B.measures}. Matched to ${S.int(B.coverage.matched)} confirmed starts (e-mail first, the form's deal id as a fallback, the answer before the contract). ${S.int(nr.n)} have no matched answer (${S.int(B.coverage.not_recorded_before_form)} started before the form existed) and are left out of the comparison, which therefore covers clients who started from May 2026.</p>

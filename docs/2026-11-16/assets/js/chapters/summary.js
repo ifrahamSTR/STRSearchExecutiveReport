@@ -12,7 +12,7 @@
   const pts = v => `${v > 0 ? '+' : v < 0 ? '−' : ''}${Math.abs(v * 100).toFixed(1)} pts`;
 
   function reconTable(host, D) {
-    const R = D.reconcile.rows, fmt = (r, v) => (v == null ? '–' : r.key === 'net_cash' ? money(v) : r.key === 'budget14' ? `${S.pct(v[0] / v[1], 1)} · ${S.pct(v[2] / v[3], 1)}<small>${v[0]} of ${v[1]} · ${v[2]} of ${v[3]}</small>` : S.med(v));
+    const R = D.reconcile.rows, fmt = (r, v) => (v == null ? '–' : r.fmt === 'trio' ? `${v[0]} · ${v[1]} · ${v[2] > 0 ? '+' : v[2] < 0 ? '−' : ''}${Math.abs(v[2])}` : r.key === 'net_cash' ? money(v) : Array.isArray(v) ? `${S.pct(v[0] / v[1], 1)} · ${S.pct(v[2] / v[3], 1)}<small>${v[0]} of ${v[1]} · ${v[2]} of ${v[3]}</small>` : S.med(v));
     const same = r => { const vs = [r.cj, r.explorer, r.cash].filter(v => v != null).map(v => JSON.stringify(typeof v === 'number' ? Math.round(v * 100) / 100 : v)); return vs.every(v => v === vs[0]); };
     const b = r => r.bridge;
     const WHY = {
@@ -26,8 +26,13 @@
       closed30: () => 'Closing date up to the data date, won-deal grain, in both.',
       oct_closed: r => `daily_client_activity (won deals) in both; Jira issues with an October closing date: ${S.int(b(r).jira_issues)} (issue grain).`,
       oct_sales: r => `Pipedrive won date in both. The Explorer's Sales funnel applies Pipedrive's duplicate filter: ${Object.entries(b(r).funnel_months_differ).map(([m, [a, c]]) => `${mon(m)} ${c} not ${a}`).join(', ')}.`,
+      starts_oct: () => 'The pair of bars and the gap in 3.2: the same daily counts in the report and the Explorer’s monthly table.',
+      starts_nov: () => 'Partial month: the data run to 16 Nov, so this gap is still moving; contracts led starts.',
+      hunting_status: () => 'The status count in 2.1 and 3.2. The Cash Forecast’s 117 “no property yet” counts won deals instead; see the Hunting row above.',
       uc_median: () => 'Confirmed starts, client start date to the latest valid contract.',
       budget14: () => 'Confirmed starts with a matched onboarding budget; the report runs the Explorer’s own budget code.',
+      budget_rf30: () => 'Refund date − client start date, among clients with 30+ days on the clock; the report runs the Explorer’s own budget code.',
+      budget_paused: () => 'Status snapshot on the data date for every matched client in each group (not a rate over time).',
       net_cash: r => `Explorer bridge at the Cash Forecast's defaults: ${money(b(r).service)} service + ${money(b(r).affiliate)} affiliate − ${money(b(r).refunds)} refunds.`,
     };
     S.ui.table(host, [
@@ -56,7 +61,7 @@
     const lanes = D.speed.lanes, ye = F.year_end_2025;
     const k = v => '$' + Math.round(v / 1e3) + 'K';
     const card = (o) => `<li class="${o.lead ? 'lead' : ''}" style="--c:var(${o.c})"><div class="sc-h"><span class="sc-t">${o.t}</span></div>
-        <div class="sc-k">${o.k.map(([v, l]) => `<span><b class="num">${v}</b><small>${l}</small></span>`).join('')}</div><p>${o.p}</p><a class="sc-go" href="#${o.go}">${o.gl} →</a></li>`;
+        <div class="sc-k">${o.k.map(([v, l]) => `<span><b class="num">${v}</b><small>${l}</small></span>`).join('')}</div><p>${o.p}</p><span class="sc-go">Section ${o.gl}</span></li>`;
     const sec = document.createElement('section');
     sec.className = 'scene summary';
     sec.id = 'summary';
@@ -80,7 +85,7 @@
             p: `Refunds come a median ${S.int(rf.median_days)} days after the start; ${S.int(rf.from_client_start)} refunded clients never reached their two-week check-in. ${ye && ye.oct25 ? `October 2025 starters also refunded early more often (${ye.oct25.k} of ${ye.oct25.n}, against ${S.pct(ye.rest25.k / ye.rest25.n)} for January–September 2025 starters), so part may be a year-end pattern, but this year's rise is larger and began in September.` : ''} By day 30 contracts pull clearly ahead (${sc.uc30} vs ${sc.rf30}).`, go: 'pace-4', gl: '3.4 The first 14 days' })}
           ${card({ c: '--b-lo', t: `Clients up to $250K are not slower; they refund more often in the first month`,
             k: [[`${S.pct(lo.uc14.k / lo.uc14.eligible, 1)} · ${S.pct(hi.uc14.k / hi.uc14.eligible, 1)}`, 'under contract within 14 days, up to · above $250K'], [`${S.med(lo.uc_to_close.median)} · ${S.med(hi.uc_to_close.median)}`, 'median days from contract to closing'], [`${S.pct(lo.rf30.k / lo.rf30.eligible)} · ${S.pct(hi.rf30.k / hi.rf30.eligible)}`, 'refunded within 30 days']],
-            p: `Like for like (same start month, experience and start rule) the 14-day difference is ${pts(m14.diff)} (95% ${pts(m14.lo)} to ${pts(m14.hi)}), and no contract or closing window differs. Refunds within 30 days are ${pts(m30.diff)} (95% ${pts(m30.lo)} to ${pts(m30.hi)}), concentrated in the New Client Experience (${nce.rf30.k} of ${nce.rf30.eligible} vs ${nceHi.rf30.k} of ${nceHi.rf30.eligible}). The budget is real: median purchase ${k(P['Up to $250K'].price.median)} vs ${k(P['Above $250K'].price.median)}.`, go: 'drivers-3', gl: '5.3 Like for like' })}
+            p: `Like for like (same start month, experience and start rule) the 14-day difference is ${pts(m14.diff)} (95% ${pts(m14.lo)} to ${pts(m14.hi)}), and no contract or closing window differs. Refunds within 30 days are ${pts(m30.diff)} (95% ${pts(m30.lo)} to ${pts(m30.hi)}), concentrated in the New Client Experience (${nce.rf30.k} of ${nce.rf30.eligible} vs ${nceHi.rf30.k} of ${nceHi.rf30.eligible}). The budget is real: median purchase ${k(P['Up to $250K'].price.median)} vs ${k(P['Above $250K'].price.median)}.`, go: 'drivers-4', gl: '5.3–5.4 Budget: how fast, and early refunds' })}
           ${card({ lead: true, c: '--paused', t: `Paused clients are the largest swing in forecast cash`,
             k: [[S.int(p.n), `paused, a median ${Math.round(p.median_days)} days`], [money(cg.paid), 'paid up front by paused clients'], [money(cg.paid * pd.refund / 100), `of ${money(br.refunds)} projected refunds, at the default ${pd.refund}% refund`]],
             p: `${S.int(p.from.long_search)} paused after eight or more weeks of searching. The Cash Forecast's default (${pd.resume}% resume, ${pd.refund}% refunded, ${pd.remain}% stay paused) puts most projected refunds on these clients; its net forecast is <b>${money(br.net)}</b>. A decision on paused clients moves cash more than any other assumption.`, go: 'outcomes-3', gl: '2.3 Where the others stand' })}
@@ -100,9 +105,9 @@
           </ol></div>
         </div>
         <div class="board" style="margin-top:16px"><h3 style="margin:0 0 4px;font:650 18px/1.25 var(--f-display)">Shared figures, reconciled</h3>
-          <p class="cap" style="margin:0 0 10px">Same snapshot (${S.date(D.meta.asof)}) across the Client Journey, the <a href="${D.meta.source}" target="_blank" rel="noopener">Business Data Explorer</a> and the <a href="cash.html">Cash Forecast</a>. Where a count differs, the unit or the event date differs, and the bridge is stated.</p>
+          <p class="cap" style="margin:0 0 10px">Same snapshot (${S.date(D.meta.asof)}) across the Client Journey, the <a href="${D.meta.source}" target="_blank" rel="noopener">Business Data Explorer</a> and the Cash Forecast tab. Where a count differs, the unit or the event date differs, and the bridge is stated.</p>
           <div class="tw" id="reconTable"></div></div>
-        <div class="links">${S.ui.xl('#budget', 'Explorer: budget performance')}${S.ui.xl('#cohorts?preset=0', 'Explorer: cohort builder')}<a class="xl" href="cash.html">Cash Forecast →</a><a class="xl" href="#top">Back to the start ↑</a></div>
+        <div class="links">${S.ui.xl('#budget', 'Explorer: budget performance')}${S.ui.xl('#cohorts?preset=0', 'Explorer: cohort builder')}</div>
       </div></div>`;
     main.append(sec);
     reconTable(S.$('#reconTable', sec), D);
