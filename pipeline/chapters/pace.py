@@ -179,6 +179,141 @@ def cohorts(ctx: C.Ctx) -> dict:
     return out
 
 
+# ----------------------------------------------------------------------------- 3.1 (added for the L10, 18 Nov 2026): the 100-a-month goal
+GOAL_PER_MONTH = 100            # completed property purchases a month: the company goal
+GOAL_FROM = "2026-04-01"        # April 2026 to the data date
+DAYS_PER_MONTH = 365.25 / 12    # so the weekly benchmark = 100 x 7 / 30.44 = 23.0 per seven calendar days
+SERIES = {"sales": "clients_won", "uc": "clients_went_uc", "closed": "properties_closed"}
+CONV_WON = ("2025-01-01", "2026-03-31")   # sales with 7+ months of follow-up: their recorded sale -> closing share
+CONV_UC_DAYS = 120                         # contracts at least this old: their recorded contract -> closing share
+
+
+def goal(ctx: C.Ctx) -> dict:
+    """Sales (Pipedrive won date), Under Contract (latest valid contract date) and Closed (completed closing date, up to the
+    data date) from daily_client_activity, by calendar month and by Sunday-Saturday reporting week, from April 2026 to the
+    data date. A period is partial when the data cover fewer of its days; every rate is events per seven calendar days covered."""
+    asof, d = ctx.asof, ctx.f.daily
+    bench = round(GOAL_PER_MONTH * 7 / DAYS_PER_MONTH, 2)
+    lo = pd.Timestamp(GOAL_FROM)
+    wk0 = lo - pd.Timedelta(days=(lo.dayofweek + 1) % 7)                     # the Sunday on or before 1 April
+    d = d[(d.activity_date >= wk0) & (d.activity_date <= asof)].copy()
+
+    def row(g, **kw):
+        days = int(g.activity_date.nunique())
+        r = dict(kw, days=days, first=g.activity_date.min().strftime("%Y-%m-%d"), last=g.activity_date.max().strftime("%Y-%m-%d"))
+        for k, c in SERIES.items():
+            r[k] = int(g[c].sum())
+            r[f"{k}_per7"] = round(r[k] * 7 / days, 2)
+        return r
+
+    months = []
+    for m in pd.period_range(GOAL_FROM[:7], asof.strftime("%Y-%m"), freq="M"):
+        g = d[d.activity_date.dt.to_period("M") == m]
+        months.append(row(g, month=str(m), label=C.month_label(m), full_days=int(m.days_in_month), partial=int(g.activity_date.nunique()) < m.days_in_month))
+    for r in months:
+        r["goal_share"] = round(r["closed"] / GOAL_PER_MONTH, 4)                     # full months: closings / 100
+        r["pace_share"] = round(r["closed_per7"] / bench, 4)                         # any period: closings per 7 days / 23.0
+    weeks = []
+    for w, g in d.groupby(d.activity_date - pd.to_timedelta((d.activity_date.dt.dayofweek + 1) % 7, unit="D")):
+        weeks.append(row(g, week=w.strftime("%Y-%m-%d"), end=(w + pd.Timedelta(days=6)).strftime("%Y-%m-%d")))
+    for r in weeks:
+        r["partial"] = r["days"] < 7
+    full_m = [r for r in months if not r["partial"]]
+    full_w = [r for r in weeks if not r["partial"]]
+
+    def best(rows, k, key):
+        b = max(rows, key=lambda r: r[k])
+        return {"at": b[key], "n": b[k], "per7": b[f"{k}_per7"]}
+
+    def per7(rows, k):
+        days = sum(r["days"] for r in rows)
+        return round(sum(r[k] for r in rows) * 7 / days, 2) if days else None
+
+    windows = {"before": ["2026-04", "2026-05"], "surge": ["2026-06", "2026-07", "2026-08", "2026-09"]}
+    win = {name: {k: per7([r for r in months if r["month"] in ms], k) for k in SERIES} for name, ms in windows.items()}
+    last4 = full_w[-4:]
+    # what the goal implies upstream, at the recorded conversion of earlier clients (engagement grain, as the daily counts)
+    e = ctx.f.eng
+    w = e[(e.won_date >= CONV_WON[0]) & (e.won_date <= CONV_WON[1])]
+    u = e[e.uc.notna() & (e.uc >= "2025-06-01") & ((asof - e.uc).dt.days >= CONV_UC_DAYS)]
+    won_close = round(float(w.closed.notna().mean()), 4)
+    uc_close = round(float(u.closed.notna().mean()), 4)
+    y26 = e[(e.won_date >= "2026-01-01")]
+    lag = {"sale_to_uc": float((y26.uc - y26.won_date).dt.days.dropna().median()), "sale_to_close": float((y26.closed - y26.won_date).dt.days.dropna().median())}
+    # where the record closing month's purchases were sold
+    best_close = best(full_m, "closed", "month")
+    bc = e[e.closed.notna() & (e.closed.dt.strftime("%Y-%m") == best_close["at"])]
+    sold = bc.won_date.dt.strftime("%Y-%m").value_counts()
+    # the same days a year earlier (seasonality of the current, partial month)
+    cur = months[-1]
+    prev_year = []
+    if cur["partial"]:
+        p = pd.Period(cur["month"], "M") - 12
+        dy = ctx.f.daily
+        for mm, upto in ((p - 1, None), (p, cur["days"]), (p + 1, None)):
+            g = dy[dy.activity_date.dt.to_period("M") == mm]
+            if upto:
+                g = g[g.activity_date.dt.day <= upto]
+            prev_year.append(row(g, month=str(mm), label=C.month_label(mm), partial=upto is not None))
+    return {
+        "goal_per_month": GOAL_PER_MONTH, "benchmark_per7": bench, "from": GOAL_FROM, "asof": asof.strftime("%Y-%m-%d"),
+        "months": months, "weeks": weeks,
+        "best": {k: {"month": best(full_m, k, "month"), "week": best(full_w, k, "week")} for k in SERIES},
+        "weeks_at_benchmark": {k: sum(1 for r in full_w if r[k] >= bench) for k in SERIES}, "full_weeks": len(full_w),
+        "windows": {"months": windows, "per7": win},
+        "last4": {"from": last4[0]["week"], "to": last4[-1]["end"], **{k: sum(r[k] for r in last4) for k in SERIES}, **{f"{k}_per7": per7(last4, k) for k in SERIES}},
+        "conversion": {"won_from": CONV_WON[0], "won_to": CONV_WON[1], "won_n": int(len(w)), "won_closed": int(w.closed.notna().sum()), "won_close": won_close,
+                       "uc_days": CONV_UC_DAYS, "uc_n": int(len(u)), "uc_closed": int(u.closed.notna().sum()), "uc_close": uc_close,
+                       "sales_needed": round(GOAL_PER_MONTH / won_close), "uc_needed": round(GOAL_PER_MONTH / uc_close)},
+        "lag": lag,
+        "best_close_sold": {"month": best_close["at"], "n": best_close["n"], "by_sale_month": {k: int(v) for k, v in sold.sort_index().items()}},
+        "prev_year": prev_year,
+        "totals": {k: sum(r[k] for r in months) for k in SERIES},
+    }
+
+
+# ----------------------------------------------------------------------------- 3.4 (added for the L10, 18 Nov 2026): the first 14 days
+FIRST_FROM = "2025-01"          # 2025 rows are context only: many 2025 contracts lack a UC date (COMPARE_FROM)
+
+
+def first14(ctx: C.Ctx) -> dict:
+    """Of each start month's confirmed starts with 14 days on the clock: under contract within 14 days (the cohort rule above)
+    and refunded within 14 days (refund date - client start date). Both counted on the same eligible clients."""
+    co, asof = ctx.cohort, ctx.asof
+    sm = co.start.dt.strftime("%Y-%m")
+    el = co.days_since_start
+    d_uc = co.days_to_uc.where(co.uc.notna())
+    rf = co.refunded.fillna(False).astype(bool)
+    d_rf = (co.refund_date - co.start).dt.days.where(rf)
+    rows = []
+    for m in sorted(x for x in sm.dropna().unique() if x >= FIRST_FROM):
+        g = sm == m
+        r = {"month": m, "label": C.month_label(m), "n": int(g.sum())}
+        for w in (14, 30):
+            e = g & (el >= w)
+            r[f"el{w}"] = int(e.sum())
+            r[f"uc{w}"] = int((e & d_uc.between(0, w)).sum())
+            r[f"rf{w}"] = int((e & d_rf.between(0, w)).sum())
+        r["mature"] = r["el14"] == r["n"] and r["n"] > 0
+        r["uc_dates_incomplete"] = m < COMPARE_FROM
+        rows.append(r)
+
+    def pool(ms):
+        cs = [r for r in rows if r["month"] in ms]
+        return {k: sum(r[k] for r in cs) for k in ("n", "el14", "uc14", "rf14", "el30", "uc30", "rf30")} | {"months": [cs[0]["month"], cs[-1]["month"]] if cs else None}
+    before = [r["month"] for r in rows if COMPARE_FROM <= r["month"] < CHANGE_MONTH]
+    after = [r["month"] for r in rows if r["month"] >= CHANGE_MONTH and r["el14"]]
+    y25 = [r for r in rows if r["month"] < COMPARE_FROM and r["el30"]]
+    late25 = [r for r in y25 if r["month"] >= "2025-10"]
+    rest25 = [r for r in y25 if r["month"] < "2025-10"]
+    oct25 = next((r for r in y25 if r["month"] == "2025-10"), None)
+    year_end = {"oct25": {"k": oct25["rf30"], "n": oct25["el30"]} if oct25 else None,
+                "rest25_max": max((round(r["rf30"] / r["el30"], 4) for r in rest25 if r["month"] != "2025-10"), default=None),
+                "rest25": {"k": sum(r["rf30"] for r in rest25), "n": sum(r["el30"] for r in rest25)}, "late25": {"k": sum(r["rf30"] for r in late25), "n": sum(r["el30"] for r in late25)}}
+    return {"from": FIRST_FROM, "compare_from": COMPARE_FROM, "rows": rows, "before": pool(before), "since_change": pool(after), "year_end_2025": year_end,
+            "refund_rule": "refund date - client start date, refunded clients only"}
+
+
 def build(ctx: C.Ctx) -> dict:
     j, s, asof = ctx.jira, ctx.signed, ctx.asof
     cur = asof.strftime("%Y-%m")
@@ -279,4 +414,5 @@ def build(ctx: C.Ctx) -> dict:
                    "early_prospects": int(((cls != "signed") & (j.created < change)).sum())},
         "windows": windows, "gap": gap, "cohort": cohort_meta, "sales": sales,
         "growth": growth(ctx), "cohorts": cohorts(ctx),
+        "goal": goal(ctx), "first14": first14(ctx),
     }

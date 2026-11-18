@@ -168,6 +168,346 @@
     }
    },
    "hunting_with_older_uc_date": 10
+  },
+  "status": {
+   "hunting": {
+    "n": 123,
+    "with_start": 110,
+    "no_start": 13,
+    "no_start_why": {
+     "No deal link": 7,
+     "Pipedrive deal lost": 3,
+     "Pipedrive deal still open": 2,
+     "Deal not in base": 1
+    },
+    "median": 59.0,
+    "mean": 103.8,
+    "over90": 33,
+    "over180": 17,
+    "within30": 29,
+    "bins": {
+     "width": 10,
+     "cap": 180,
+     "counts": [
+      6,
+      9,
+      12,
+      10,
+      10,
+      8,
+      7,
+      10,
+      4,
+      5,
+      4,
+      4,
+      1,
+      0,
+      1,
+      1,
+      0,
+      1
+     ],
+     "overflow": 17
+    },
+    "bands": [
+     {
+      "lo": 0,
+      "hi": 30,
+      "n": 29
+     },
+     {
+      "lo": 31,
+      "hi": 60,
+      "n": 27
+     },
+     {
+      "lo": 61,
+      "hi": 90,
+      "n": 21
+     },
+     {
+      "lo": 91,
+      "hi": 180,
+      "n": 16
+     },
+     {
+      "lo": 181,
+      "hi": 365,
+      "n": 10
+     },
+     {
+      "lo": 366,
+      "hi": null,
+      "n": 7
+     }
+    ],
+    "by_status": {
+     "Client Start": {
+      "n": 18,
+      "median": 12.0
+     },
+     "2 Weeks": {
+      "n": 22,
+      "median": 29.0
+     },
+     "4 Weeks": {
+      "n": 11,
+      "median": 39.5
+     },
+     "6 Weeks": {
+      "n": 11,
+      "median": 56.0
+     },
+     "8 Weeks": {
+      "n": 61,
+      "median": 108.0
+     }
+    },
+    "by_start_month": [
+     {
+      "month": "2026-04",
+      "n": 3,
+      "median": 220.0
+     },
+     {
+      "month": "2026-05",
+      "n": 3,
+      "median": 193.0
+     },
+     {
+      "month": "2026-06",
+      "n": 2,
+      "median": 149.5
+     },
+     {
+      "month": "2026-07",
+      "n": 7,
+      "median": 111.0
+     },
+     {
+      "month": "2026-08",
+      "n": 13,
+      "median": 90.0
+     },
+     {
+      "month": "2026-09",
+      "n": 27,
+      "median": 61.0
+     },
+     {
+      "month": "2026-10",
+      "n": 34,
+      "median": 29.0
+     },
+     {
+      "month": "2026-11",
+      "n": 9,
+      "median": 5.0
+     },
+     {
+      "month": "earlier",
+      "n": 12,
+      "median": 399.0
+     }
+    ],
+    "started_last_90": 77,
+    "older_uc_date": 10,
+    "recorded_median_to_uc": 37.5,
+    "past_recorded_median": 78
+   },
+   "paused": {
+    "n": 108,
+    "dated": 106,
+    "median_days": 162.5,
+    "bands": [
+     {
+      "lo": 0,
+      "hi": 30,
+      "n": 15
+     },
+     {
+      "lo": 31,
+      "hi": 90,
+      "n": 28
+     },
+     {
+      "lo": 91,
+      "hi": 180,
+      "n": 14
+     },
+     {
+      "lo": 181,
+      "hi": 365,
+      "n": 38
+     },
+     {
+      "lo": 366,
+      "hi": null,
+      "n": 11
+     }
+    ],
+    "from": {
+     "long_search": 62,
+     "earlier_search": 28,
+     "contract": 6,
+     "other": 4,
+     "unknown": 8
+    },
+    "older_uc_date": 28,
+    "start_year": {
+     "2024": 4,
+     "2025": 42,
+     "2026": 60
+    }
+   },
+   "refunded": {
+    "n": 82,
+    "dated": 82,
+    "timed": 80,
+    "median_days": 14.0,
+    "within14": 43,
+    "within30": 59,
+    "bands": [
+     {
+      "lo": 0,
+      "hi": 14,
+      "n": 43
+     },
+     {
+      "lo": 15,
+      "hi": 30,
+      "n": 16
+     },
+     {
+      "lo": 31,
+      "hi": 60,
+      "n": 9
+     },
+     {
+      "lo": 61,
+      "hi": 90,
+      "n": 3
+     },
+     {
+      "lo": 91,
+      "hi": null,
+      "n": 9
+     }
+    ],
+    "from_client_start": 36,
+    "prev_unknown": 22,
+    "by_month": [
+     {
+      "month": "2025-01",
+      "n": 0
+     },
+     {
+      "month": "2025-02",
+      "n": 0
+     },
+     {
+      "month": "2025-03",
+      "n": 3
+     },
+     {
+      "month": "2025-04",
+      "n": 0
+     },
+     {
+      "month": "2025-05",
+      "n": 1
+     },
+     {
+      "month": "2025-06",
+      "n": 0
+     },
+     {
+      "month": "2025-07",
+      "n": 0
+     },
+     {
+      "month": "2025-08",
+      "n": 3
+     },
+     {
+      "month": "2025-09",
+      "n": 2
+     },
+     {
+      "month": "2025-10",
+      "n": 3
+     },
+     {
+      "month": "2025-11",
+      "n": 4
+     },
+     {
+      "month": "2025-12",
+      "n": 2
+     },
+     {
+      "month": "2026-01",
+      "n": 2
+     },
+     {
+      "month": "2026-02",
+      "n": 1
+     },
+     {
+      "month": "2026-03",
+      "n": 3
+     },
+     {
+      "month": "2026-04",
+      "n": 1
+     },
+     {
+      "month": "2026-05",
+      "n": 1
+     },
+     {
+      "month": "2026-06",
+      "n": 3
+     },
+     {
+      "month": "2026-07",
+      "n": 4
+     },
+     {
+      "month": "2026-08",
+      "n": 10
+     },
+     {
+      "month": "2026-09",
+      "n": 5
+     },
+     {
+      "month": "2026-10",
+      "n": 26
+     },
+     {
+      "month": "2026-11",
+      "n": 8
+     }
+    ],
+    "before_2025": 0
+   },
+   "under_contract": {
+    "n": 65,
+    "scheduled": 6,
+    "median_days_since": 19.0,
+    "over60": 1,
+    "passed_inspection": 9
+   },
+   "additional": {
+    "n": 5,
+    "after_search": 4
+   },
+   "source_12nov": {
+    "asof": "2026-11-11",
+    "missing": 14
+   }
   }
  },
  "pace": {
@@ -3899,6 +4239,1134 @@
    },
    "kickoff_lag_median": 5.0,
    "refunded_included": 77
+  },
+  "goal": {
+   "goal_per_month": 100,
+   "benchmark_per7": 23.0,
+   "from": "2026-04-01",
+   "asof": "2026-11-16",
+   "months": [
+    {
+     "month": "2026-04",
+     "label": "Apr 2026",
+     "full_days": 30,
+     "partial": false,
+     "days": 30,
+     "first": "2026-04-01",
+     "last": "2026-04-30",
+     "sales": 31,
+     "sales_per7": 7.23,
+     "uc": 28,
+     "uc_per7": 6.53,
+     "closed": 22,
+     "closed_per7": 5.13,
+     "goal_share": 0.22,
+     "pace_share": 0.223
+    },
+    {
+     "month": "2026-05",
+     "label": "May 2026",
+     "full_days": 31,
+     "partial": false,
+     "days": 31,
+     "first": "2026-05-01",
+     "last": "2026-05-31",
+     "sales": 25,
+     "sales_per7": 5.65,
+     "uc": 19,
+     "uc_per7": 4.29,
+     "closed": 26,
+     "closed_per7": 5.87,
+     "goal_share": 0.26,
+     "pace_share": 0.2552
+    },
+    {
+     "month": "2026-06",
+     "label": "Jun 2026",
+     "full_days": 30,
+     "partial": false,
+     "days": 30,
+     "first": "2026-06-01",
+     "last": "2026-06-30",
+     "sales": 58,
+     "sales_per7": 13.53,
+     "uc": 17,
+     "uc_per7": 3.97,
+     "closed": 25,
+     "closed_per7": 5.83,
+     "goal_share": 0.25,
+     "pace_share": 0.2535
+    },
+    {
+     "month": "2026-07",
+     "label": "Jul 2026",
+     "full_days": 31,
+     "partial": false,
+     "days": 31,
+     "first": "2026-07-01",
+     "last": "2026-07-31",
+     "sales": 79,
+     "sales_per7": 17.84,
+     "uc": 43,
+     "uc_per7": 9.71,
+     "closed": 17,
+     "closed_per7": 3.84,
+     "goal_share": 0.17,
+     "pace_share": 0.167
+    },
+    {
+     "month": "2026-08",
+     "label": "Aug 2026",
+     "full_days": 31,
+     "partial": false,
+     "days": 31,
+     "first": "2026-08-01",
+     "last": "2026-08-31",
+     "sales": 76,
+     "sales_per7": 17.16,
+     "uc": 52,
+     "uc_per7": 11.74,
+     "closed": 43,
+     "closed_per7": 9.71,
+     "goal_share": 0.43,
+     "pace_share": 0.4222
+    },
+    {
+     "month": "2026-09",
+     "label": "Sep 2026",
+     "full_days": 30,
+     "partial": false,
+     "days": 30,
+     "first": "2026-09-01",
+     "last": "2026-09-30",
+     "sales": 82,
+     "sales_per7": 19.13,
+     "uc": 60,
+     "uc_per7": 14.0,
+     "closed": 40,
+     "closed_per7": 9.33,
+     "goal_share": 0.4,
+     "pace_share": 0.4057
+    },
+    {
+     "month": "2026-10",
+     "label": "Oct 2026",
+     "full_days": 31,
+     "partial": false,
+     "days": 31,
+     "first": "2026-10-01",
+     "last": "2026-10-31",
+     "sales": 69,
+     "sales_per7": 15.58,
+     "uc": 55,
+     "uc_per7": 12.42,
+     "closed": 64,
+     "closed_per7": 14.45,
+     "goal_share": 0.64,
+     "pace_share": 0.6283
+    },
+    {
+     "month": "2026-11",
+     "label": "Nov 2026",
+     "full_days": 30,
+     "partial": true,
+     "days": 16,
+     "first": "2026-11-01",
+     "last": "2026-11-16",
+     "sales": 11,
+     "sales_per7": 4.81,
+     "uc": 26,
+     "uc_per7": 11.38,
+     "closed": 15,
+     "closed_per7": 6.56,
+     "goal_share": 0.15,
+     "pace_share": 0.2852
+    }
+   ],
+   "weeks": [
+    {
+     "week": "2026-03-29",
+     "end": "2026-04-04",
+     "days": 7,
+     "first": "2026-03-29",
+     "last": "2026-04-04",
+     "sales": 11,
+     "sales_per7": 11.0,
+     "uc": 5,
+     "uc_per7": 5.0,
+     "closed": 4,
+     "closed_per7": 4.0,
+     "partial": false
+    },
+    {
+     "week": "2026-04-05",
+     "end": "2026-04-11",
+     "days": 7,
+     "first": "2026-04-05",
+     "last": "2026-04-11",
+     "sales": 4,
+     "sales_per7": 4.0,
+     "uc": 5,
+     "uc_per7": 5.0,
+     "closed": 6,
+     "closed_per7": 6.0,
+     "partial": false
+    },
+    {
+     "week": "2026-04-12",
+     "end": "2026-04-18",
+     "days": 7,
+     "first": "2026-04-12",
+     "last": "2026-04-18",
+     "sales": 6,
+     "sales_per7": 6.0,
+     "uc": 9,
+     "uc_per7": 9.0,
+     "closed": 5,
+     "closed_per7": 5.0,
+     "partial": false
+    },
+    {
+     "week": "2026-04-19",
+     "end": "2026-04-25",
+     "days": 7,
+     "first": "2026-04-19",
+     "last": "2026-04-25",
+     "sales": 8,
+     "sales_per7": 8.0,
+     "uc": 7,
+     "uc_per7": 7.0,
+     "closed": 5,
+     "closed_per7": 5.0,
+     "partial": false
+    },
+    {
+     "week": "2026-04-26",
+     "end": "2026-05-02",
+     "days": 7,
+     "first": "2026-04-26",
+     "last": "2026-05-02",
+     "sales": 11,
+     "sales_per7": 11.0,
+     "uc": 3,
+     "uc_per7": 3.0,
+     "closed": 7,
+     "closed_per7": 7.0,
+     "partial": false
+    },
+    {
+     "week": "2026-05-03",
+     "end": "2026-05-09",
+     "days": 7,
+     "first": "2026-05-03",
+     "last": "2026-05-09",
+     "sales": 5,
+     "sales_per7": 5.0,
+     "uc": 5,
+     "uc_per7": 5.0,
+     "closed": 7,
+     "closed_per7": 7.0,
+     "partial": false
+    },
+    {
+     "week": "2026-05-10",
+     "end": "2026-05-16",
+     "days": 7,
+     "first": "2026-05-10",
+     "last": "2026-05-16",
+     "sales": 3,
+     "sales_per7": 3.0,
+     "uc": 5,
+     "uc_per7": 5.0,
+     "closed": 7,
+     "closed_per7": 7.0,
+     "partial": false
+    },
+    {
+     "week": "2026-05-17",
+     "end": "2026-05-23",
+     "days": 7,
+     "first": "2026-05-17",
+     "last": "2026-05-23",
+     "sales": 9,
+     "sales_per7": 9.0,
+     "uc": 7,
+     "uc_per7": 7.0,
+     "closed": 6,
+     "closed_per7": 6.0,
+     "partial": false
+    },
+    {
+     "week": "2026-05-24",
+     "end": "2026-05-30",
+     "days": 7,
+     "first": "2026-05-24",
+     "last": "2026-05-30",
+     "sales": 6,
+     "sales_per7": 6.0,
+     "uc": 2,
+     "uc_per7": 2.0,
+     "closed": 3,
+     "closed_per7": 3.0,
+     "partial": false
+    },
+    {
+     "week": "2026-05-31",
+     "end": "2026-06-06",
+     "days": 7,
+     "first": "2026-05-31",
+     "last": "2026-06-06",
+     "sales": 14,
+     "sales_per7": 14.0,
+     "uc": 0,
+     "uc_per7": 0.0,
+     "closed": 7,
+     "closed_per7": 7.0,
+     "partial": false
+    },
+    {
+     "week": "2026-06-07",
+     "end": "2026-06-13",
+     "days": 7,
+     "first": "2026-06-07",
+     "last": "2026-06-13",
+     "sales": 9,
+     "sales_per7": 9.0,
+     "uc": 5,
+     "uc_per7": 5.0,
+     "closed": 5,
+     "closed_per7": 5.0,
+     "partial": false
+    },
+    {
+     "week": "2026-06-14",
+     "end": "2026-06-20",
+     "days": 7,
+     "first": "2026-06-14",
+     "last": "2026-06-20",
+     "sales": 10,
+     "sales_per7": 10.0,
+     "uc": 5,
+     "uc_per7": 5.0,
+     "closed": 7,
+     "closed_per7": 7.0,
+     "partial": false
+    },
+    {
+     "week": "2026-06-21",
+     "end": "2026-06-27",
+     "days": 7,
+     "first": "2026-06-21",
+     "last": "2026-06-27",
+     "sales": 15,
+     "sales_per7": 15.0,
+     "uc": 5,
+     "uc_per7": 5.0,
+     "closed": 4,
+     "closed_per7": 4.0,
+     "partial": false
+    },
+    {
+     "week": "2026-06-28",
+     "end": "2026-07-04",
+     "days": 7,
+     "first": "2026-06-28",
+     "last": "2026-07-04",
+     "sales": 23,
+     "sales_per7": 23.0,
+     "uc": 5,
+     "uc_per7": 5.0,
+     "closed": 4,
+     "closed_per7": 4.0,
+     "partial": false
+    },
+    {
+     "week": "2026-07-05",
+     "end": "2026-07-11",
+     "days": 7,
+     "first": "2026-07-05",
+     "last": "2026-07-11",
+     "sales": 10,
+     "sales_per7": 10.0,
+     "uc": 4,
+     "uc_per7": 4.0,
+     "closed": 3,
+     "closed_per7": 3.0,
+     "partial": false
+    },
+    {
+     "week": "2026-07-12",
+     "end": "2026-07-18",
+     "days": 7,
+     "first": "2026-07-12",
+     "last": "2026-07-18",
+     "sales": 13,
+     "sales_per7": 13.0,
+     "uc": 11,
+     "uc_per7": 11.0,
+     "closed": 4,
+     "closed_per7": 4.0,
+     "partial": false
+    },
+    {
+     "week": "2026-07-19",
+     "end": "2026-07-25",
+     "days": 7,
+     "first": "2026-07-19",
+     "last": "2026-07-25",
+     "sales": 20,
+     "sales_per7": 20.0,
+     "uc": 14,
+     "uc_per7": 14.0,
+     "closed": 3,
+     "closed_per7": 3.0,
+     "partial": false
+    },
+    {
+     "week": "2026-07-26",
+     "end": "2026-08-01",
+     "days": 7,
+     "first": "2026-07-26",
+     "last": "2026-08-01",
+     "sales": 23,
+     "sales_per7": 23.0,
+     "uc": 12,
+     "uc_per7": 12.0,
+     "closed": 5,
+     "closed_per7": 5.0,
+     "partial": false
+    },
+    {
+     "week": "2026-08-02",
+     "end": "2026-08-08",
+     "days": 7,
+     "first": "2026-08-02",
+     "last": "2026-08-08",
+     "sales": 14,
+     "sales_per7": 14.0,
+     "uc": 12,
+     "uc_per7": 12.0,
+     "closed": 9,
+     "closed_per7": 9.0,
+     "partial": false
+    },
+    {
+     "week": "2026-08-09",
+     "end": "2026-08-15",
+     "days": 7,
+     "first": "2026-08-09",
+     "last": "2026-08-15",
+     "sales": 23,
+     "sales_per7": 23.0,
+     "uc": 11,
+     "uc_per7": 11.0,
+     "closed": 8,
+     "closed_per7": 8.0,
+     "partial": false
+    },
+    {
+     "week": "2026-08-16",
+     "end": "2026-08-22",
+     "days": 7,
+     "first": "2026-08-16",
+     "last": "2026-08-22",
+     "sales": 19,
+     "sales_per7": 19.0,
+     "uc": 12,
+     "uc_per7": 12.0,
+     "closed": 7,
+     "closed_per7": 7.0,
+     "partial": false
+    },
+    {
+     "week": "2026-08-23",
+     "end": "2026-08-29",
+     "days": 7,
+     "first": "2026-08-23",
+     "last": "2026-08-29",
+     "sales": 13,
+     "sales_per7": 13.0,
+     "uc": 13,
+     "uc_per7": 13.0,
+     "closed": 16,
+     "closed_per7": 16.0,
+     "partial": false
+    },
+    {
+     "week": "2026-08-30",
+     "end": "2026-09-05",
+     "days": 7,
+     "first": "2026-08-30",
+     "last": "2026-09-05",
+     "sales": 26,
+     "sales_per7": 26.0,
+     "uc": 12,
+     "uc_per7": 12.0,
+     "closed": 7,
+     "closed_per7": 7.0,
+     "partial": false
+    },
+    {
+     "week": "2026-09-06",
+     "end": "2026-09-12",
+     "days": 7,
+     "first": "2026-09-06",
+     "last": "2026-09-12",
+     "sales": 17,
+     "sales_per7": 17.0,
+     "uc": 14,
+     "uc_per7": 14.0,
+     "closed": 8,
+     "closed_per7": 8.0,
+     "partial": false
+    },
+    {
+     "week": "2026-09-13",
+     "end": "2026-09-19",
+     "days": 7,
+     "first": "2026-09-13",
+     "last": "2026-09-19",
+     "sales": 11,
+     "sales_per7": 11.0,
+     "uc": 16,
+     "uc_per7": 16.0,
+     "closed": 13,
+     "closed_per7": 13.0,
+     "partial": false
+    },
+    {
+     "week": "2026-09-20",
+     "end": "2026-09-26",
+     "days": 7,
+     "first": "2026-09-20",
+     "last": "2026-09-26",
+     "sales": 23,
+     "sales_per7": 23.0,
+     "uc": 11,
+     "uc_per7": 11.0,
+     "closed": 6,
+     "closed_per7": 6.0,
+     "partial": false
+    },
+    {
+     "week": "2026-09-27",
+     "end": "2026-10-03",
+     "days": 7,
+     "first": "2026-09-27",
+     "last": "2026-10-03",
+     "sales": 23,
+     "sales_per7": 23.0,
+     "uc": 15,
+     "uc_per7": 15.0,
+     "closed": 20,
+     "closed_per7": 20.0,
+     "partial": false
+    },
+    {
+     "week": "2026-10-04",
+     "end": "2026-10-10",
+     "days": 7,
+     "first": "2026-10-04",
+     "last": "2026-10-10",
+     "sales": 14,
+     "sales_per7": 14.0,
+     "uc": 9,
+     "uc_per7": 9.0,
+     "closed": 7,
+     "closed_per7": 7.0,
+     "partial": false
+    },
+    {
+     "week": "2026-10-11",
+     "end": "2026-10-17",
+     "days": 7,
+     "first": "2026-10-11",
+     "last": "2026-10-17",
+     "sales": 13,
+     "sales_per7": 13.0,
+     "uc": 9,
+     "uc_per7": 9.0,
+     "closed": 11,
+     "closed_per7": 11.0,
+     "partial": false
+    },
+    {
+     "week": "2026-10-18",
+     "end": "2026-10-24",
+     "days": 7,
+     "first": "2026-10-18",
+     "last": "2026-10-24",
+     "sales": 19,
+     "sales_per7": 19.0,
+     "uc": 11,
+     "uc_per7": 11.0,
+     "closed": 12,
+     "closed_per7": 12.0,
+     "partial": false
+    },
+    {
+     "week": "2026-10-25",
+     "end": "2026-10-31",
+     "days": 7,
+     "first": "2026-10-25",
+     "last": "2026-10-31",
+     "sales": 12,
+     "sales_per7": 12.0,
+     "uc": 21,
+     "uc_per7": 21.0,
+     "closed": 23,
+     "closed_per7": 23.0,
+     "partial": false
+    },
+    {
+     "week": "2026-11-01",
+     "end": "2026-11-07",
+     "days": 7,
+     "first": "2026-11-01",
+     "last": "2026-11-07",
+     "sales": 5,
+     "sales_per7": 5.0,
+     "uc": 17,
+     "uc_per7": 17.0,
+     "closed": 8,
+     "closed_per7": 8.0,
+     "partial": false
+    },
+    {
+     "week": "2026-11-08",
+     "end": "2026-11-14",
+     "days": 7,
+     "first": "2026-11-08",
+     "last": "2026-11-14",
+     "sales": 6,
+     "sales_per7": 6.0,
+     "uc": 7,
+     "uc_per7": 7.0,
+     "closed": 6,
+     "closed_per7": 6.0,
+     "partial": false
+    },
+    {
+     "week": "2026-11-15",
+     "end": "2026-11-21",
+     "days": 2,
+     "first": "2026-11-15",
+     "last": "2026-11-16",
+     "sales": 0,
+     "sales_per7": 0.0,
+     "uc": 2,
+     "uc_per7": 7.0,
+     "closed": 1,
+     "closed_per7": 3.5,
+     "partial": true
+    }
+   ],
+   "best": {
+    "sales": {
+     "month": {
+      "at": "2026-09",
+      "n": 82,
+      "per7": 19.13
+     },
+     "week": {
+      "at": "2026-08-30",
+      "n": 26,
+      "per7": 26.0
+     }
+    },
+    "uc": {
+     "month": {
+      "at": "2026-09",
+      "n": 60,
+      "per7": 14.0
+     },
+     "week": {
+      "at": "2026-10-25",
+      "n": 21,
+      "per7": 21.0
+     }
+    },
+    "closed": {
+     "month": {
+      "at": "2026-10",
+      "n": 64,
+      "per7": 14.45
+     },
+     "week": {
+      "at": "2026-10-25",
+      "n": 23,
+      "per7": 23.0
+     }
+    }
+   },
+   "weeks_at_benchmark": {
+    "sales": 6,
+    "uc": 0,
+    "closed": 1
+   },
+   "full_weeks": 33,
+   "windows": {
+    "months": {
+     "before": [
+      "2026-04",
+      "2026-05"
+     ],
+     "surge": [
+      "2026-06",
+      "2026-07",
+      "2026-08",
+      "2026-09"
+     ]
+    },
+    "per7": {
+     "before": {
+      "sales": 6.43,
+      "uc": 5.39,
+      "closed": 5.51
+     },
+     "surge": {
+      "sales": 16.93,
+      "uc": 9.87,
+      "closed": 7.17
+     }
+    }
+   },
+   "last4": {
+    "from": "2026-10-18",
+    "to": "2026-11-14",
+    "sales": 42,
+    "uc": 56,
+    "closed": 49,
+    "sales_per7": 10.5,
+    "uc_per7": 14.0,
+    "closed_per7": 12.25
+   },
+   "conversion": {
+    "won_from": "2025-01-01",
+    "won_to": "2026-03-31",
+    "won_n": 357,
+    "won_closed": 224,
+    "won_close": 0.6275,
+    "uc_days": 120,
+    "uc_n": 199,
+    "uc_closed": 183,
+    "uc_close": 0.9196,
+    "sales_needed": 159,
+    "uc_needed": 109
+   },
+   "lag": {
+    "sale_to_uc": 38.0,
+    "sale_to_close": 73.0
+   },
+   "best_close_sold": {
+    "month": "2026-10",
+    "n": 64,
+    "by_sale_month": {
+     "2025-12": 2,
+     "2026-02": 1,
+     "2026-05": 1,
+     "2026-06": 8,
+     "2026-07": 24,
+     "2026-08": 20,
+     "2026-09": 8
+    }
+   },
+   "prev_year": [
+    {
+     "month": "2025-10",
+     "label": "Oct 2025",
+     "partial": false,
+     "days": 31,
+     "first": "2025-10-01",
+     "last": "2025-10-31",
+     "sales": 38,
+     "sales_per7": 8.58,
+     "uc": 17,
+     "uc_per7": 3.84,
+     "closed": 18,
+     "closed_per7": 4.06
+    },
+    {
+     "month": "2025-11",
+     "label": "Nov 2025",
+     "partial": true,
+     "days": 16,
+     "first": "2025-11-01",
+     "last": "2025-11-16",
+     "sales": 10,
+     "sales_per7": 4.38,
+     "uc": 4,
+     "uc_per7": 1.75,
+     "closed": 6,
+     "closed_per7": 2.62
+    },
+    {
+     "month": "2025-12",
+     "label": "Dec 2025",
+     "partial": false,
+     "days": 31,
+     "first": "2025-12-01",
+     "last": "2025-12-31",
+     "sales": 42,
+     "sales_per7": 9.48,
+     "uc": 10,
+     "uc_per7": 2.26,
+     "closed": 24,
+     "closed_per7": 5.42
+    }
+   ],
+   "totals": {
+    "sales": 431,
+    "uc": 300,
+    "closed": 252
+   }
+  },
+  "first14": {
+   "from": "2025-01",
+   "compare_from": "2026-01",
+   "rows": [
+    {
+     "month": "2025-01",
+     "label": "Jan 2025",
+     "n": 10,
+     "el14": 10,
+     "uc14": 1,
+     "rf14": 0,
+     "el30": 10,
+     "uc30": 2,
+     "rf30": 0,
+     "mature": true,
+     "uc_dates_incomplete": true
+    },
+    {
+     "month": "2025-02",
+     "label": "Feb 2025",
+     "n": 4,
+     "el14": 4,
+     "uc14": 0,
+     "rf14": 0,
+     "el30": 4,
+     "uc30": 1,
+     "rf30": 1,
+     "mature": true,
+     "uc_dates_incomplete": true
+    },
+    {
+     "month": "2025-03",
+     "label": "Mar 2025",
+     "n": 12,
+     "el14": 12,
+     "uc14": 1,
+     "rf14": 1,
+     "el30": 12,
+     "uc30": 3,
+     "rf30": 2,
+     "mature": true,
+     "uc_dates_incomplete": true
+    },
+    {
+     "month": "2025-04",
+     "label": "Apr 2025",
+     "n": 11,
+     "el14": 11,
+     "uc14": 1,
+     "rf14": 0,
+     "el30": 11,
+     "uc30": 2,
+     "rf30": 0,
+     "mature": true,
+     "uc_dates_incomplete": true
+    },
+    {
+     "month": "2025-05",
+     "label": "May 2025",
+     "n": 15,
+     "el14": 15,
+     "uc14": 2,
+     "rf14": 0,
+     "el30": 15,
+     "uc30": 6,
+     "rf30": 0,
+     "mature": true,
+     "uc_dates_incomplete": true
+    },
+    {
+     "month": "2025-06",
+     "label": "Jun 2025",
+     "n": 15,
+     "el14": 15,
+     "uc14": 0,
+     "rf14": 0,
+     "el30": 15,
+     "uc30": 0,
+     "rf30": 0,
+     "mature": true,
+     "uc_dates_incomplete": true
+    },
+    {
+     "month": "2025-07",
+     "label": "Jul 2025",
+     "n": 24,
+     "el14": 24,
+     "uc14": 1,
+     "rf14": 0,
+     "el30": 24,
+     "uc30": 3,
+     "rf30": 0,
+     "mature": true,
+     "uc_dates_incomplete": true
+    },
+    {
+     "month": "2025-08",
+     "label": "Aug 2025",
+     "n": 29,
+     "el14": 29,
+     "uc14": 3,
+     "rf14": 2,
+     "el30": 29,
+     "uc30": 4,
+     "rf30": 2,
+     "mature": true,
+     "uc_dates_incomplete": true
+    },
+    {
+     "month": "2025-09",
+     "label": "Sep 2025",
+     "n": 39,
+     "el14": 39,
+     "uc14": 1,
+     "rf14": 1,
+     "el30": 39,
+     "uc30": 5,
+     "rf30": 2,
+     "mature": true,
+     "uc_dates_incomplete": true
+    },
+    {
+     "month": "2025-10",
+     "label": "Oct 2025",
+     "n": 38,
+     "el14": 38,
+     "uc14": 4,
+     "rf14": 4,
+     "el30": 38,
+     "uc30": 7,
+     "rf30": 5,
+     "mature": true,
+     "uc_dates_incomplete": true
+    },
+    {
+     "month": "2025-11",
+     "label": "Nov 2025",
+     "n": 20,
+     "el14": 20,
+     "uc14": 1,
+     "rf14": 1,
+     "el30": 20,
+     "uc30": 3,
+     "rf30": 1,
+     "mature": true,
+     "uc_dates_incomplete": true
+    },
+    {
+     "month": "2025-12",
+     "label": "Dec 2025",
+     "n": 21,
+     "el14": 21,
+     "uc14": 3,
+     "rf14": 1,
+     "el30": 21,
+     "uc30": 3,
+     "rf30": 1,
+     "mature": true,
+     "uc_dates_incomplete": true
+    },
+    {
+     "month": "2026-01",
+     "label": "Jan 2026",
+     "n": 35,
+     "el14": 35,
+     "uc14": 2,
+     "rf14": 1,
+     "el30": 35,
+     "uc30": 6,
+     "rf30": 1,
+     "mature": true,
+     "uc_dates_incomplete": false
+    },
+    {
+     "month": "2026-02",
+     "label": "Feb 2026",
+     "n": 24,
+     "el14": 24,
+     "uc14": 1,
+     "rf14": 0,
+     "el30": 24,
+     "uc30": 5,
+     "rf30": 0,
+     "mature": true,
+     "uc_dates_incomplete": false
+    },
+    {
+     "month": "2026-03",
+     "label": "Mar 2026",
+     "n": 31,
+     "el14": 31,
+     "uc14": 3,
+     "rf14": 2,
+     "el30": 31,
+     "uc30": 7,
+     "rf30": 2,
+     "mature": true,
+     "uc_dates_incomplete": false
+    },
+    {
+     "month": "2026-04",
+     "label": "Apr 2026",
+     "n": 27,
+     "el14": 27,
+     "uc14": 3,
+     "rf14": 0,
+     "el30": 27,
+     "uc30": 9,
+     "rf30": 0,
+     "mature": true,
+     "uc_dates_incomplete": false
+    },
+    {
+     "month": "2026-05",
+     "label": "May 2026",
+     "n": 37,
+     "el14": 37,
+     "uc14": 2,
+     "rf14": 1,
+     "el30": 37,
+     "uc30": 3,
+     "rf30": 1,
+     "mature": true,
+     "uc_dates_incomplete": false
+    },
+    {
+     "month": "2026-06",
+     "label": "Jun 2026",
+     "n": 57,
+     "el14": 57,
+     "uc14": 0,
+     "rf14": 2,
+     "el30": 57,
+     "uc30": 14,
+     "rf30": 3,
+     "mature": true,
+     "uc_dates_incomplete": false
+    },
+    {
+     "month": "2026-07",
+     "label": "Jul 2026",
+     "n": 74,
+     "el14": 74,
+     "uc14": 5,
+     "rf14": 3,
+     "el30": 74,
+     "uc30": 26,
+     "rf30": 4,
+     "mature": true,
+     "uc_dates_incomplete": false
+    },
+    {
+     "month": "2026-08",
+     "label": "Aug 2026",
+     "n": 74,
+     "el14": 74,
+     "uc14": 6,
+     "rf14": 5,
+     "el30": 74,
+     "uc30": 24,
+     "rf30": 6,
+     "mature": true,
+     "uc_dates_incomplete": false
+    },
+    {
+     "month": "2026-09",
+     "label": "Sep 2026",
+     "n": 79,
+     "el14": 79,
+     "uc14": 6,
+     "rf14": 7,
+     "el30": 79,
+     "uc30": 17,
+     "rf30": 12,
+     "mature": true,
+     "uc_dates_incomplete": false
+    },
+    {
+     "month": "2026-10",
+     "label": "Oct 2026",
+     "n": 68,
+     "el14": 68,
+     "uc14": 8,
+     "rf14": 11,
+     "el30": 37,
+     "uc30": 11,
+     "rf30": 7,
+     "mature": true,
+     "uc_dates_incomplete": false
+    },
+    {
+     "month": "2026-11",
+     "label": "Nov 2026",
+     "n": 10,
+     "el14": 0,
+     "uc14": 0,
+     "rf14": 0,
+     "el30": 0,
+     "uc30": 0,
+     "rf30": 0,
+     "mature": false,
+     "uc_dates_incomplete": false
+    }
+   ],
+   "before": {
+    "n": 154,
+    "el14": 154,
+    "uc14": 11,
+    "rf14": 4,
+    "el30": 154,
+    "uc30": 30,
+    "rf30": 4,
+    "months": [
+     "2026-01",
+     "2026-05"
+    ]
+   },
+   "since_change": {
+    "n": 352,
+    "el14": 352,
+    "uc14": 25,
+    "rf14": 28,
+    "el30": 321,
+    "uc30": 92,
+    "rf30": 32,
+    "months": [
+     "2026-06",
+     "2026-10"
+    ]
+   },
+   "year_end_2025": {
+    "oct25": {
+     "k": 5,
+     "n": 38
+    },
+    "rest25_max": 0.25,
+    "rest25": {
+     "k": 7,
+     "n": 159
+    },
+    "late25": {
+     "k": 7,
+     "n": 79
+    }
+   },
+   "refund_rule": "refund date - client start date, refunded clients only"
   }
  },
  "speed": {
@@ -5011,6 +6479,74 @@
     {
      "label": "Not recorded",
      "range": null,
+     "clients": 431,
+     "recorded": {
+      "n": 266,
+      "mean": 68.87,
+      "median": 41.0
+     },
+     "hunting": 17,
+     "waits": {
+      "n": 17,
+      "mean": 349.76,
+      "median": 323.0
+     },
+     "scenario": {
+      "n": 279,
+      "mean": 85.95,
+      "median": 46.0
+     },
+     "km_median": 103.0,
+     "hunting_with_older_uc": 4
+    }
+   ],
+   "cmp": [
+    {
+     "label": "Up to $250K",
+     "clients": 198,
+     "recorded": {
+      "n": 116,
+      "mean": 41.33,
+      "median": 35.0
+     },
+     "hunting": 42,
+     "waits": {
+      "n": 42,
+      "mean": 65.74,
+      "median": 54.0
+     },
+     "scenario": {
+      "n": 155,
+      "mean": 48.03,
+      "median": 39.0
+     },
+     "km_median": 57.0,
+     "hunting_with_older_uc": 3
+    },
+    {
+     "label": "Above $250K",
+     "clients": 196,
+     "recorded": {
+      "n": 110,
+      "mean": 41.09,
+      "median": 32.0
+     },
+     "hunting": 49,
+     "waits": {
+      "n": 49,
+      "mean": 55.98,
+      "median": 48.0
+     },
+     "scenario": {
+      "n": 157,
+      "mean": 45.77,
+      "median": 39.0
+     },
+     "km_median": 63.0,
+     "hunting_with_older_uc": 2
+    },
+    {
+     "label": "Not recorded",
      "clients": 431,
      "recorded": {
       "n": 266,
@@ -12175,6 +13711,1670 @@
    "scheduled_dates_to": "2026-12-04"
   }
  },
+ "budgets": {
+  "field": "Total out-of-pocket capital available (all-in)",
+  "measures": "down payment + closing costs + renovation + furniture + amenities: all-in capital, not the purchase price",
+  "threshold": 250,
+  "form_since": "2026-04-20",
+  "population": "won engagements with a confirmed Jira start",
+  "n": 825,
+  "groups": [
+   {
+    "label": "Up to $250K",
+    "n": 198,
+    "uc14": {
+     "k": 13,
+     "eligible": 194
+    },
+    "uc30": {
+     "k": 45,
+     "eligible": 178
+    },
+    "uc45": {
+     "k": 68,
+     "eligible": 167
+    },
+    "uc60": {
+     "k": 78,
+     "eligible": 144
+    },
+    "uc90": {
+     "k": 64,
+     "eligible": 102
+    },
+    "cl60": {
+     "k": 28,
+     "eligible": 144
+    },
+    "cl90": {
+     "k": 39,
+     "eligible": 102
+    },
+    "cl120": {
+     "k": 41,
+     "eligible": 61
+    },
+    "rf14": {
+     "k": 16,
+     "eligible": 194
+    },
+    "rf30": {
+     "k": 22,
+     "eligible": 178
+    },
+    "rf60": {
+     "k": 14,
+     "eligible": 144
+    },
+    "rf90": {
+     "k": 12,
+     "eligible": 102
+    },
+    "recorded": {
+     "n": 116,
+     "mean": 41.33,
+     "median": 35.0
+    },
+    "uc_to_close": {
+     "n": 79,
+     "mean": 39.76,
+     "median": 36.0
+    },
+    "scenario": {
+     "n": 155,
+     "mean": 48.03,
+     "median": 39.0
+    },
+    "km_uc": 57.0,
+    "km_closed": 103.0,
+    "stages": {
+     "purchased": 78,
+     "hunting": 42,
+     "refunded": 31,
+     "under_contract": 29,
+     "paused": 15,
+     "presale": 3
+    },
+    "closed": 79,
+    "hunting": 42,
+    "hunting_wait": {
+     "median": 53.0,
+     "mean": 64.74
+    }
+   },
+   {
+    "label": "Above $250K",
+    "n": 196,
+    "uc14": {
+     "k": 12,
+     "eligible": 191
+    },
+    "uc30": {
+     "k": 50,
+     "eligible": 176
+    },
+    "uc45": {
+     "k": 62,
+     "eligible": 158
+    },
+    "uc60": {
+     "k": 65,
+     "eligible": 138
+    },
+    "uc90": {
+     "k": 66,
+     "eligible": 106
+    },
+    "cl60": {
+     "k": 27,
+     "eligible": 138
+    },
+    "cl90": {
+     "k": 44,
+     "eligible": 106
+    },
+    "cl120": {
+     "k": 37,
+     "eligible": 64
+    },
+    "rf14": {
+     "k": 13,
+     "eligible": 191
+    },
+    "rf30": {
+     "k": 11,
+     "eligible": 176
+    },
+    "rf60": {
+     "k": 6,
+     "eligible": 138
+    },
+    "rf90": {
+     "k": 8,
+     "eligible": 106
+    },
+    "recorded": {
+     "n": 110,
+     "mean": 41.09,
+     "median": 32.0
+    },
+    "uc_to_close": {
+     "n": 73,
+     "mean": 35.6,
+     "median": 36.0
+    },
+    "scenario": {
+     "n": 157,
+     "mean": 45.77,
+     "median": 39.0
+    },
+    "km_uc": 63.0,
+    "km_closed": 105.0,
+    "stages": {
+     "purchased": 76,
+     "hunting": 49,
+     "under_contract": 30,
+     "refunded": 20,
+     "paused": 20,
+     "presale": 1
+    },
+    "closed": 77,
+    "hunting": 49,
+    "hunting_wait": {
+     "median": 47.0,
+     "mean": 54.98
+    }
+   },
+   {
+    "label": "Not recorded",
+    "n": 431,
+    "uc14": {
+     "k": 46,
+     "eligible": 430
+    },
+    "uc30": {
+     "k": 98,
+     "eligible": 430
+    },
+    "uc45": {
+     "k": 139,
+     "eligible": 430
+    },
+    "uc60": {
+     "k": 168,
+     "eligible": 430
+    },
+    "uc90": {
+     "k": 201,
+     "eligible": 429
+    },
+    "cl60": {
+     "k": 88,
+     "eligible": 430
+    },
+    "cl90": {
+     "k": 166,
+     "eligible": 429
+    },
+    "cl120": {
+     "k": 207,
+     "eligible": 427
+    },
+    "rf14": {
+     "k": 13,
+     "eligible": 430
+    },
+    "rf30": {
+     "k": 17,
+     "eligible": 430
+    },
+    "rf60": {
+     "k": 20,
+     "eligible": 430
+    },
+    "rf90": {
+     "k": 21,
+     "eligible": 429
+    },
+    "recorded": {
+     "n": 266,
+     "mean": 68.87,
+     "median": 41.0
+    },
+    "uc_to_close": {
+     "n": 220,
+     "mean": 37.94,
+     "median": 35.5
+    },
+    "scenario": {
+     "n": 279,
+     "mean": 85.95,
+     "median": 46.0
+    },
+    "km_uc": 103.0,
+    "km_closed": 125.0,
+    "stages": {
+     "purchased": 302,
+     "paused": 70,
+     "refunded": 26,
+     "hunting": 17,
+     "under_contract": 6,
+     "additional": 5,
+     "presale": 4,
+     "declined": 1
+    },
+    "closed": 282,
+    "hunting": 17,
+    "hunting_wait": {
+     "median": 322.0,
+     "mean": 348.76
+    }
+   }
+  ],
+  "strict": [
+   {
+    "label": "Below $250K",
+    "n": 119,
+    "uc14": {
+     "k": 7,
+     "eligible": 117
+    },
+    "uc30": {
+     "k": 26,
+     "eligible": 110
+    },
+    "rf30": {
+     "k": 13,
+     "eligible": 110
+    },
+    "recorded": {
+     "n": 67,
+     "mean": 43.6,
+     "median": 38.0
+    },
+    "stages": {
+     "purchased": 44,
+     "hunting": 27,
+     "refunded": 20,
+     "under_contract": 17,
+     "paused": 9,
+     "presale": 2
+    }
+   },
+   {
+    "label": "Range ends at $250K",
+    "n": 79,
+    "uc14": {
+     "k": 6,
+     "eligible": 77
+    },
+    "uc30": {
+     "k": 19,
+     "eligible": 68
+    },
+    "rf30": {
+     "k": 9,
+     "eligible": 68
+    },
+    "recorded": {
+     "n": 49,
+     "mean": 38.22,
+     "median": 31.0
+    },
+    "stages": {
+     "purchased": 34,
+     "hunting": 15,
+     "under_contract": 12,
+     "refunded": 11,
+     "paused": 6,
+     "presale": 1
+    }
+   },
+   {
+    "label": "Above $250K",
+    "n": 196,
+    "uc14": {
+     "k": 12,
+     "eligible": 191
+    },
+    "uc30": {
+     "k": 50,
+     "eligible": 176
+    },
+    "rf30": {
+     "k": 11,
+     "eligible": 176
+    },
+    "recorded": {
+     "n": 110,
+     "mean": 41.09,
+     "median": 32.0
+    },
+    "stages": {
+     "purchased": 76,
+     "hunting": 49,
+     "under_contract": 30,
+     "refunded": 20,
+     "paused": 20,
+     "presale": 1
+    }
+   },
+   {
+    "label": "Not recorded",
+    "n": 431,
+    "uc14": {
+     "k": 46,
+     "eligible": 430
+    },
+    "uc30": {
+     "k": 98,
+     "eligible": 430
+    },
+    "rf30": {
+     "k": 17,
+     "eligible": 430
+    },
+    "recorded": {
+     "n": 266,
+     "mean": 68.87,
+     "median": 41.0
+    },
+    "stages": {
+     "purchased": 302,
+     "paused": 70,
+     "refunded": 26,
+     "hunting": 17,
+     "under_contract": 6,
+     "additional": 5,
+     "presale": 4,
+     "declined": 1
+    }
+   }
+  ],
+  "mh": {
+   "uc": [
+    {
+     "w": 14,
+     "strata": 13,
+     "diff": 0.0034,
+     "lo": -0.0468,
+     "hi": 0.0536,
+     "a": [
+      13,
+      190
+     ],
+     "b": [
+      12,
+      187
+     ],
+     "thin": false
+    },
+    {
+     "w": 30,
+     "strata": 13,
+     "diff": -0.0416,
+     "lo": -0.1316,
+     "hi": 0.0485,
+     "a": [
+      44,
+      174
+     ],
+     "b": [
+      49,
+      172
+     ],
+     "thin": false
+    },
+    {
+     "w": 45,
+     "strata": 12,
+     "diff": 0.0187,
+     "lo": -0.0863,
+     "hi": 0.1238,
+     "a": [
+      67,
+      163
+     ],
+     "b": [
+      60,
+      153
+     ],
+     "thin": false
+    },
+    {
+     "w": 60,
+     "strata": 11,
+     "diff": 0.0583,
+     "lo": -0.0536,
+     "hi": 0.1703,
+     "a": [
+      76,
+      140
+     ],
+     "b": [
+      63,
+      134
+     ],
+     "thin": false
+    },
+    {
+     "w": 90,
+     "strata": 9,
+     "diff": -0.0005,
+     "lo": -0.1295,
+     "hi": 0.1286,
+     "a": [
+      62,
+      98
+     ],
+     "b": [
+      64,
+      102
+     ],
+     "thin": false
+    }
+   ],
+   "closed": [
+    {
+     "w": 60,
+     "strata": 11,
+     "diff": -0.0042,
+     "lo": -0.0965,
+     "hi": 0.0881,
+     "a": [
+      28,
+      140
+     ],
+     "b": [
+      25,
+      134
+     ],
+     "thin": false
+    },
+    {
+     "w": 90,
+     "strata": 9,
+     "diff": -0.0132,
+     "lo": -0.1389,
+     "hi": 0.1125,
+     "a": [
+      39,
+      98
+     ],
+     "b": [
+      41,
+      102
+     ],
+     "thin": false
+    },
+    {
+     "w": 120,
+     "strata": 7,
+     "diff": 0.0977,
+     "lo": -0.0547,
+     "hi": 0.2501,
+     "a": [
+      39,
+      57
+     ],
+     "b": [
+      34,
+      60
+     ],
+     "thin": false
+    }
+   ],
+   "refunded": [
+    {
+     "w": 14,
+     "strata": 13,
+     "diff": 0.0177,
+     "lo": -0.0333,
+     "hi": 0.0688,
+     "a": [
+      16,
+      190
+     ],
+     "b": [
+      12,
+      187
+     ],
+     "thin": false
+    },
+    {
+     "w": 30,
+     "strata": 13,
+     "diff": 0.0593,
+     "lo": 0.0009,
+     "hi": 0.1177,
+     "a": [
+      22,
+      174
+     ],
+     "b": [
+      10,
+      172
+     ],
+     "thin": false
+    },
+    {
+     "w": 60,
+     "strata": 11,
+     "diff": 0.0587,
+     "lo": 0.0043,
+     "hi": 0.1131,
+     "a": [
+      14,
+      140
+     ],
+     "b": [
+      5,
+      134
+     ],
+     "thin": false
+    },
+    {
+     "w": 90,
+     "strata": 9,
+     "diff": 0.0506,
+     "lo": -0.0252,
+     "hi": 0.1264,
+     "a": [
+      12,
+      98
+     ],
+     "b": [
+      7,
+      102
+     ],
+     "thin": false
+    }
+   ]
+  },
+  "mh_strict": {
+   "uc": [
+    {
+     "w": 14,
+     "strata": 13,
+     "diff": 0.0029,
+     "lo": -0.0535,
+     "hi": 0.0593,
+     "a": [
+      7,
+      115
+     ],
+     "b": [
+      12,
+      187
+     ],
+     "thin": false
+    },
+    {
+     "w": 30,
+     "strata": 13,
+     "diff": -0.0438,
+     "lo": -0.1461,
+     "hi": 0.0586,
+     "a": [
+      26,
+      108
+     ],
+     "b": [
+      49,
+      172
+     ],
+     "thin": false
+    },
+    {
+     "w": 45,
+     "strata": 12,
+     "diff": -0.0111,
+     "lo": -0.1289,
+     "hi": 0.1067,
+     "a": [
+      39,
+      103
+     ],
+     "b": [
+      60,
+      153
+     ],
+     "thin": false
+    },
+    {
+     "w": 60,
+     "strata": 11,
+     "diff": 0.058,
+     "lo": -0.067,
+     "hi": 0.183,
+     "a": [
+      46,
+      85
+     ],
+     "b": [
+      63,
+      134
+     ],
+     "thin": false
+    },
+    {
+     "w": 90,
+     "strata": 9,
+     "diff": 0.0108,
+     "lo": -0.1304,
+     "hi": 0.1521,
+     "a": [
+      41,
+      62
+     ],
+     "b": [
+      64,
+      102
+     ],
+     "thin": false
+    }
+   ],
+   "refunded": [
+    {
+     "w": 14,
+     "strata": 13,
+     "diff": 0.0437,
+     "lo": -0.0207,
+     "hi": 0.1081,
+     "a": [
+      12,
+      115
+     ],
+     "b": [
+      12,
+      187
+     ],
+     "thin": false
+    },
+    {
+     "w": 30,
+     "strata": 13,
+     "diff": 0.0561,
+     "lo": -0.013,
+     "hi": 0.1251,
+     "a": [
+      13,
+      108
+     ],
+     "b": [
+      10,
+      172
+     ],
+     "thin": false
+    },
+    {
+     "w": 60,
+     "strata": 11,
+     "diff": 0.0756,
+     "lo": 0.0139,
+     "hi": 0.1374,
+     "a": [
+      9,
+      85
+     ],
+     "b": [
+      5,
+      134
+     ],
+     "thin": false
+    },
+    {
+     "w": 90,
+     "strata": 9,
+     "diff": 0.0694,
+     "lo": -0.0121,
+     "hi": 0.1509,
+     "a": [
+      8,
+      62
+     ],
+     "b": [
+      7,
+      102
+     ],
+     "thin": false
+    }
+   ]
+  },
+  "thin": 20,
+  "coverage": {
+   "matched": 394,
+   "not_recorded": 431,
+   "matched_start_months": {
+    "2026-04": 4,
+    "2026-05": 33,
+    "2026-06": 56,
+    "2026-07": 72,
+    "2026-08": 73,
+    "2026-09": 79,
+    "2026-10": 68,
+    "2026-11": 9
+   },
+   "matched_experience": {
+    "New Client Experience": 222,
+    "Legacy": 172
+   },
+   "matched_rule": {
+    "won": 352,
+    "due": 38,
+    "created+4": 4
+   },
+   "not_recorded_before_form": 416,
+   "henry_known": 523,
+   "henry_known_hunting": 8,
+   "hunting": 108,
+   "henry_known_with_uc": 433,
+   "with_uc": 493
+  },
+  "months": [
+   {
+    "month": "2026-04",
+    "label": "Apr 2026",
+    "Up to $250K": {
+     "n": 3,
+     "w14": {
+      "k": 0,
+      "eligible": 3,
+      "mature": true
+     },
+     "w30": {
+      "k": 1,
+      "eligible": 3,
+      "mature": true
+     },
+     "w60": {
+      "k": 1,
+      "eligible": 3,
+      "mature": true
+     },
+     "w90": {
+      "k": 1,
+      "eligible": 3,
+      "mature": true
+     },
+     "rf14": {
+      "k": 0,
+      "eligible": 3
+     },
+     "rf30": {
+      "k": 0,
+      "eligible": 3
+     }
+    },
+    "Above $250K": {
+     "n": 1,
+     "w14": {
+      "k": 0,
+      "eligible": 1,
+      "mature": true
+     },
+     "w30": {
+      "k": 1,
+      "eligible": 1,
+      "mature": true
+     },
+     "w60": {
+      "k": 1,
+      "eligible": 1,
+      "mature": true
+     },
+     "w90": {
+      "k": 1,
+      "eligible": 1,
+      "mature": true
+     },
+     "rf14": {
+      "k": 0,
+      "eligible": 1
+     },
+     "rf30": {
+      "k": 0,
+      "eligible": 1
+     }
+    }
+   },
+   {
+    "month": "2026-05",
+    "label": "May 2026",
+    "Up to $250K": {
+     "n": 14,
+     "w14": {
+      "k": 0,
+      "eligible": 14,
+      "mature": true
+     },
+     "w30": {
+      "k": 1,
+      "eligible": 14,
+      "mature": true
+     },
+     "w60": {
+      "k": 4,
+      "eligible": 14,
+      "mature": true
+     },
+     "w90": {
+      "k": 10,
+      "eligible": 14,
+      "mature": true
+     },
+     "rf14": {
+      "k": 0,
+      "eligible": 14
+     },
+     "rf30": {
+      "k": 0,
+      "eligible": 14
+     }
+    },
+    "Above $250K": {
+     "n": 19,
+     "w14": {
+      "k": 0,
+      "eligible": 19,
+      "mature": true
+     },
+     "w30": {
+      "k": 0,
+      "eligible": 19,
+      "mature": true
+     },
+     "w60": {
+      "k": 4,
+      "eligible": 19,
+      "mature": true
+     },
+     "w90": {
+      "k": 10,
+      "eligible": 19,
+      "mature": true
+     },
+     "rf14": {
+      "k": 1,
+      "eligible": 19
+     },
+     "rf30": {
+      "k": 1,
+      "eligible": 19
+     }
+    }
+   },
+   {
+    "month": "2026-06",
+    "label": "Jun 2026",
+    "Up to $250K": {
+     "n": 25,
+     "w14": {
+      "k": 0,
+      "eligible": 25,
+      "mature": true
+     },
+     "w30": {
+      "k": 8,
+      "eligible": 25,
+      "mature": true
+     },
+     "w60": {
+      "k": 16,
+      "eligible": 25,
+      "mature": true
+     },
+     "w90": {
+      "k": 19,
+      "eligible": 25,
+      "mature": true
+     },
+     "rf14": {
+      "k": 1,
+      "eligible": 25
+     },
+     "rf30": {
+      "k": 2,
+      "eligible": 25
+     }
+    },
+    "Above $250K": {
+     "n": 31,
+     "w14": {
+      "k": 0,
+      "eligible": 31,
+      "mature": true
+     },
+     "w30": {
+      "k": 6,
+      "eligible": 31,
+      "mature": true
+     },
+     "w60": {
+      "k": 11,
+      "eligible": 31,
+      "mature": true
+     },
+     "w90": {
+      "k": 17,
+      "eligible": 31,
+      "mature": true
+     },
+     "rf14": {
+      "k": 1,
+      "eligible": 31
+     },
+     "rf30": {
+      "k": 1,
+      "eligible": 31
+     }
+    }
+   },
+   {
+    "month": "2026-07",
+    "label": "Jul 2026",
+    "Up to $250K": {
+     "n": 39,
+     "w14": {
+      "k": 2,
+      "eligible": 39,
+      "mature": true
+     },
+     "w30": {
+      "k": 9,
+      "eligible": 39,
+      "mature": true
+     },
+     "w60": {
+      "k": 20,
+      "eligible": 39,
+      "mature": true
+     },
+     "w90": {
+      "k": 24,
+      "eligible": 39,
+      "mature": true
+     },
+     "rf14": {
+      "k": 2,
+      "eligible": 39
+     },
+     "rf30": {
+      "k": 3,
+      "eligible": 39
+     }
+    },
+    "Above $250K": {
+     "n": 33,
+     "w14": {
+      "k": 3,
+      "eligible": 33,
+      "mature": true
+     },
+     "w30": {
+      "k": 17,
+      "eligible": 33,
+      "mature": true
+     },
+     "w60": {
+      "k": 23,
+      "eligible": 33,
+      "mature": true
+     },
+     "w90": {
+      "k": 26,
+      "eligible": 33,
+      "mature": true
+     },
+     "rf14": {
+      "k": 1,
+      "eligible": 33
+     },
+     "rf30": {
+      "k": 1,
+      "eligible": 33
+     }
+    }
+   },
+   {
+    "month": "2026-08",
+    "label": "Aug 2026",
+    "Up to $250K": {
+     "n": 39,
+     "w14": {
+      "k": 3,
+      "eligible": 39,
+      "mature": true
+     },
+     "w30": {
+      "k": 15,
+      "eligible": 39,
+      "mature": true
+     },
+     "w60": {
+      "k": 24,
+      "eligible": 39,
+      "mature": true
+     },
+     "w90": {
+      "k": 10,
+      "eligible": 21,
+      "mature": false
+     },
+     "rf14": {
+      "k": 3,
+      "eligible": 39
+     },
+     "rf30": {
+      "k": 4,
+      "eligible": 39
+     }
+    },
+    "Above $250K": {
+     "n": 34,
+     "w14": {
+      "k": 3,
+      "eligible": 34,
+      "mature": true
+     },
+     "w30": {
+      "k": 9,
+      "eligible": 34,
+      "mature": true
+     },
+     "w60": {
+      "k": 15,
+      "eligible": 34,
+      "mature": true
+     },
+     "w90": {
+      "k": 12,
+      "eligible": 22,
+      "mature": false
+     },
+     "rf14": {
+      "k": 2,
+      "eligible": 34
+     },
+     "rf30": {
+      "k": 2,
+      "eligible": 34
+     }
+    }
+   },
+   {
+    "month": "2026-09",
+    "label": "Sep 2026",
+    "Up to $250K": {
+     "n": 42,
+     "w14": {
+      "k": 3,
+      "eligible": 42,
+      "mature": true
+     },
+     "w30": {
+      "k": 7,
+      "eligible": 42,
+      "mature": true
+     },
+     "w60": {
+      "k": 13,
+      "eligible": 24,
+      "mature": false
+     },
+     "w90": {
+      "k": 0,
+      "eligible": 0,
+      "mature": false
+     },
+     "rf14": {
+      "k": 5,
+      "eligible": 42
+     },
+     "rf30": {
+      "k": 9,
+      "eligible": 42
+     }
+    },
+    "Above $250K": {
+     "n": 37,
+     "w14": {
+      "k": 3,
+      "eligible": 37,
+      "mature": true
+     },
+     "w30": {
+      "k": 10,
+      "eligible": 37,
+      "mature": true
+     },
+     "w60": {
+      "k": 11,
+      "eligible": 20,
+      "mature": false
+     },
+     "w90": {
+      "k": 0,
+      "eligible": 0,
+      "mature": false
+     },
+     "rf14": {
+      "k": 2,
+      "eligible": 37
+     },
+     "rf30": {
+      "k": 3,
+      "eligible": 37
+     }
+    }
+   },
+   {
+    "month": "2026-10",
+    "label": "Oct 2026",
+    "Up to $250K": {
+     "n": 32,
+     "w14": {
+      "k": 5,
+      "eligible": 32,
+      "mature": true
+     },
+     "w30": {
+      "k": 4,
+      "eligible": 16,
+      "mature": false
+     },
+     "w60": {
+      "k": 0,
+      "eligible": 0,
+      "mature": false
+     },
+     "w90": {
+      "k": 0,
+      "eligible": 0,
+      "mature": false
+     },
+     "rf14": {
+      "k": 5,
+      "eligible": 32
+     },
+     "rf30": {
+      "k": 4,
+      "eligible": 16
+     }
+    },
+    "Above $250K": {
+     "n": 36,
+     "w14": {
+      "k": 3,
+      "eligible": 36,
+      "mature": true
+     },
+     "w30": {
+      "k": 7,
+      "eligible": 21,
+      "mature": false
+     },
+     "w60": {
+      "k": 0,
+      "eligible": 0,
+      "mature": false
+     },
+     "w90": {
+      "k": 0,
+      "eligible": 0,
+      "mature": false
+     },
+     "rf14": {
+      "k": 6,
+      "eligible": 36
+     },
+     "rf30": {
+      "k": 3,
+      "eligible": 21
+     }
+    }
+   },
+   {
+    "month": "2026-11",
+    "label": "Nov 2026",
+    "Up to $250K": {
+     "n": 4,
+     "w14": {
+      "k": 0,
+      "eligible": 0,
+      "mature": false
+     },
+     "w30": {
+      "k": 0,
+      "eligible": 0,
+      "mature": false
+     },
+     "w60": {
+      "k": 0,
+      "eligible": 0,
+      "mature": false
+     },
+     "w90": {
+      "k": 0,
+      "eligible": 0,
+      "mature": false
+     },
+     "rf14": {
+      "k": 0,
+      "eligible": 0
+     },
+     "rf30": {
+      "k": 0,
+      "eligible": 0
+     }
+    },
+    "Above $250K": {
+     "n": 5,
+     "w14": {
+      "k": 0,
+      "eligible": 0,
+      "mature": false
+     },
+     "w30": {
+      "k": 0,
+      "eligible": 0,
+      "mature": false
+     },
+     "w60": {
+      "k": 0,
+      "eligible": 0,
+      "mature": false
+     },
+     "w90": {
+      "k": 0,
+      "eligible": 0,
+      "mature": false
+     },
+     "rf14": {
+      "k": 0,
+      "eligible": 0
+     },
+     "rf30": {
+      "k": 0,
+      "eligible": 0
+     }
+    }
+   }
+  ],
+  "experience": [
+   {
+    "experience": "New Client Experience",
+    "group": "Up to $250K",
+    "n": 120,
+    "rf30": {
+     "k": 18,
+     "eligible": 107
+    },
+    "uc14": {
+     "k": 10,
+     "eligible": 118
+    },
+    "uc30": {
+     "k": 29,
+     "eligible": 107
+    }
+   },
+   {
+    "experience": "New Client Experience",
+    "group": "Above $250K",
+    "n": 102,
+    "rf30": {
+     "k": 8,
+     "eligible": 85
+    },
+    "uc14": {
+     "k": 9,
+     "eligible": 98
+    },
+    "uc30": {
+     "k": 25,
+     "eligible": 85
+    }
+   },
+   {
+    "experience": "Legacy",
+    "group": "Up to $250K",
+    "n": 78,
+    "rf30": {
+     "k": 4,
+     "eligible": 71
+    },
+    "uc14": {
+     "k": 3,
+     "eligible": 76
+    },
+    "uc30": {
+     "k": 16,
+     "eligible": 71
+    }
+   },
+   {
+    "experience": "Legacy",
+    "group": "Above $250K",
+    "n": 94,
+    "rf30": {
+     "k": 3,
+     "eligible": 91
+    },
+    "uc14": {
+     "k": 3,
+     "eligible": 93
+    },
+    "uc30": {
+     "k": 25,
+     "eligible": 91
+    }
+   }
+  ],
+  "profile": [
+   {
+    "label": "Up to $250K",
+    "n": 198,
+    "price": {
+     "n": 79,
+     "median": 530000.0
+    },
+    "oop": {
+     "n": 79,
+     "median": 250000.0
+    },
+    "fee": {
+     "median": 20000.0,
+     "mean": 19926.0
+    },
+    "complete_share": 0.7857,
+    "split_share": 0.9697,
+    "uc_close90": {
+     "k": 38,
+     "eligible": 38
+    },
+    "refund": {
+     "n": 31,
+     "median_days": 14.0,
+     "within14": 17
+    },
+    "offers": {
+     "No offers before": 29,
+     "1\u20132 offers before": 68,
+     "3+ offers before": 101
+    },
+    "experience": {
+     "New Client Experience": 120,
+     "Legacy": 78
+    }
+   },
+   {
+    "label": "Above $250K",
+    "n": 196,
+    "price": {
+     "n": 75,
+     "median": 800000.0
+    },
+    "oop": {
+     "n": 76,
+     "median": 367125.0
+    },
+    "fee": {
+     "median": 20950.0,
+     "mean": 20340.0
+    },
+    "complete_share": 0.7653,
+    "split_share": 0.9643,
+    "uc_close90": {
+     "k": 33,
+     "eligible": 34
+    },
+    "refund": {
+     "n": 20,
+     "median_days": 13.0,
+     "within14": 13
+    },
+    "offers": {
+     "No offers before": 21,
+     "1\u20132 offers before": 48,
+     "3+ offers before": 127
+    },
+    "experience": {
+     "New Client Experience": 102,
+     "Legacy": 94
+    }
+   },
+   {
+    "label": "Not recorded",
+    "n": 431,
+    "price": {
+     "n": 281,
+     "median": 625000.0
+    },
+    "oop": {
+     "n": 280,
+     "median": 310633.0
+    },
+    "fee": {
+     "median": 17000.0,
+     "mean": 16490.0
+    },
+    "complete_share": 0.0256,
+    "split_share": 1.0,
+    "uc_close90": {
+     "k": 213,
+     "eligible": 253
+    },
+    "refund": {
+     "n": 26,
+     "median_days": 16.0,
+     "within14": 13
+    },
+    "offers": {
+     "No offers before": 0,
+     "1\u20132 offers before": 0,
+     "3+ offers before": 0
+    },
+    "experience": {
+     "Legacy": 430,
+     "New Client Experience": 1
+    }
+   }
+  ],
+  "explorer_view": "#budget"
+ },
+ "reconcile": {
+  "asof": "2026-11-16",
+  "rows": [
+   {
+    "key": "signed",
+    "label": "Signed-up clients",
+    "cj": 843,
+    "explorer": 843,
+    "cash": 876,
+    "unit": "Jira issues (one per search) \u00b7 Cash: won Pipedrive deals",
+    "bridge": {
+     "issues_with_won_deal": 819,
+     "issues_without_won_deal": 24,
+     "deals_presale_or_unsigned_issue": 10,
+     "deals_without_jira": 47
+    }
+   },
+   {
+    "key": "hunting",
+    "label": "Hunting (no contract yet, still searching)",
+    "cj": 123,
+    "explorer": 123,
+    "cash": 117,
+    "unit": "Jira issues by status \u00b7 Cash: won deals with no property yet",
+    "bridge": {
+     "in_cash_noprop": 107,
+     "in_cash_closed": 1,
+     "without_won_deal": 15,
+     "cash_not_started": 10,
+     "cash_hunting": 107
+    }
+   },
+   {
+    "key": "uc",
+    "label": "Under contract, not yet closed",
+    "cj": 65,
+    "explorer": 65,
+    "cash": 65,
+    "unit": "Jira issues by status \u00b7 Cash: under contract + closing scheduled",
+    "bridge": {
+     "cash_uc": 59,
+     "cash_scheduled": 6,
+     "matched": 65
+    }
+   },
+   {
+    "key": "paused",
+    "label": "Paused + Additional Service",
+    "cj": 113,
+    "explorer": 113,
+    "cash": 113,
+    "unit": "Jira issues by status \u00b7 Cash: won deals in Paused / Additional Service",
+    "bridge": {
+     "matched": 110,
+     "jira_in_cash_closed": 1,
+     "jira_without_won_deal": 2,
+     "cash_only": 3
+    }
+   },
+   {
+    "key": "refunded",
+    "label": "Refunded",
+    "cj": 82,
+    "explorer": 82,
+    "cash": 80,
+    "unit": "Jira issues by status \u00b7 Cash: won deals with a refund processed",
+    "bridge": {
+     "matched": 79,
+     "jira_without_won_deal": 3,
+     "cash_only": 1
+    }
+   },
+   {
+    "key": "purchased",
+    "label": "Completed purchases",
+    "cj": 460,
+    "explorer": 460,
+    "cash": 462,
+    "unit": "Jira issues, status first \u00b7 Cash: closing recorded + post-close without a closing date",
+    "bridge": {
+     "in_cash_closed": 437,
+     "in_cash_unverified": 19,
+     "without_won_deal": 4,
+     "cash_closed": 442,
+     "cash_unverified": 20,
+     "cash_closed_other_stage": 5
+    }
+   },
+   {
+    "key": "scheduled",
+    "label": "Closings dated after the data date",
+    "cj": 6,
+    "explorer": 6,
+    "cash": 6,
+    "unit": "Client Journey: still under contract (not a purchase) \u00b7 Cash: collected on the scheduled date",
+    "bridge": {}
+   },
+   {
+    "key": "closed30",
+    "label": "Closings 18 Oct\u201316 Nov",
+    "cj": 50,
+    "explorer": 50,
+    "cash": 50,
+    "unit": "closing date up to the data date, won-deal grain (daily_client_activity)",
+    "bridge": {}
+   },
+   {
+    "key": "oct_closed",
+    "label": "October 2026 closings",
+    "cj": 64,
+    "explorer": 64,
+    "cash": null,
+    "unit": "daily_client_activity (won deals) \u00b7 Jira issues dated in October: 65",
+    "bridge": {
+     "jira_issues": 65
+    }
+   },
+   {
+    "key": "oct_sales",
+    "label": "October 2026 sales",
+    "cj": 69,
+    "explorer": 69,
+    "cash": null,
+    "unit": "Pipedrive won date (daily_client_activity) \u00b7 Explorer Sales funnel uses the official filter",
+    "bridge": {
+     "funnel_months_differ": {
+      "2026-06": [
+       58,
+       57
+      ],
+      "2026-11": [
+       11,
+       10
+      ]
+     }
+    }
+   },
+   {
+    "key": "uc_median",
+    "label": "Median days to Under Contract (recorded)",
+    "cj": 37.5,
+    "explorer": 37.5,
+    "cash": null,
+    "unit": "confirmed starts, client start date to latest valid contract",
+    "bridge": {}
+   },
+   {
+    "key": "budget14",
+    "label": "Under contract within 14 days, up to / above $250K",
+    "cj": [
+     13,
+     194,
+     12,
+     191
+    ],
+    "explorer": [
+     13,
+     194,
+     12,
+     191
+    ],
+    "cash": null,
+    "unit": "confirmed starts with a matched onboarding budget, eligible = 14 days on the clock",
+    "bridge": {}
+   },
+   {
+    "key": "net_cash",
+    "label": "Forecast net cash (default assumptions)",
+    "cj": null,
+    "explorer": 1796146.57,
+    "cash": 1796146.57,
+    "unit": "service + affiliate \u2212 future refunds, Cash Forecast defaults",
+    "bridge": {
+     "service": 1360698.01,
+     "affiliate": 896752.34,
+     "refunds": -461303.78
+    }
+   }
+  ],
+  "explorer_asof": "2026-11-16",
+  "cash_bridge": {
+   "service": 1360698.01,
+   "service_parts": {
+    "contracts": 589409.38,
+    "searching": 678498.63,
+    "paused": 92790.0
+   },
+   "affiliate": 896752.34,
+   "refunds": -461303.78,
+   "net": 1796146.57
+  }
+ },
  "meta": {
   "title": "The Client Journey",
   "asof": "2026-11-16",
@@ -12187,7 +15387,7 @@
   "snapshots": {
    "reporting_layer": "2026-11-16"
   },
-  "built_at": "2026-11-18 06:48",
+  "built_at": "2026-11-18 16:23",
   "chapters": [
    "journey",
    "outcomes",
@@ -12971,6 +16171,239 @@
    "hard": true
   },
   {
+   "check": "Goal pace: every month's and every Sunday-Saturday week's Sales / Under Contract / Closed equal daily_client_activity over the days it covers",
+   "page": true,
+   "explorer": true,
+   "ok": true,
+   "hard": true
+  },
+  {
+   "check": "Goal pace: full months equal the published Explorer's monthly table (won / UC / closed)",
+   "page": 0,
+   "explorer": 0,
+   "ok": true,
+   "hard": true
+  },
+  {
+   "check": "Goal pace: weeks cover every day from the first Sunday to the data date exactly once; only the last month and week are partial and both end on the data date",
+   "page": [
+    233,
+    1,
+    1,
+    "2026-11-16",
+    "2026-11-16"
+   ],
+   "explorer": [
+    233,
+    1,
+    1,
+    "2026-11-16",
+    "2026-11-16"
+   ],
+   "ok": true,
+   "hard": true
+  },
+  {
+   "check": "Goal pace: weekly benchmark = 100 a month per seven calendar days; every rate = count x 7 / days covered",
+   "page": [
+    23.0,
+    true
+   ],
+   "explorer": [
+    23.0,
+    true
+   ],
+   "ok": true,
+   "hard": true
+  },
+  {
+   "check": "Goal pace: sales and contracts needed for 100 closings a month = 100 / the recorded conversion",
+   "page": [
+    159,
+    109
+   ],
+   "explorer": [
+    159,
+    109
+   ],
+   "ok": true,
+   "hard": true
+  },
+  {
+   "check": "Client status: hunting, paused, refunded and under contract equal scene 2.1 (status first) and hunting equals the published Explorer",
+   "page": [
+    123,
+    108,
+    82,
+    65,
+    123
+   ],
+   "explorer": [
+    123,
+    108,
+    82,
+    65,
+    123
+   ],
+   "ok": true,
+   "hard": true
+  },
+  {
+   "check": "Client status: hunting with a start date + without = hunting; wait bins (10-day + 180+) and bands add up to those with a start date; no-start reasons add up",
+   "page": [
+    123,
+    110,
+    110,
+    13,
+    110
+   ],
+   "explorer": [
+    123,
+    110,
+    110,
+    13,
+    110
+   ],
+   "ok": true,
+   "hard": true
+  },
+  {
+   "check": "Client status: pause-length bands add up to dated pauses; refund-timing bands to timed refunds; refund months to dated refunds; previous statuses of paused clients to Paused",
+   "page": [
+    106,
+    80,
+    82,
+    108
+   ],
+   "explorer": [
+    106,
+    80,
+    82,
+    108
+   ],
+   "ok": true,
+   "hard": true
+  },
+  {
+   "check": "First 14 days: under contract within 14 days and eligible clients equal the cohort table (3.3), months that differ",
+   "page": 0,
+   "explorer": 0,
+   "ok": true,
+   "hard": true
+  },
+  {
+   "check": "First 14 days: contracts and refunds never exceed eligible clients, eligible never exceeds the month",
+   "page": true,
+   "explorer": true,
+   "ok": true,
+   "hard": true
+  },
+  {
+   "check": "Budget: up to / above $250K / not recorded (sizes, windows, refunds, Kaplan-Meier, stages) = the published Explorer #budget view",
+   "page": 0,
+   "explorer": 0,
+   "ok": true,
+   "hard": true
+  },
+  {
+   "check": "Budget: like-for-like differences and intervals (contracts, closings, refunds) = the published Explorer",
+   "page": 0,
+   "explorer": 0,
+   "ok": true,
+   "hard": true
+  },
+  {
+   "check": "Budget: monthly cohort cells add up to each group's 14 / 30-day contracts and 14 / 30-day refunds",
+   "page": true,
+   "explorer": true,
+   "ok": true,
+   "hard": true
+  },
+  {
+   "check": "Budget: the UC-tomorrow groups (4.3) hold the same clients and recorded durations as the budget groups",
+   "page": [
+    [
+     "Up to $250K",
+     198,
+     116,
+     35.0
+    ],
+    [
+     "Above $250K",
+     196,
+     110,
+     32.0
+    ],
+    [
+     "Not recorded",
+     431,
+     266,
+     41.0
+    ]
+   ],
+   "explorer": [
+    [
+     "Up to $250K",
+     198,
+     116,
+     35.0
+    ],
+    [
+     "Above $250K",
+     196,
+     110,
+     32.0
+    ],
+    [
+     "Not recorded",
+     431,
+     266,
+     41.0
+    ]
+   ],
+   "ok": true,
+   "hard": true
+  },
+  {
+   "check": "Budget: experience split adds up to the matched groups' 30-day refunds",
+   "page": true,
+   "explorer": true,
+   "ok": true,
+   "hard": true
+  },
+  {
+   "check": "Reconciliation: figures that must be equal across the report, the Explorer and the Cash Forecast are equal",
+   "page": [],
+   "explorer": [],
+   "ok": true,
+   "hard": true
+  },
+  {
+   "check": "Reconciliation: every bridge between Jira issues and won deals adds up (signed, hunting, paused, refunded, purchases)",
+   "page": [
+    843,
+    123,
+    117,
+    113,
+    113,
+    82,
+    80,
+    460
+   ],
+   "explorer": [
+    843,
+    123,
+    117,
+    113,
+    113,
+    82,
+    80,
+    460
+   ],
+   "ok": true,
+   "hard": true
+  },
+  {
    "check": "Keeping pace: 'the gap has narrowed every month since' its peak after late May",
    "page": true,
    "explorer": true,
@@ -12993,6 +16426,62 @@
   },
   {
    "check": "Offer experience: share within 30 days rises 0 -> 1-2 -> 3+ offers",
+   "page": true,
+   "explorer": true,
+   "ok": true,
+   "hard": false
+  },
+  {
+   "check": "Summary: the best closing month is the most closings of any month on record",
+   "page": true,
+   "explorer": true,
+   "ok": true,
+   "hard": false
+  },
+  {
+   "check": "Summary: refunds peaked in the same month as closings ('record refunds')",
+   "page": "2026-10",
+   "explorer": "2026-10",
+   "ok": true,
+   "hard": false
+  },
+  {
+   "check": "Summary: sales have slowed since their best month (last full month and the partial month below it)",
+   "page": true,
+   "explorer": true,
+   "ok": true,
+   "hard": false
+  },
+  {
+   "check": "Summary: in the first 14 days since June, refunds at least match contracts",
+   "page": true,
+   "explorer": true,
+   "ok": true,
+   "hard": false
+  },
+  {
+   "check": "3.4: the 30-day refund rate rises with each start month since July",
+   "page": true,
+   "explorer": true,
+   "ok": true,
+   "hard": false
+  },
+  {
+   "check": "5.3: no contract or closing window differs like for like (every 95% interval includes zero)",
+   "page": true,
+   "explorer": true,
+   "ok": true,
+   "hard": false
+  },
+  {
+   "check": "5.3: refunds within 30 days are higher up to $250K, interval clear of zero",
+   "page": true,
+   "explorer": true,
+   "ok": true,
+   "hard": false
+  },
+  {
+   "check": "2.3 / Summary: paused clients carry most of the projected refunds at the default assumptions",
    "page": true,
    "explorer": true,
    "ok": true,

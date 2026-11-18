@@ -26,6 +26,7 @@
     uc: css('--uc'), uc2: css('--uc-2'), closed: css('--closed'), closed2: css('--closed-2'),
     wait: css('--wait'), wait2: css('--wait-2'), hold: css('--hold'), hold2: css('--hold-2'), paused: css('--paused'),
     sp1: css('--sp-fast'), sp2: css('--sp-mid'), sp3: css('--sp-slow'), decl: css('--decl'),
+    blo: css('--b-lo'), bhi: css('--b-hi'), refund: css('--refund'), refund2: css('--refund-2'), acq2: css('--acq-2'),
   });
 
   /* charts: ECharts (SVG renderer), redrawn on theme change, resized with their container */
@@ -151,6 +152,19 @@
     },
     keys: (items, cols) => `<div class="stack-keys" style="--cols:${cols || items.length}">${items.map(x => `<div class="sk" style="--c:${x.c}"><span class="sk-v num">${S.int(x.n)}${x.of ? `<small>${x.of}</small>` : ''}</span><span class="sk-t">${x.label}</span>${x.sub ? `<span class="sk-s">${x.sub}</span>` : ''}</div>`).join('')}</div>`,
     bar: (label, n, max, c, note) => `<div class="ob-r${n ? '' : ' zero'}"><span>${label}${note ? `<small style="display:block;color:var(--muted);font-size:12px">${note}</small>` : ''}</span><span class="bar" style="--c:${c}"><i style="width:${max ? (100 * n / max).toFixed(1) : 0}%"></i></span><span class="n num">${S.int(n)}</span></div>`,
+  };
+  /* a link to the Business Data Explorer view with the deeper cuts (same snapshot) */
+  S.ui.xl = (hash, text) => `<a class="xl" href="${S.data.meta.source}${hash}" target="_blank" rel="noopener">${text} <span aria-hidden="true">↗</span></a>`;
+  S.ui.go = (id, text) => `<a class="xl" href="#${id}">${text} <span aria-hidden="true">→</span></a>`;
+  /* diagonal stripes as an image pattern for ECharts fills (partial periods, scenarios) */
+  S.stripes = (fg, bg) => {
+    const r = Math.min(2, Math.ceil(window.devicePixelRatio || 1)), s = 6, c = document.createElement('canvas');
+    c.width = c.height = s * r;
+    const x = c.getContext('2d');
+    x.scale(r, r); x.fillStyle = bg; x.fillRect(0, 0, s, s); x.strokeStyle = fg; x.lineWidth = 2.1; x.beginPath();
+    [0, s, 2 * s].forEach(k => { x.moveTo(k - s - 2, s + 2); x.lineTo(k + 2, -2); });
+    x.stroke();
+    return { image: c, repeat: 'repeat', imageWidth: c.width, imageHeight: c.height, scaleX: 1 / r, scaleY: 1 / r };
   };
   S.pctp = (v, d = 0) => (v == null ? '–' : (v * 100).toFixed(d) + '%');
   S.signed = (v, d = 0) => (v == null ? '–' : (v > 0 ? '+' : v < 0 ? '−' : '') + Math.abs(v * 100).toFixed(d) + '%');

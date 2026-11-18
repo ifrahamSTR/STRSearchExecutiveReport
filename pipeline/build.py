@@ -13,6 +13,8 @@ from __future__ import annotations
 
 import argparse
 import json
+
+import pandas as pd
 import sys
 import time
 from datetime import datetime
@@ -20,7 +22,7 @@ from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 import core as C  # noqa: E402
-from chapters import cash, drivers, fallout, journey, outcomes, pace, repeat, speed  # noqa: E402
+from chapters import budgets, cash, drivers, fallout, journey, outcomes, pace, repeat, speed, summary  # noqa: E402
 
 CHAPTERS = {"journey": journey, "outcomes": outcomes, "pace": pace, "speed": speed, "drivers": drivers, "fallout": fallout, "repeat": repeat}
 OUT = C.ROOT / "docs" / C.VERSION_ID / "data" / "story-data.js"
@@ -143,6 +145,66 @@ def checks(ctx: C.Ctx, data: dict) -> list[dict]:
     cr = rp["cribs"]
     chk("STR Cribs: first and later designer choices add up to the repeat buyers' purchases", (sum(cr["first"].values()), sum(cr["later"].values())), (cr["clients"], cr["purchases"] - cr["clients"]))
     chk("STR Cribs: repeat buyers are the Jira clients with two or more completed purchases", cr["clients"], rp["jira"]["two_plus_purchases"])
+    # ---- L10 update (18 Nov 2026): the 100-a-month goal, client status, the first 14 days, budget groups, reconciliation
+    gl, dm = pc["goal"], ctx.f.daily
+    day = dm.set_index("activity_date")
+    cols = {"sales": "clients_won", "uc": "clients_went_uc", "closed": "properties_closed"}
+    chk("Goal pace: every month's and every Sunday-Saturday week's Sales / Under Contract / Closed equal daily_client_activity over the days it covers",
+        all(r[k] == int(day.loc[r["first"]:r["last"], c].sum()) and r["days"] == len(day.loc[r["first"]:r["last"]]) for r in gl["months"] + gl["weeks"] for k, c in cols.items()), True)
+    chk("Goal pace: full months equal the published Explorer's monthly table (won / UC / closed)" if pub else "Goal pace: full months equal the foundation's monthly table",
+        sum(1 for r in gl["months"] if not r["partial"] and (r["sales"], r["uc"], r["closed"]) != (q3[r["month"]]["won"], q3[r["month"]]["uc"], q3[r["month"]]["closed"])), 0)
+    chk("Goal pace: weeks cover every day from the first Sunday to the data date exactly once; only the last month and week are partial and both end on the data date",
+        (sum(r["days"] for r in gl["weeks"]), [r["partial"] for r in gl["months"]].count(True), [r["partial"] for r in gl["weeks"]].count(True), gl["months"][-1]["last"], gl["weeks"][-1]["last"]),
+        ((ctx.asof - pd.Timestamp(gl["weeks"][0]["week"])).days + 1, int(gl["months"][-1]["partial"]), int(gl["weeks"][-1]["partial"]), gl["asof"], gl["asof"]))
+    chk("Goal pace: weekly benchmark = 100 a month per seven calendar days; every rate = count x 7 / days covered",
+        (gl["benchmark_per7"], all(abs(r[f"{k}_per7"] - r[k] * 7 / r["days"]) < 0.01 for r in gl["months"] + gl["weeks"] for k in cols)), (round(100 * 7 / (365.25 / 12), 2), True))
+    cv = gl["conversion"]
+    chk("Goal pace: sales and contracts needed for 100 closings a month = 100 / the recorded conversion", (cv["sales_needed"], cv["uc_needed"]), (round(100 / cv["won_close"]), round(100 / cv["uc_close"])))
+    cs2 = oc["status"]
+    h, pa, rf, uc = cs2["hunting"], cs2["paused"], cs2["refunded"], cs2["under_contract"]
+    stg = oc["waiting"]["stages"]
+    chk("Client status: hunting, paused, refunded and under contract equal scene 2.1 (status first) and hunting equals the published Explorer",
+        (h["n"], pa["n"], rf["n"], uc["n"], h["n"]), (stg["hunting"], stg["paused"], stg["refunded"], stg["under_contract"], pub["jira"]["hunting"] if pub else stg["hunting"]))
+    chk("Client status: hunting with a start date + without = hunting; wait bins (10-day + 180+) and bands add up to those with a start date; no-start reasons add up",
+        (h["with_start"] + h["no_start"], sum(h["bins"]["counts"]) + h["bins"]["overflow"], sum(b["n"] for b in h["bands"]), sum(h["no_start_why"].values()), sum(r["n"] for r in h["by_start_month"])),
+        (h["n"], h["with_start"], h["with_start"], h["no_start"], h["with_start"]))
+    chk("Client status: pause-length bands add up to dated pauses; refund-timing bands to timed refunds; refund months to dated refunds; previous statuses of paused clients to Paused",
+        (sum(b["n"] for b in pa["bands"]), sum(b["n"] for b in rf["bands"]), sum(r["n"] for r in rf["by_month"]) + rf["before_2025"], sum(pa["from"].values())),
+        (pa["dated"], rf["timed"], rf["dated"], pa["n"]))
+    f14 = pc["first14"]
+    cc14 = {r["month"]: r for r in pc["cohorts"]["clocks"]["start"]["rows"]}
+    chk("First 14 days: under contract within 14 days and eligible clients equal the cohort table (3.3), months that differ",
+        sum(1 for r in f14["rows"] if (r["uc14"], r["el14"]) != (cc14[r["month"]]["w14"]["k"], cc14[r["month"]]["w14"]["eligible"])), 0)
+    chk("First 14 days: contracts and refunds never exceed eligible clients, eligible never exceeds the month",
+        all(r[f"uc{w}"] <= r[f"el{w}"] and r[f"rf{w}"] <= r[f"el{w}"] <= r["n"] for r in f14["rows"] for w in (14, 30)), True)
+    bd = data["budgets"]
+    if pub:
+        pb = {g["label"]: g for g in pub["budget"]["groups"]["cmp"]}
+        keys = ("n", "uc14", "uc30", "uc60", "uc90", "cl90", "rf14", "rf30", "rf60", "km_uc", "km_closed", "stages")
+        chk("Budget: up to / above $250K / not recorded (sizes, windows, refunds, Kaplan-Meier, stages) = the published Explorer #budget view",
+            sum(1 for g in bd["groups"] for k in keys if g[k] != pb[g["label"]][k]) + sum(1 for g in bd["groups"] if g["recorded"]["median"] != pb[g["label"]]["recorded"]["median"]), 0)
+        pm = pub["budget"]["mh"]["cmp"]
+        chk("Budget: like-for-like differences and intervals (contracts, closings, refunds) = the published Explorer",
+            sum(1 for k in ("uc", "closed", "refunded") for a, b in zip(bd["mh"][k], pm[k]) if (a["diff"], a["lo"], a["hi"], a["a"], a["b"]) != (b["diff"], b["lo"], b["hi"], b["a"], b["b"])), 0)
+    bg = {g["label"]: g for g in bd["groups"]}
+    chk("Budget: monthly cohort cells add up to each group's 14 / 30-day contracts and 14 / 30-day refunds",
+        all(sum(r[lab][f"w{w}"]["k"] for r in bd["months"]) == bg[lab][f"uc{w}"]["k"] and sum(r[lab][f"w{w}"]["eligible"] for r in bd["months"]) == bg[lab][f"uc{w}"]["eligible"]
+            and sum(r[lab][f"rf{w}"]["k"] for r in bd["months"]) == bg[lab][f"rf{w}"]["k"] for lab in ("Up to $250K", "Above $250K") for w in (14, 30)), True)
+    chk("Budget: the UC-tomorrow groups (4.3) hold the same clients and recorded durations as the budget groups",
+        [(c["label"], c["clients"], c["recorded"]["n"], c["recorded"]["median"]) for c in sp["scenario"]["cmp"]], [(g["label"], g["n"], g["recorded"]["n"], g["recorded"]["median"]) for g in bd["groups"]])
+    chk("Budget: experience split adds up to the matched groups' 30-day refunds",
+        all(sum(x["rf30"]["k"] for x in bd["experience"] if x["group"] == lab) == bg[lab]["rf30"]["k"] for lab in ("Up to $250K", "Above $250K")), True)
+    rows = {r["key"]: r for r in data["reconcile"]["rows"]}
+    same = ["uc", "paused", "scheduled", "closed30", "oct_closed", "oct_sales", "uc_median", "budget14"]
+    chk("Reconciliation: figures that must be equal across the report, the Explorer and the Cash Forecast are equal",
+        [k for k in same if not (rows[k]["cj"] == rows[k]["explorer"] and (rows[k]["cash"] is None or rows[k]["cash"] == rows[k]["cj"]))]
+        + ([] if abs(rows["net_cash"]["explorer"] - rows["net_cash"]["cash"]) < 0.01 else ["net_cash"]), [])
+    hb, pb2, rb, ub, sb = rows["hunting"]["bridge"], rows["paused"]["bridge"], rows["refunded"]["bridge"], rows["purchased"]["bridge"], rows["signed"]["bridge"]
+    chk("Reconciliation: every bridge between Jira issues and won deals adds up (signed, hunting, paused, refunded, purchases)",
+        (sb["issues_with_won_deal"] + sb["issues_without_won_deal"], hb["in_cash_noprop"] + hb["in_cash_closed"] + hb["without_won_deal"], hb["cash_hunting"] + hb["cash_not_started"],
+         pb2["matched"] + pb2["jira_in_cash_closed"] + pb2["jira_without_won_deal"], pb2["matched"] + pb2["cash_only"], rb["matched"] + rb["jira_without_won_deal"], rb["matched"] + rb["cash_only"],
+         ub["in_cash_closed"] + ub["in_cash_unverified"] + ub["without_won_deal"]),
+        (rows["signed"]["cj"], rows["hunting"]["cj"], rows["hunting"]["cash"], rows["paused"]["cj"], rows["paused"]["cash"], rows["refunded"]["cj"], rows["refunded"]["cash"], rows["purchased"]["cj"]))
     # statements the presentation makes in words (warn only: on a refresh the page text follows the data)
     gp = pc["gap"]
     chk("Keeping pace: 'the gap has narrowed every month since' its peak after late May", gp["narrowing"], True, hard=False)
@@ -151,6 +213,24 @@ def checks(ctx: C.Ctx, data: dict) -> list[dict]:
     chk("Capital: Cox 95% CI for capital includes 1 (Pipedrive capital)", cx.get("lo", 2) <= 1 <= cx.get("hi", 0), True, hard=False)
     of = [r["within30"]["share"] for r in dr["offers"]["rows"]]
     chk("Offer experience: share within 30 days rises 0 -> 1-2 -> 3+ offers", None not in of and of == sorted(of), True, hard=False)
+    # L10 update: statements the chapters and the Executive Summary make in words (warn only)
+    gm = [r for r in gl["months"] if not r["partial"]]
+    cur = next((r for r in gl["months"] if r["partial"]), None)
+    chk("Summary: the best closing month is the most closings of any month on record", gl["best"]["closed"]["month"]["n"] == max(r["closed"] for r in ctx.expected["q3"]), True, hard=False)
+    rfm = max(cs2["refunded"]["by_month"], key=lambda r: r["n"])
+    chk("Summary: refunds peaked in the same month as closings ('record refunds')", rfm["month"], gl["best"]["closed"]["month"]["at"], hard=False)
+    chk("Summary: sales have slowed since their best month (last full month and the partial month below it)",
+        gm[-1]["sales_per7"] < gl["best"]["sales"]["month"]["per7"] and (cur is None or cur["sales_per7"] < gm[-1]["sales_per7"]), True, hard=False)
+    chk("Summary: in the first 14 days since June, refunds at least match contracts", f14["since_change"]["rf14"] >= f14["since_change"]["uc14"], True, hard=False)
+    r30 = [r for r in f14["rows"] if "2026-07" <= r["month"] and r["el30"]]
+    chk("3.4: the 30-day refund rate rises with each start month since July", all(a["rf30"] / a["el30"] < b["rf30"] / b["el30"] for a, b in zip(r30, r30[1:])), True, hard=False)
+    chk("5.3: no contract or closing window differs like for like (every 95% interval includes zero)",
+        all(x["lo"] <= 0 <= x["hi"] for k in ("uc", "closed") for x in bd["mh"][k]), True, hard=False)
+    chk("5.3: refunds within 30 days are higher up to $250K, interval clear of zero", bd["mh"]["refunded"][1]["w"] == 30 and bd["mh"]["refunded"][1]["lo"] > 0, True, hard=False)
+    br_ = data["reconcile"]["cash_bridge"]
+    pd_ = data["cash"]["defaults"]["paused_defaults"]
+    chk("2.3 / Summary: paused clients carry most of the projected refunds at the default assumptions",
+        data["cash"]["groups"]["paused"]["paid"] * pd_["refund"] / 100 > 0.5 * abs(br_["refunds"]), True, hard=False)
     # cash forecast tab: every engagement in exactly one group, balances reconcile with client_cash_forecast,
     # the fixed schedule holds exactly the expected amounts, and no engagement can produce both cash and a refund twice
     cf = data["cash"]
@@ -195,6 +275,8 @@ def main() -> None:
     ctx = C.load(args.explorer, args.reports, args.cache)
     data = {k: mod.build(ctx) for k, mod in CHAPTERS.items()}
     data["cash"] = cash.build(ctx)          # the Cash forecast tab (cash.html), not a presentation chapter
+    data["budgets"] = budgets.build(ctx)    # the Explorer's budget view, used in chapters 2-5 (added 18 Nov 2026)
+    data["reconcile"] = summary.reconcile(ctx, data)   # shared figures across the report, the Explorer and the Cash Forecast
     f = ctx.f
     data["meta"] = {
         "title": "The Client Journey", "asof": ctx.asof.strftime("%Y-%m-%d"),

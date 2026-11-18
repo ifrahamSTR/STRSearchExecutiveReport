@@ -5,6 +5,8 @@ post-close services. Hunting = the Active clients still searching (Client Start 
 completed milestones only: closing dates after the data date are scheduled, not closed."""
 from __future__ import annotations
 
+import pandas as pd
+
 import core as C
 from chapters import records as R
 
@@ -45,6 +47,87 @@ def waiting(ctx: C.Ctx) -> dict:
     }
 
 
+WAIT_BIN, WAIT_CAP = 10, 180            # the hunting-wait strip: 10-day bins, 180+ together
+WAIT_BANDS = [(0, 30), (31, 60), (61, 90), (91, 180), (181, 365), (366, 10_000)]
+PAUSE_BANDS = [(0, 30), (31, 90), (91, 180), (181, 365), (366, 10_000)]
+REFUND_BANDS = [(0, 14), (15, 30), (31, 60), (61, 90), (91, 10_000)]
+SEARCH = ["Client Start", "2 Weeks", "4 Weeks", "6 Weeks", "8 Weeks"]
+RECENT_FROM = "2026-04"                   # hunting waits by start month: April 2026 on, earlier months together
+
+
+def _bands(v: pd.Series, bands) -> list:
+    v = pd.to_numeric(v, errors="coerce").dropna()
+    return [{"lo": lo, "hi": hi if hi < 10_000 else None, "n": int(v.between(lo, hi).sum())} for lo, hi in bands]
+
+
+def status(ctx: C.Ctx) -> dict:
+    """Scenes 2.2-2.3 (added for the L10, 18 Nov 2026): how long hunting clients have waited and where the other clients
+    without a current contract or completed purchase stand. Jira-issue grain, status first (records.stage), so every count
+    equals scene 2.1. Hunting wait = data date - client start date (the reporting layer's client_start_date); clients without
+    a start date are counted, not aged. Pause entry dates and previous statuses come from the 12 Nov 2026 Jira extract
+    (latest_status_date / previous_status, data as of 11 Nov); issues opened after it have none."""
+    asof, s = ctx.asof, ctx.signed.copy()
+    s["stage"] = R.stage(s)
+    j12 = R.jira12(ctx.explorer)
+    key = s.key.astype(str).str.upper()
+    for c in ("previous_status", "latest_status", "latest_status_date"):
+        s[c] = key.map(j12[c]).values
+    h = s[s.stage == "hunting"]
+    age = (asof - h.start).dt.days
+    a = age.dropna()
+    nostart = h[h.start.isna()]
+    why = nostart.pd_status.fillna("No deal link").replace({"lost": "Pipedrive deal lost", "open": "Pipedrive deal still open"}).value_counts()
+    hm = h.assign(m=h.start.dt.strftime("%Y-%m"), a=age).dropna(subset=["m"])
+    hm["m"] = hm.m.where(hm.m >= RECENT_FROM, "earlier")                       # older start months together (no single-client ages)
+    by_month = hm.groupby("m").a.agg(["size", "median"])
+    hunting = {
+        "n": int(len(h)), "with_start": int(len(a)), "no_start": int(len(nostart)),
+        "no_start_why": {k: int(v) for k, v in why.items()},
+        "median": float(a.median()), "mean": round(float(a.mean()), 1), "over90": int((a > 90).sum()), "over180": int((a > 180).sum()),
+        "within30": int((a <= 30).sum()),
+        "bins": {"width": WAIT_BIN, "cap": WAIT_CAP, "counts": [int(((a >= x) & (a < x + WAIT_BIN)).sum()) for x in range(0, WAIT_CAP, WAIT_BIN)],
+                 "overflow": int((a >= WAIT_CAP).sum())},
+        "bands": _bands(a, WAIT_BANDS),
+        "by_status": {st: {"n": int((h.status == st).sum()), "median": float(age[h.status == st].median()) if age[h.status == st].notna().any() else None} for st in SEARCH},
+        "by_start_month": [{"month": m, "n": int(r["size"]), "median": float(r["median"])} for m, r in by_month.iterrows()],
+        "started_last_90": int((a <= 90).sum()),
+        "older_uc_date": int(h.uc.notna().sum()),
+        "recorded_median_to_uc": ctx.expected["q1"]["uc"]["median"],
+        "past_recorded_median": int((a > ctx.expected["q1"]["uc"]["median"]).sum()),
+    }
+    p = s[s.stage == "paused"]
+    dp = (asof - pd.to_datetime(p.latest_status_date)).dt.days.where(p.latest_status.eq("Paused"))
+    prev = p.previous_status.fillna("").str.strip().str.lower()
+    paused = {
+        "n": int(len(p)), "dated": int(dp.notna().sum()), "median_days": float(dp.median()), "bands": _bands(dp, PAUSE_BANDS),
+        "from": {"long_search": int(prev.eq("8 weeks").sum()), "earlier_search": int(prev.isin([x.lower() for x in SEARCH[:4]]).sum()),
+                 "contract": int(prev.isin(["under contract", "passed inspection"]).sum()),
+                 "other": int((~prev.isin([x.lower() for x in SEARCH] + ["under contract", "passed inspection", ""])).sum()), "unknown": int(prev.eq("").sum())},
+        "older_uc_date": int(p.uc.notna().sum()),
+        "start_year": {str(int(k)): int(v) for k, v in p.start.dt.year.value_counts().sort_index().items()},
+    }
+    r = s[s.stage == "refunded"]
+    dr = (r.refund_date - r.start).dt.days
+    rprev = r.previous_status.fillna("").str.strip()
+    by_m = r.refund_date.dt.strftime("%Y-%m").value_counts()
+    months = [str(m) for m in pd.period_range("2025-01", asof.strftime("%Y-%m"), freq="M")]
+    refunded = {
+        "n": int(len(r)), "dated": int(r.refund_date.notna().sum()), "timed": int(dr.notna().sum()), "median_days": float(dr.median()),
+        "within14": int(dr.between(0, 14).sum()), "within30": int(dr.between(0, 30).sum()), "bands": _bands(dr, REFUND_BANDS),
+        "from_client_start": int(rprev.eq("Client Start").sum()), "prev_unknown": int(rprev.eq("").sum()),
+        "by_month": [{"month": m, "n": int(by_m.get(m, 0))} for m in months],
+        "before_2025": int((r.refund_date < "2025-01-01").sum()),
+    }
+    u = s[s.stage == "under_contract"]
+    du = (asof - u.uc).dt.days
+    uc = {"n": int(len(u)), "scheduled": int(u.closed_scheduled.sum()), "median_days_since": float(du.median()), "over60": int((du > 60).sum()),
+          "passed_inspection": int((u.status == "Passed Inspection").sum())}
+    ad = s[s.stage == "additional"]
+    return {"hunting": hunting, "paused": paused, "refunded": refunded, "under_contract": uc,
+            "additional": {"n": int(len(ad)), "after_search": int(ad.previous_status.fillna("").str.strip().isin(SEARCH).sum())},
+            "source_12nov": {"asof": "2026-11-11", "missing": int((~key.isin(j12.index)).sum())}}
+
+
 def build(ctx: C.Ctx) -> dict:
     ex, s = ctx.expected, ctx.signed
     act = s[s.active]
@@ -62,4 +145,5 @@ def build(ctx: C.Ctx) -> dict:
                        "closed_scheduled": q2["active_closed_scheduled"]},
         "hunting_engagements": ex["engagements"]["hunting_official"],
         "waiting": waiting(ctx),
+        "status": status(ctx),
     }

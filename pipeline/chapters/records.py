@@ -62,6 +62,8 @@ def jira12(explorer) -> pd.DataFrame:
         "first_uc": _day(k["first_under_contract_date"]),
         "latest_uc": _day(k["latest_under_contract_date"]),
         "previous_status": k["previous_status"],
+        "latest_status": k["latest_status"],
+        "latest_status_date": _day(k["latest_status_date"]),       # date the current status was entered (as of 11 Nov 2026)
     }, index=k.index)
 
 

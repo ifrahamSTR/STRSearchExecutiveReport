@@ -33,6 +33,7 @@ def _bins(values: pd.Series, width: int, cap: int) -> dict:
 BUDGETS = [(200, "$200K", "$150K–$200K"), (250, "$250K", "$200K–$250K"), (300, "$300K", "$250K–$300K"),
            (400, "$350K–$400K", "$300K–$400K"), (10_000, "$450K and above", "$400K–$500K and $500K+")]
 NO_BUDGET = "Not recorded"
+CMP_AT, CMP = 250, ["Up to $250K", "Above $250K"]
 
 
 def _budget(cap) -> str:
@@ -80,6 +81,10 @@ def scenario(ctx: C.Ctx) -> dict:
     for _, lab, rng in BUDGETS + [(None, NO_BUDGET, None)]:
         g = co[co.budget == lab]
         groups.append({"label": lab, "range": rng, **block(g)})
+    # up to vs above $250K (upper end of the form range; an open-ended answer such as "$400K+" is above), as the Explorer's #budget view
+    cap = pd.to_numeric(ans.cap, errors="coerce")
+    co["cmp"] = np.where(cap.isna(), NO_BUDGET, np.where((cap >= 0) & (cap <= CMP_AT), CMP[0], CMP[1]))
+    cmp = [{"label": lab, **block(co[co.cmp == lab])} for lab in CMP + [NO_BUDGET]]
     # every hunting Jira client, including the 15 without a confirmed start on a won deal (measured from their Jira start)
     jh = ctx.jira[ctx.jira.hunting]
     extra = jh[~jh.key.isin(co.jira_key) & jh.start.notna()]
@@ -88,7 +93,7 @@ def scenario(ctx: C.Ctx) -> dict:
     sig = ctx.signed
     since = co[co.start >= pd.Timestamp("2026-04-20")]
     return {
-        "all": block(co), "budgets": groups,
+        "all": block(co), "budgets": groups, "cmp": cmp,
         "budget_rule": {"field": "Total out-of-pocket capital available (all-in)", "column": "M", "form_since": "2026-04-20",
                         "measures": "down payment + closing costs + renovation + furniture + amenities (all-in capital, not the purchase price)",
                         "matched": int(ans.matched.sum()), "since_form": int(len(since)), "since_form_matched": int(since.index.isin(ans.index[ans.matched]).sum()),

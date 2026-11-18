@@ -1,5 +1,7 @@
-/* Chapter 2: how long does it actually take? Four scenes on one shared day axis:
-   recorded durations -> where the bulk falls -> journeys still running -> Kaplan-Meier. */
+/* Chapter 4: how long does it actually take? Four scenes on one shared day axis:
+   recorded durations -> where the bulk falls -> if every hunting client went under contract tomorrow (all clients, up to vs
+   above $250K, budget ranges) -> Kaplan-Meier. The old 'who is still waiting' lanes moved to chapter 2 (2.2-2.3), where they use
+   the status-first counts that reconcile with the Cash Forecast (18 Nov 2026). */
 (function () {
   'use strict';
   const S = window.S;
@@ -99,31 +101,6 @@
     });
   }
 
-  /* 2.3 journeys still running: one dot per client, by days on the clock so far */
-  function lane(node, l, colorKey, refText, showAxis) {
-    const W = l.width, cap = l.cap;
-    const pts = [];
-    l.counts.forEach((c, i) => { for (let k = 0; k < c; k++) pts.push([i * W + W / 2, k + 0.5]); });
-    for (let k = 0; k < l.overflow; k++) pts.push([cap + (k % 2 ? 7.5 : 2.5), Math.floor(k / 2) + 0.5]);
-    const rows = Math.max(...l.counts, Math.ceil(l.overflow / 2), 1);
-    S.chart(node, (t, el) => {
-      const color = t[colorKey], top = 30, bottom = showAxis ? 36 : 10;
-      const innerH = el.clientHeight - top - bottom, innerW = el.clientWidth - 56;
-      const size = Math.max(5, Math.min(innerH / (rows + 0.6), (innerW / (cap + W)) * W) * 0.78);
-      return Object.assign(S.base(t), {
-        tooltip: { show: false },
-        grid: { left: 40, right: 16, top, bottom },
-        xAxis: S.dayAxis(t, cap + W, { interval: 30, name: showAxis ? 'days since client start date, so far' : '', axisLabel: { show: showAxis, color: t.label, fontSize: 12.5, formatter: v => (v >= cap ? cap + '+' : v) } }),
-        yAxis: { type: 'value', min: 0, max: rows + 0.6, show: false },
-        series: [{
-          type: 'scatter', data: pts, symbolSize: size, itemStyle: { color, opacity: 0.92 }, silent: true,
-          markArea: { silent: true, itemStyle: { color, opacity: 0.07 }, data: [[{ xAxis: l.ref }, { xAxis: cap + W }]] },
-          markLine: { symbol: 'none', silent: true, lineStyle: { color: t.ink, width: 1.8, type: 'solid' }, label: { show: true, position: 'end', formatter: refText, color: t.ink, fontWeight: 600, fontSize: 12.5 }, data: [{ xAxis: l.ref }] },
-        }],
-      });
-    });
-  }
-
   /* 2.4 recorded-only curve vs Kaplan-Meier curve, with the median shift along the 50% line */
   function kmPanel(node, km, rec, obsMed, kmMed, colorKey) {
     S.chart(node, t => {
@@ -158,7 +135,7 @@
       x.scale(r, r); x.fillStyle = bg; x.fillRect(0, 0, s, s); x.strokeStyle = fg; x.lineWidth = 2.1; x.beginPath();
       [0, s, 2 * s].forEach(k => { x.moveTo(k - s - 2, s + 2); x.lineTo(k + 2, -2); });
       x.stroke();
-      return { image: c, repeat: 'repeat' };
+      return { image: c, repeat: 'repeat', imageWidth: c.width, imageHeight: c.height };
     };
     return S.chart(node, (t, el) => {
       const all = st.mode === 'all', a = sc.all;
@@ -166,7 +143,7 @@
         { name: 'Recorded', sub: `${S.int(a.recorded.n)} contracts`, kind: 'rec', med: a.recorded.median, mean: a.recorded.mean },
         { name: 'UC tomorrow', sub: `${S.int(a.scenario.n)} searches`, kind: 'sce', med: a.scenario.median, mean: a.scenario.mean },
         { name: 'Kaplan–Meier', sub: `all ${S.int(a.clients)} searches`, kind: 'inf', med: a.km_median, mean: null },
-      ] : sc.budgets.flatMap(g => [
+      ] : (st.mode === 'cmp' ? sc.cmp : sc.budgets).flatMap(g => [
         { group: g.label, name: 'Recorded', sub: `${g.recorded.n}`, kind: 'rec', med: g.recorded.median, mean: g.recorded.mean },
         { group: '', name: 'UC tomorrow', sub: `${g.scenario.n}`, kind: 'sce', med: g.scenario.median, mean: g.scenario.mean, km: g.km_median, nm: g.label },
       ]);
@@ -222,7 +199,8 @@
 
   function scenarioScene(main, D, ch) {
     const sp = D.speed, sc = sp.scenario, a = sc.all, BR = sc.budget_rule, st = { mode: 'all' };
-    const body = S.scene(main, { ch, step: 4, of: 5, label: 'If they all went under contract tomorrow',
+    const BG = Object.fromEntries(D.budgets.groups.map(g => [g.label, g])), bLo = BG['Up to $250K'], bHi = BG['Above $250K'];
+    const body = S.scene(main, { ch, step: 3, of: 4, label: 'If they all went under contract tomorrow',
       title: `If every hunting client went under contract tomorrow: average ${S.d1(a.scenario.mean)} days, median ${S.med(a.scenario.median)}` });
     const nr = sc.budgets.find(g => g.label === 'Not recorded');
     const why = Object.entries(sc.jira_hunting_not_confirmed_why).map(([k, v]) => `${v} ${k.toLowerCase() === 'lost' || k.toLowerCase() === 'open' || k.toLowerCase() === 'won' ? k + ' deal' + (v > 1 ? 's' : '') : k.toLowerCase()}`).join(', ');
@@ -233,9 +211,10 @@
         <div class="fig"><span class="v num">${S.med(a.km_median)}<small>days</small></span><span class="l"><i style="background:linear-gradient(90deg,var(--uc) 50%,var(--uc-2) 50%)"></i>Kaplan–Meier median, the statistical estimate for all ${S.int(a.clients)} searches (next scene) ${S.ui.chip('inf')}</span></div>
       </div>
       <div class="board" id="scnBoard">
-        <div class="ptools"><div class="pl">${S.ui.seg('mode', 'Group', [['all', 'All clients'], ['budget', 'By budget']], 'all')}<span class="vt-l only-budget" hidden>Budget = upper amount of the form range</span></div><div class="pr">${S.ui.toggle()}</div></div>
+        <div class="ptools"><div class="pl">${S.ui.seg('mode', 'Group', [['all', 'All clients'], ['cmp', 'Up to vs above $250K'], ['budget', 'Budget ranges']], 'all')}<span class="vt-l only-budget" hidden>Budget = upper end of the onboarding-form range</span></div><div class="pr">${S.ui.toggle()}</div></div>
         <div class="pv-chart"><div class="chart h-scn" id="scnChart" role="img" aria-label="Days from client start to Under Contract. Recorded: median ${a.recorded.median}, average ${a.recorded.mean}. If every hunting client went under contract tomorrow: median ${a.scenario.median}, average ${a.scenario.mean}. Kaplan–Meier median ${a.km_median}. By budget: ${sc.budgets.map(g => `${g.label} recorded median ${g.recorded.median}, scenario median ${g.scenario.median}`).join('; ')}."></div>
-          <div class="legend"><span><i style="background:var(--uc)"></i>Recorded, to the median</span><span><i class="hatch-uc"></i>UC tomorrow (scenario), to the median</span><span><i style="background:var(--uc-2)"></i>To the average (tick)</span><span><i class="ring" style="color:var(--uc);border-color:var(--uc);background:linear-gradient(90deg,var(--uc) 50%,transparent 50%) !important"></i>Kaplan–Meier median</span></div></div>
+          <div class="legend"><span><i style="background:var(--uc)"></i>Recorded, to the median</span><span><i class="hatch-uc"></i>UC tomorrow (scenario), to the median</span><span><i style="background:var(--uc-2)"></i>To the average (tick)</span><span><i class="ring" style="color:var(--uc);border-color:var(--uc);background:linear-gradient(90deg,var(--uc) 50%,transparent 50%) !important"></i>Kaplan–Meier median</span></div>
+          <p class="bnote only-cmp">Up to $250K against above $250K: recorded median <b>${S.med(bLo.recorded.median)}</b> vs <b>${S.med(bHi.recorded.median)}</b> days to Under Contract (averages ${S.d1(bLo.recorded.mean)} and ${S.d1(bHi.recorded.mean)}), Kaplan–Meier ${S.med(bLo.km_uc)} vs ${S.med(bHi.km_uc)}, and contract to closing <b>${S.med(bLo.uc_to_close.median)}</b> vs <b>${S.med(bHi.uc_to_close.median)}</b> days: no measurable difference in speed (<a href="#drivers-3">5.3</a>). Not recorded = mostly clients who started before the form, an older and slower period.</p></div>
         <div class="pv-table tw" id="scnTable"></div>
       </div>
       ${S.ui.ex('How is this number built?', [
@@ -249,7 +228,7 @@
     const rec = scenarioChart(node, sc, st);
     const table = () => {
       const row = (lab, rng, g) => ({ lab, rng, clients: g.clients, rn: g.recorded.n, ra: g.recorded.mean, rm: g.recorded.median, h: g.hunting, sn: g.scenario.n, sa: g.scenario.mean, sm: g.scenario.median, km: g.km_median });
-      const rows = st.mode === 'all' ? [row('All clients', 'every confirmed start', a)] : sc.budgets.map(g => row(g.label, g.range ? `form range ${g.range}` : 'no matched form answer', g));
+      const rows = st.mode === 'all' ? [row('All clients', 'every confirmed start', a)] : st.mode === 'cmp' ? sc.cmp.map(g => row(g.label, g.label === 'Not recorded' ? 'no matched form answer' : g.label === 'Up to $250K' ? 'upper end of the form range ≤ $250K' : 'upper end above $250K', g)) : sc.budgets.map(g => row(g.label, g.range ? `form range ${g.range}` : 'no matched form answer', g));
       const d = v => (v == null ? '–' : S.d1(v)), m = v => (v == null ? 'not reached' : S.med(v));
       S.ui.table(host, [
         { k: 'lab', label: st.mode === 'all' ? 'Group' : 'Budget (upper amount)', html: r => `${r.lab}<small>${r.rng}</small>` },
@@ -273,7 +252,9 @@
     S.ui.wire(board, (name, v) => {
       st[name] = v;
       node.classList.toggle('h-scn', v === 'all');
-      node.classList.toggle('h-scb', v !== 'all');
+      node.classList.toggle('h-scc', v === 'cmp');
+      node.classList.toggle('h-scb', v === 'budget');
+      board.classList.toggle('m-cmp', v === 'cmp');
       board.querySelector('.only-budget').hidden = v === 'all';
       if (rec.inst) rec.inst.resize();
       rec.draw();
@@ -287,7 +268,7 @@
       const sp = D.speed, ob = sp.observed, h = sp.hist, L = sp.lanes, est = sp.estimate;
 
       // 2.1
-      let body = S.scene(main, { ch, step: 1, of: 5, label: 'What has happened', title: `Recorded journeys: median ${S.med(ob.uc.median)} days to Under Contract, ${S.med(ob.closed.median)} to CLOSED` });
+      let body = S.scene(main, { ch, step: 1, of: 4, label: 'What has happened', title: `Recorded journeys: median ${S.med(ob.uc.median)} days to Under Contract, ${S.med(ob.closed.median)} to CLOSED` });
       const ck = sp.clock;
       body.innerHTML = `<div class="board">
           <div class="clock" aria-label="How the days are counted">
@@ -300,7 +281,7 @@
       ruler(S.$('#rulerChart', body), ob);
 
       // 2.2
-      body = S.scene(main, { ch, step: 2, of: 5, label: 'Where the bulk falls', title: `Most recorded contracts land early, with the largest group at ${h.largest.from}–${h.largest.to} days` });
+      body = S.scene(main, { ch, step: 2, of: 4, label: 'Where the bulk falls', title: `Most recorded contracts land early, with the largest group at ${h.largest.from}–${h.largest.to} days` });
       body.innerHTML = `<div class="figs">
           <div class="fig"><span class="v num">${h.largest.from}–${h.largest.to}<small>days</small></span><span class="l"><i style="background:var(--uc)"></i>largest group · ${S.int(h.largest.n)} clients</span></div>
           <div class="fig"><span class="v num">${S.pct(h.within60.share)}</span><span class="l"><i style="background:var(--uc);opacity:.6"></i>of recorded contracts within 60 days</span></div>
@@ -310,23 +291,11 @@
         <p class="cap">${S.int(h.n)} recorded Under Contract milestones · 15-day bins.</p>`;
       histogram(S.$('#histChart', body), h);
 
-      // 2.3
-      body = S.scene(main, { ch, step: 3, of: 5, label: 'Who is still waiting', title: `${S.int(sp.running)} started clients have not bought a property yet` });
-      body.innerHTML = `<div class="board">
-          <div class="lane"><div class="lane-head"><span class="v num">${S.int(L.searching.n)}</span><span class="t"><i style="background:var(--wait)"></i>Hunting, no contract yet</span><span class="s">${S.int(L.searching.past_ref)} have already waited longer than ${L.searching.ref} days</span></div>
-            <div class="chart h-s" id="laneSearch" role="img" aria-label="${L.searching.n} clients hunting, by days so far."></div></div>
-          <div class="lane"><div class="lane-head"><span class="v num">${S.int(L.under_contract.n)}</span><span class="t"><i style="background:var(--uc)"></i>Under contract, not yet closed</span><span class="s">${S.int(L.under_contract.past_ref)} already past ${L.under_contract.ref} days · recorded contracts close a median ${sp.uc_to_close.median} days after Under Contract</span></div>
-            <div class="chart h-s" id="laneUC" role="img" aria-label="${L.under_contract.n} clients under contract, by days so far."></div></div>
-        </div>
-        <p class="cap">One dot per client · acquisitions still to come, and time the recorded medians cannot see.</p>`;
-      lane(S.$('#laneSearch', body), L.searching, 'wait', `recorded median to Under Contract · ${L.searching.ref}`, false);
-      lane(S.$('#laneUC', body), L.under_contract, 'uc', `recorded median to CLOSED · ${L.under_contract.ref}`, true);
-
-      // 4.4 (added 18 Nov 2026)
+      // 4.3 (added 18 Nov 2026; the old 4.3 'who is still waiting' moved to 2.2-2.3 on the status-first counts)
       scenarioScene(main, D, ch);
 
-      // 4.5 (was 4.4)
-      body = S.scene(main, { ch, step: 5, of: 5, label: 'What it means for the timeline', title: `Counting everyone still waiting: ${est.uc.median} days to Under Contract, ${est.closed.median} to CLOSED` });
+      // 4.4
+      body = S.scene(main, { ch, step: 4, of: 4, label: 'What it means for the timeline', title: `Counting everyone still waiting: ${est.uc.median} days to Under Contract, ${est.closed.median} to CLOSED` });
       body.innerHTML = `<div class="board" style="margin-bottom:16px"><div class="chart h-s" id="extChart" role="img" aria-label="Recorded medians ${ob.uc.median} and ${ob.closed.median} days extend to ${est.uc.median} and ${est.closed.median} days when unfinished journeys are counted."></div></div>
         <div class="duo">
           <div class="board"><div class="fig arrow"><span class="v num"><span class="from">${ob.uc.median}</span><span class="ar">→</span><span class="to">${est.uc.median}</span><small>days</small></span><span class="l"><i style="background:var(--uc)"></i>Under Contract</span></div>
