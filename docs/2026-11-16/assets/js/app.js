@@ -45,7 +45,7 @@
     ];
     const where = id => { const c = chapters.find(x => x.id === id.split('-')[0]); return c ? `${c.n}.${S.pos(c, id)}` : ''; };
     return `<div class="qa"><div class="qa-h"><b>Questions and short answers</b><span>Each is answered in the section named on its card; the outline on the left jumps there. The Executive Summary at the end reads them together.</span></div>
-      <ol>${q.map(([id, t, a], i) => `<li><div class="qc${i < core.length ? ' kpi' : ''}">${i < core.length ? '<span class="kpi-tag">Core KPI</span>' : ''}<span class="q">${t}</span><span class="ans">${a}</span><span class="go" title="Section ${where(id)}">Section ${where(id)}</span></div></li>`).join('')}</ol></div>`;
+      <ol>${q.map(([id, t, a], i) => `<li><div class="qc${i < core.length ? ' kpi' : ''}">${i < core.length ? '<span class="kpi-tag">Core KPI</span>' : ''}<a class="q" href="#${id}" data-go="${id}">${t}</a><span class="ans">${a}</span><a class="go" href="#${id}" data-go="${id}" title="Read it in depth: section ${where(id)}">Section ${where(id)} <span aria-hidden="true">→</span></a></div></li>`).join('')}</ol></div>`;
   };
   let qa = '';
   try { qa = questions(); } catch (e) { console.error(e); }
@@ -110,6 +110,9 @@
     goTo(a.dataset.go);
     if (!matchMedia('(min-width: 1260px)').matches) setOpen(false);   // floating-button layout: close once a destination is chosen
   });
+
+  /* the opening's question cards are the one place a link in the body moves the reader: it scrolls in place exactly as the outline does */
+  document.querySelector('.qa').addEventListener('click', e => { const a = e.target.closest('a[data-go]'); if (!a) return; e.preventDefault(); goTo(a.dataset.go); });
 
   /* scroll-spy: which chapter and scene is being read */
   const keys = entries.map(e => e.key);

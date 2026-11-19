@@ -710,3 +710,8 @@ table.tg tr.tg-sce td { border-top: 1px dashed var(--line-2); }
 /* core KPI questions at the top of the opening list */
 .qc.kpi { border-color: color-mix(in srgb, var(--acq) 45%, var(--line)); background: color-mix(in srgb, var(--acq) 6%, var(--surface)); }
 .kpi-tag { justify-self: start; font: 600 10.5px/1 var(--f-mono); letter-spacing: .07em; text-transform: uppercase; color: var(--acq); margin-bottom: 2px; }
+
+.qa a.go { text-decoration: none; }
+.qa a.go:hover, .qa a.go:focus-visible { color: var(--acq); border-color: var(--acq); background: var(--surface); }
+.qa a.q { color: var(--ink); text-decoration: none; }
+.qa a.q:hover, .qa a.q:focus-visible { color: var(--acq); text-decoration: underline; text-underline-offset: 3px; }
