@@ -334,6 +334,11 @@ def checks(ctx: C.Ctx, data: dict) -> list[dict]:
     cr_ = rp["cribs"]
     chk("STR Cribs: first-purchase and later-purchase designer counts add up to the 19 first and 21 later purchases; both-times buyers never exceed first-time Cribs buyers",
         (sum(cr_["first"].values()), sum(cr_["later"].values()), cr_["clients_both"] <= cr_["clients_first_cribs"]), (cr_["first_purchases"], cr_["later_purchases"], True))
+    us = rp["usage"]
+    chk("STR Cribs usage: designer groups add up to the completed purchases and the searches under contract; they equal chapter 2's stages and the repeat view's all-purchase counts",
+        (sum(us["purchased"][k] for k in ("cribs", "other", "turnkey", "unknown")), us["purchased"]["n"], us["under_contract"]["n"], sum(us["under_contract"][k] for k in ("cribs", "other", "turnkey", "unknown")),
+         sum(v["n"] for v in us["purchased_by_year"].values()), us["purchased"]["cribs"], us["purchased"]["unknown"]),
+        (us["purchased"]["n"], oc["waiting"]["stages"]["purchased"], oc["waiting"]["stages"]["under_contract"], us["under_contract"]["n"], us["purchased"]["n"], cr_["all_purchases"]["cribs"], cr_["all_purchases"]["unknown"]))
     chk("Fall-through: outcomes of the ended contracts add up to the ended count", sum(fo["ended"]["now"].values()), fo["ended"]["n"])
     sp_ = sp["estimate"]
     chk("Timing: the estimated medians' population is every confirmed start; unfinished = start - recorded milestones", (sp_["n"], sp_["events"]["closed"] == sp["observed"]["closed"]["n"]), (sc["all"]["clients"], True))

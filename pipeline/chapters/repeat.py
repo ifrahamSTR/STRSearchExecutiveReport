@@ -153,8 +153,26 @@ def _cribs(ctx, s):
     }
 
 
+def _usage(ctx) -> dict:
+    """Clients using STR Cribs (the simple executive view): the recorded designer on every signed-up search that has reached a purchase or a
+    contract, by status (records.stage, status first). Same Jira field and mapping as the repeat-purchase view (designer_used); a blank is
+    'unknown' (not recorded), never counted as another designer. Searches still hunting, paused or refunded are left out (a designer is
+    mostly chosen once a property is found)."""
+    s = ctx.signed.copy()
+    s["stage"] = R.stage(s)
+    raw = ctx.f.frames["jira"].assign(key=lambda f: f["key"].astype(str).str.upper()).set_index("key")
+    s["des"] = s.key.map(raw["designer_used"]).map(DESIGNER).fillna("unknown")
+    keys = ["cribs", "other", "turnkey", "unknown"]
+    row = lambda g: {"n": int(len(g)), **{k: int((g.des == k).sum()) for k in keys}}  # noqa: E731
+    p = s[s.stage == "purchased"]
+    yr = p.closed.dt.year
+    return {"purchased": row(p), "under_contract": row(s[s.stage == "under_contract"]),
+            "purchased_by_year": {**{str(int(y)): row(p[yr == y]) for y in sorted(yr.dropna().unique())}, **({"none": row(p[yr.isna()])} if yr.isna().any() else {})},
+            "field": "Jira Designer Used"}
+
+
 def build(ctx: C.Ctx) -> dict:
     j12 = R.jira12(ctx.explorer)
     s, P, jira = _jira_side(ctx, j12)
     pdr = _pipedrive_side(ctx, j12, s.set_index("key").pid)
-    return {"jira": jira, "pipedrive": pdr, "cribs": _cribs(ctx, s)}
+    return {"jira": jira, "pipedrive": pdr, "cribs": _cribs(ctx, s), "usage": _usage(ctx)}

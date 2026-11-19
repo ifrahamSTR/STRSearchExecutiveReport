@@ -32,6 +32,7 @@
       ['drivers-6', 'Can early deal flow be seen?', `The Deals Sent total has no send dates; the median Deal Number Purchased rose from ${S.med(dn.early.median)} to ${S.med(dn.late.median)} (Jan–May to Jun–Sep starts under contract by day 30).`],
       ['fallout-1', 'What happens after a contract falls through?', `${S.int(F.documented.n)} documented fall-throughs and ${S.int(F.ended.n)} ended contracts without a recorded purchase (${S.int(F.ended.now.paused)} paused, ${S.int(F.ended.now.hunting)} hunting, ${S.int(F.ended.now.refunded)} refunded, ${S.int(F.ended.now.additional)} Additional Service).`],
       ['repeat-1', 'How many clients come back, and for which purchase?', `${S.int(P.repeat_clients)} have two or more won deals; ${S.int(J.two_plus_purchases)} completed two or more purchases; ${S.int(J.pursuing)} are pursuing their next.`],
+      ['repeat-3', 'How many clients use STR Cribs?', `Recorded on ${S.int(D.repeat.usage.purchased.cribs)} of ${S.int(D.repeat.usage.purchased.n)} completed purchases (${S.pct(D.repeat.usage.purchased.cribs / D.repeat.usage.purchased.n)}) and ${S.int(D.repeat.usage.under_contract.cribs)} of the ${S.int(D.repeat.usage.under_contract.n)} searches under contract.`],
       ['repeat-2', 'Do repeat buyers use STR Cribs again?', `${S.int(C.clients_both)} of the ${S.int(C.clients_first_cribs)} repeat buyers who chose Cribs first have Cribs recorded again (recorded selection).`],
     ];
     const where = id => { const c = chapters.find(x => x.id === id.split('-')[0]); return c ? `${c.n}.${S.pos(c, id)}` : ''; };

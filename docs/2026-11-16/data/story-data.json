@@ -7569,6 +7569,53 @@
      ]
     }
    }
+  },
+  "usage": {
+   "purchased": {
+    "n": 460,
+    "cribs": 291,
+    "other": 40,
+    "turnkey": 29,
+    "unknown": 100
+   },
+   "under_contract": {
+    "n": 65,
+    "cribs": 39,
+    "other": 2,
+    "turnkey": 10,
+    "unknown": 14
+   },
+   "purchased_by_year": {
+    "2024": {
+     "n": 26,
+     "cribs": 1,
+     "other": 0,
+     "turnkey": 0,
+     "unknown": 25
+    },
+    "2025": {
+     "n": 131,
+     "cribs": 70,
+     "other": 13,
+     "turnkey": 3,
+     "unknown": 45
+    },
+    "2026": {
+     "n": 280,
+     "cribs": 219,
+     "other": 27,
+     "turnkey": 26,
+     "unknown": 8
+    },
+    "none": {
+     "n": 23,
+     "cribs": 1,
+     "other": 0,
+     "turnkey": 0,
+     "unknown": 22
+    }
+   },
+   "field": "Jira Designer Used"
   }
  },
  "cash": {
@@ -17846,7 +17893,7 @@
   "snapshots": {
    "reporting_layer": "2026-11-16"
   },
-  "built_at": "2026-11-19 02:19",
+  "built_at": "2026-11-19 23:38",
   "chapters": [
    "journey",
    "outcomes",
@@ -19343,6 +19390,29 @@
     19,
     21,
     true
+   ],
+   "ok": true,
+   "hard": true
+  },
+  {
+   "check": "STR Cribs usage: designer groups add up to the completed purchases and the searches under contract; they equal chapter 2's stages and the repeat view's all-purchase counts",
+   "page": [
+    460,
+    460,
+    65,
+    65,
+    460,
+    291,
+    100
+   ],
+   "explorer": [
+    460,
+    460,
+    65,
+    65,
+    460,
+    291,
+    100
    ],
    "ok": true,
    "hard": true

@@ -11,7 +11,7 @@
   function repeatScene(main, D, ch) {
     const J = D.repeat.jira, P = D.repeat.pipedrive, nj = P.no_own_jira, c = J.categories, pb = J.pursuing_by_purchase;
     const later = Object.keys(pb).filter(k => +k >= 3).reduce((a, k) => a + pb[k], 0);
-    const body = S.scene(main, { ch, step: 1, of: 2, label: 'Repeat clients',
+    const body = S.scene(main, { ch, step: 1, of: 3, label: 'Repeat clients',
       title: `${S.int(P.repeat_clients)} clients have bought STRSearch more than once; ${S.int(J.two_plus_purchases)} have completed two or more property purchases` });
     body.innerHTML = `<div class="figs qf">
         <div class="fig"><span class="v num">${S.int(J.two_plus_purchases)}</span><span class="l"><i style="background:var(--closed)"></i>clients with two or more completed purchases (${dist(J.purchases_dist)}) · Jira ${S.ui.chip('rec')}</span></div>
@@ -66,7 +66,7 @@
     const seg = (o, n) => DES.map(([k, l, c]) => ({ k, n: o[k], label: l, c, lt: k !== 'cribs' && k !== 'other', cls: k === 'unknown' ? 'hatch-neutral' : '', text: `${l} · ${o[k]}` })).filter(s => s.n);
     // direct labels: the purchases on top, every designer group underneath (Not recorded is its own hatched group, never merged into Other designer)
     const brk = (o, total, word) => { const sg = seg(o); return [{ from: sg[0].k, to: sg[sg.length - 1].k, text: `${S.int(total)} ${word}`, lvl: 0 }]; };
-    const body = S.scene(main, { ch, step: 2, of: 2, label: 'STR Cribs on repeat purchases',
+    const body = S.scene(main, { ch, step: 2, of: 3, label: 'STR Cribs on repeat purchases',
       title: `${S.int(C.clients_both)} of the ${S.int(C.clients_first_cribs)} repeat buyers who chose STR Cribs first have Cribs recorded again` });
     body.innerHTML = `<div class="figs qf">
         <div class="fig emph"><span class="v num">${S.int(C.clients_both)}<span class="of">of ${S.int(C.clients_first_cribs)}</span></span><span class="l"><i style="background:var(--acq)"></i><b>chose STR Cribs first and have Cribs recorded again</b> · ${S.int(C.clients_first_cribs_not_later)} switched to another designer, ${S.int(C.clients_first_cribs_later_unknown)} later choice not recorded ${S.ui.chip('rec')}</span></div>
@@ -86,10 +86,10 @@
       </div>
       <p class="miss"><b>Selection, not proof of use:</b> Jira's Designer Used field records the client's chosen designer, the same recorded partner choice the Cash Forecast uses. The Cribs tracker confirms a project handed to a Cribs project manager at ${S.int(tr.first)} of the ${S.int(C.first_purchases)} first-purchase addresses but only ${S.int(tr.later)} of the ${S.int(C.later_purchases)} later ones, so most later Cribs selections are not yet confirmed as projects.</p>
       ${S.ui.ex('How are these numbers built?', [
-        `<p class="ex-h">Repeat buyers and purchase order</p><p>The ${S.int(C.clients)} Jira clients with two or more completed purchases (previous scene), ${S.int(C.purchases)} purchases ordered by closing date (the client start date where a post-close record has none). <b>Later</b> = the second and third purchases.</p>
+        `<p class="ex-h">Repeat buyers and purchase order</p><p>The ${S.int(C.clients)} Jira clients with two or more completed purchases (section 7.1), ${S.int(C.purchases)} purchases ordered by closing date (the client start date where a post-close record has none). <b>Later</b> = the second and third purchases.</p>
          <p class="ex-h">Designer choice (Recorded)</p><p>Jira Designer Used: STR Cribs, Other Designer, Other Designer-Bought Turnkey, or blank (<b>Not recorded</b>, kept as its own group). The field was rarely filled before 2025: blank for ${ap.unknown_by_year['2024'] ? `${ap.unknown_by_year['2024'][0]} of ${ap.unknown_by_year['2024'][1]}` : '–'} purchases in 2024, ${ap.unknown_by_year['2025'] ? `${ap.unknown_by_year['2025'][0]} of ${ap.unknown_by_year['2025'][1]}` : '–'} in 2025 and ${ap.unknown_by_year['2026'] ? `${ap.unknown_by_year['2026'][0]} of ${ap.unknown_by_year['2026'][1]}` : '–'} in 2026. Across all ${S.int(ap.n)} completed purchases, STR Cribs is recorded on ${S.int(ap.cribs)} (${S.pct(ap.cribs / ap.n)}).</p>`,
         `<p class="ex-h">Evidence of use (Inferred)</p><p>Cribs tracker (Cribs_Data, 12 Nov package): a Cribs deal at the purchase address in the stage "Handed off to PM", matched by address. The tracker's own Jira join is not used: it attaches one Cribs deal to over a thousand Jira issues. Any Cribs deal at the address (any stage): ${S.int(C.tracker_any_deal.first)} first, ${S.int(C.tracker_any_deal.later)} later purchases.</p>
-         <p class="ex-h">Unknown</p><p>${S.int(C.clients_first_unknown)} clients have no first choice recorded; ${S.int(C.later.unknown)} later purchases have none. Repeat deals without their own Jira issue (previous scene) have no designer field at all.</p>`,
+         <p class="ex-h">Unknown</p><p>${S.int(C.clients_first_unknown)} clients have no first choice recorded; ${S.int(C.later.unknown)} later purchases have none. Repeat deals without their own Jira issue (section 7.1) have no designer field at all.</p>`,
       ])}
       <p class="cap">Jira Designer Used on completed purchases · Cribs tracker matched by property address · ${S.date(D.meta.asof)}.</p>`;
     const row = (lab, o, n, t) => ({ lab, n, cribs: o.cribs, other: o.other, turnkey: o.turnkey, unknown: o.unknown, t });
@@ -110,10 +110,51 @@
     S.ui.wire(S.$('#crBoard', body));
   }
 
+  /* 7.2 (new): Clients using STR Cribs, the simple view: the recorded designer on every completed purchase and every search under contract */
+  function usageScene(main, D, ch) {
+    const U = D.repeat.usage, P = U.purchased, Q = U.under_contract, y26 = U.purchased_by_year['2026'];
+    const share = (g, k) => g[k] / g.n, recd = g => g.n - g.unknown;
+    const rows = [['Completed purchases', P], ['Under contract now', Q]];
+    const seg = g => DES.map(([k, l, c]) => ({ k, n: g[k], label: l, c, lt: k !== 'cribs' && k !== 'other', cls: k === 'unknown' ? 'hatch-neutral' : '', text: g[k] / g.n >= 0.12 ? `${l} · ${g[k]}` : undefined })).filter(x => x.n);   // narrow segments show the count only; the legend names them
+    const body = S.scene(main, { ch, step: 3, of: 3, label: 'Clients using STR Cribs',
+      title: `STR Cribs is the recorded designer on ${S.int(P.cribs)} of ${S.int(P.n)} completed purchases (${S.pct(share(P, 'cribs'))}) and ${S.int(Q.cribs)} of the ${S.int(Q.n)} searches under contract` });
+    body.innerHTML = `<div class="figs qf">
+        <div class="fig emph"><span class="v num">${S.pct(share(P, 'cribs'))}<span class="of">${S.int(P.cribs)} of ${S.int(P.n)}</span></span><span class="l"><i style="background:var(--acq)"></i><b>completed purchases</b> with STR Cribs recorded as the designer ${S.ui.chip('rec')}</span></div>
+        <div class="fig emph"><span class="v num">${S.pct(share(Q, 'cribs'))}<span class="of">${S.int(Q.cribs)} of ${S.int(Q.n)}</span></span><span class="l"><i style="background:var(--acq)"></i><b>searches under contract</b> with STR Cribs recorded; ${S.int(Q.unknown)} have no designer recorded yet ${S.ui.chip('rec')}</span></div>
+        <div class="fig"><span class="v num">${S.pct(share(y26, 'cribs'))}<span class="of">${S.int(y26.cribs)} of ${S.int(y26.n)}</span></span><span class="l"><i style="background:var(--acq)"></i>of purchases closed in 2026, where the field is almost always filled (${S.int(y26.unknown)} blank)</span></div>
+      </div>
+      <div class="board" id="cuBoard">
+        <div class="ptools"><div class="pl"><span class="vt-l">Recorded designer, by where each search stands · Jira, ${S.date(D.meta.asof)}</span></div><div class="pr">${S.ui.toggle()}</div></div>
+        <div class="pv-chart">
+          ${rows.map(([lab, g]) => `<div class="ob-h"><span class="t">${lab}</span><span class="s">${S.int(g.n)} searches · ${S.pct(share(g, 'cribs'))} STR Cribs · ${S.pct(share(g, 'cribs') * g.n / Math.max(1, recd(g)))} of those with a designer recorded</span></div>
+            ${S.ui.stack(seg(g), [], `${lab}: ${DES.map(([k, l]) => `${l} ${g[k]}`).join(', ')}`)}`).join('')}
+          <div class="legend">${DES.map(([k, l, c]) => `<span><i class="${k === 'unknown' ? 'hatch-neutral' : ''}" style="${k === 'unknown' ? '' : 'background:' + c}"></i>${l}${k === 'unknown' ? ' (blank in Jira)' : ''}</span>`).join('')}</div>
+        </div>
+        <div class="pv-table tw" id="cuTable"></div>
+      </div>
+      ${S.ui.ex('How is this number built?', [
+        `<p class="ex-h">What is counted</p><p>Every signed-up Jira search (one record per search) that has either completed a purchase (${S.int(P.n)}) or is under contract and not yet closed (${S.int(Q.n)}), by the status on ${S.date(D.meta.asof)}: the same stages as chapter 2. The designer is Jira's <b>Designer Used</b> field: STR Cribs, Other Designer, Other Designer-Bought Turnkey, or blank (<b>Not recorded</b>, kept as its own group and never counted as another designer).</p>`,
+        `<p class="ex-h">Reading it</p><p>The field is filled in as a client moves toward a purchase: blank for ${S.int(U.purchased_by_year['2024'].unknown)} of ${S.int(U.purchased_by_year['2024'].n)} purchases closed in 2024 and ${S.int(U.purchased_by_year['2025'].unknown)} of ${S.int(U.purchased_by_year['2025'].n)} in 2025, but ${S.int(y26.unknown)} of ${S.int(y26.n)} in 2026. A search under contract has often not chosen yet, so its share is a floor. Searches still hunting, paused or refunded are not shown. This is the client's chosen designer, not a confirmed Cribs project (the next scene compares it with the Cribs tracker for repeat buyers).</p>`,
+      ])}
+      <p class="cap">Jira Designer Used on completed purchases and searches under contract · ${S.date(D.meta.asof)}.</p>`;
+    S.ui.table(S.$('#cuTable', body), [
+      { k: 'lab', label: 'Where the search stands' }, { k: 'n', label: 'Searches', num: true, html: r => S.int(r.n) },
+      ...DES.map(([k, l]) => ({ k, label: l, num: true, html: r => S.int(r[k]) })),
+      { k: 'sh', label: 'STR Cribs, of all', num: true, html: r => S.pct(r.cribs / r.n) },
+      { k: 'sr', label: 'STR Cribs, of those recorded', num: true, html: r => S.pct(r.cribs / Math.max(1, recd(r))) },
+    ], [
+      { _group: 'Now' }, Object.assign({ lab: 'Completed purchases' }, P), Object.assign({ lab: 'Under contract, not yet closed' }, Q),
+      { _group: 'Completed purchases by closing year' }, ...Object.entries(U.purchased_by_year).map(([y, g]) => Object.assign({ lab: y === 'none' ? 'No closing date recorded (status only)' : y }, g)),
+    ], { caption: 'Recorded designer by where each search stands', sortable: false });
+    S.ui.wire(S.$('#cuBoard', body));
+  }
+
   S.chapter('repeat', {
     n: 7, title: 'Do clients come back for another property?',
+    order: ['repeat-1', 'repeat-3', 'repeat-2'],       // displayed order; ids are stable keys (deep links): the new view comes just before the repeat-purchase one
     render(main, D, ch) {
       repeatScene(main, D, ch);
+      usageScene(main, D, ch);
       cribsScene(main, D, ch);
     },
   });
