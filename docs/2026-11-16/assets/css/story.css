@@ -706,3 +706,7 @@ table.tg tr.tg-sce td { border-top: 1px dashed var(--line-2); }
 .stack-bar i { white-space: nowrap; }
 .sum-cards > li.wide { grid-column: 1 / -1; }
 .sum-cards > li.wide .sc-k small { max-width: 32ch; }
+
+/* core KPI questions at the top of the opening list */
+.qc.kpi { border-color: color-mix(in srgb, var(--acq) 45%, var(--line)); background: color-mix(in srgb, var(--acq) 6%, var(--surface)); }
+.kpi-tag { justify-self: start; font: 600 10.5px/1 var(--f-mono); letter-spacing: .07em; text-transform: uppercase; color: var(--acq); margin-bottom: 2px; }
