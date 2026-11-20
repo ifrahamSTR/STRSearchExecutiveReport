@@ -1,8 +1,8 @@
 /* Chapter 2: where are our clients today? (updated 18 Nov 2026)
    2.1 every signed-up client in one stage, status first: no current contract or completed purchase = hunting + Inactive
        (Paused + Additional Service + Refunded) -> 2.2 how long the hunting clients have waited -> 2.3 where the others stand
-       (pauses, refunds, contracts) -> 2.4 pauses by acquisition lead (id outcomes-6, added 20 Nov 2026) -> 2.5 up to vs above $250K today
-       (id outcomes-4) -> 2.6 milestones reached (id outcomes-5). Scene ids are stable keys; `order` sets the displayed numbers.
+       (pauses, refunds, contracts) -> 2.4 is A1 pausing more? (id outcomes-7) -> 2.5 pauses by acquisition lead (id outcomes-6) -> 2.6 up to vs above $250K today
+       (id outcomes-4) -> 2.7 milestones reached (id outcomes-5). Scene ids are stable keys; `order` sets the displayed numbers.
    Every count is a Jira issue (one per search) by its status on the data date, so the scenes add up to each other and to the
    Cash Forecast's groups (reconciled in the Executive Summary). */
 (function () {
@@ -247,6 +247,34 @@
     });
   }
 
+  /* 2.4 is A1 putting more searches into Paused than the other leads? (added 20 Nov 2026; id outcomes-7). The plain-language version of 2.5:
+     per 100 searches, A1 against the other assigned leads. Leads appear only as aliases. */
+  function pauseGap(main, D, ch, of) {
+    const L = D.outcomes.leads, big = L.largest, a = L.groups.largest, o = L.groups.others;
+    const ra = a.paused / a.n, ro = o.paused / o.n, ka = Math.round(ra * 100), ko = Math.round(ro * 100), times = Math.round(ra / ro);
+    const dots = (k, c) => Array.from({ length: 100 }, (_, i) => `<i class="${i < k ? 'on' : ''}" style="${i < k ? `background:${c}` : ''}"></i>`).join('');
+    const body = S.scene(main, { ch, step: 7, of, label: `Is ${big} pausing more?`,
+      title: `Yes: ${big} puts searches into Paused about ${times} times as often as the other leads, even though ${big} has more clients` });
+    body.innerHTML = `<div class="board" id="pgBoard">
+        <div class="ptools"><div class="pl"><span class="vt-l">Jira, ${S.date(D.meta.asof)} · every 100 searches</span></div><div class="pr">${S.ui.toggle()}</div></div>
+        <div class="pv-chart"><div class="pg" role="img" aria-label="Of every 100 searches, ${ka} are paused for ${big} and ${ko} for the other leads. ${big}: ${a.paused} of ${a.n}. Other leads: ${o.paused} of ${o.n}.">
+          <div class="pg-col"><p class="pg-h"><b style="color:var(--sales)">${big}</b><small>${S.int(a.n)} searches</small></p><div class="pg-grid">${dots(ka, 'var(--sales)')}</div><p class="pg-n"><span class="num" style="color:var(--sales)">${ka}</span> in every 100 are paused<small>${S.int(a.paused)} of ${S.int(a.n)} searches (${S.pct(ra, 1)})</small></p></div>
+          <div class="pg-x"><span class="num">${times}×</span><small>as often</small></div>
+          <div class="pg-col"><p class="pg-h"><b>Other leads</b><small>${S.int(o.n)} searches</small></p><div class="pg-grid">${dots(ko, 'var(--hold)')}</div><p class="pg-n"><span class="num">${ko}</span> in every 100 are paused<small>${S.int(o.paused)} of ${S.int(o.n)} searches (${S.pct(ro, 1)})</small></p></div>
+        </div>
+        <div class="legend"><span><i style="background:var(--sales)"></i>Paused, ${big}</span><span><i style="background:var(--hold)"></i>Paused, other leads</span><span><i style="background:var(--hold-2)"></i>Not paused</span></div></div>
+        <div class="pv-table tw" id="pgTable"></div>
+      </div>
+      <p class="cap">Each square is one search out of every 100, rounded; the counts underneath are exact. "Other leads" = every other assigned lead (${S.int(o.n)} searches); Unassigned searches are left out. The next section shows where ${big}'s pauses come from.</p>`;
+    S.ui.table(S.$('#pgTable', body), [
+      { k: 'label', label: 'Group', html: r => `<b>${r.label}</b>` },
+      { k: 'n', label: 'Searches', num: true, html: r => S.int(r.n) },
+      { k: 'paused', label: 'Paused', num: true, html: r => S.int(r.paused) },
+      { k: 'rate', label: 'Paused, per 100 searches', num: true, html: r => `${(r.paused / r.n * 100).toFixed(1)}` },
+    ], [{ label: big, n: a.n, paused: a.paused }, { label: 'Other leads', n: o.n, paused: o.paused }], { caption: `Paused searches: ${big} against the other leads`, sortable: false });
+    S.ui.wire(S.$('#pgBoard', body));
+  }
+
   /* 2.4 pauses by acquisition lead (added 20 Nov 2026; scene id outcomes-6, shown 4th). Unit = search. Leads appear only as aliases (A1, A2, ...)
      drawn at random, independent of any figure; the mapping stays in the private Explorer repo. Three answers in reading order: the pause rate
      per lead with the median start-to-pause in the same row order; where the largest portfolio's extra pauses come from (status before the
@@ -458,7 +486,7 @@
     });
   }
 
-  /* 2.5 up to vs above $250K: where each group stands today (scene id outcomes-4) */
+  /* 2.6 up to vs above $250K: where each group stands today (scene id outcomes-4) */
   function budgetToday(main, D, ch, of) {
     const B = D.budgets, G = Object.fromEntries(B.groups.map(g => [g.label, g])), lo = G['Up to $250K'], hi = G['Above $250K'], nr = G['Not recorded'];
     const mh = B.mh.refunded.find(x => x.w === 30), sh = (g, k) => (g.stages[k] || 0) / g.n;
@@ -510,12 +538,13 @@
 
   S.chapter('outcomes', {
     n: 2, title: 'Where are our searches today?',
-    order: ['outcomes-1', 'outcomes-2', 'outcomes-3', 'outcomes-6', 'outcomes-4', 'outcomes-5'],   // displayed order; ids are stable keys (deep links)
+    order: ['outcomes-1', 'outcomes-2', 'outcomes-3', 'outcomes-7', 'outcomes-6', 'outcomes-4', 'outcomes-5'],   // displayed order; ids are stable keys (deep links)
     render(main, D, ch) {
-      const OF = 6, at = D.outcomes.attainment;
+      const OF = 7, at = D.outcomes.attainment;
       stages(main, D, ch, OF);
       hunting(main, D, ch, OF);
       others(main, D, ch, OF);
+      pauseGap(main, D, ch, OF);
       byLead(main, D, ch, OF);
       budgetToday(main, D, ch, OF);
       const body = S.scene(main, { ch, step: 5, of: OF, label: 'Milestones reached', title: `${S.pct(at.uc_share)} of Active clients have recorded Under Contract, ${S.pct(at.closed_share)} CLOSED` });
