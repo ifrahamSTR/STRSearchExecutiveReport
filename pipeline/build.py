@@ -50,6 +50,41 @@ def explorer_published(explorer: Path) -> dict | None:
     return json.loads(s[s.index("=") + 1:].rstrip().rstrip(";"))["expected"]
 
 
+def explorer_lead_counts(ctx: C.Ctx) -> dict | None:
+    """The published (private) Explorer's own Jira records, signed searches per Acq Lead under the report's aliases: searches, paused, paused
+    with a documented fall-through or ended contract. Read only for the 2.4 check; nothing from it is written."""
+    import pandas as pd
+    from chapters import records as R
+    p = ctx.explorer / "docs" / C.VERSION_ID / "data" / "explorer-data.js"
+    if not p.exists():
+        return None
+    s = p.read_text(encoding="utf-8")
+    d = json.loads(s[s.index("=") + 1:].rstrip().rstrip(";"))
+    if d["meta"].get("anonymized"):
+        return None
+    j = pd.DataFrame(d["jira"]["rows"], columns=d["jira"]["columns"])
+    j = j[j.signed.astype(bool)]
+    lead = j.acq_lead.astype("string").str.strip()
+    lead = lead.where(lead.notna() & lead.ne("") & lead.ne("Unassigned"))
+    al = R.lead_aliases(ctx.explorer, lead)
+    j = j.assign(a=lead.map(al).fillna("Unassigned"), P=j.stage.eq("paused"), F=j.stage.eq("paused") & j.fallout.isin(["documented", "ended"]))
+    return {a: [int(len(g)), int(g.P.sum()), int(g.F.sum())] for a, g in j.groupby("a")}
+
+
+def leaked_names(ctx: C.Ctx, text: str) -> list:
+    """Lead names (full names and surnames of 4+ letters, whole words) found in `text`: the generated data and the report's own files must
+    carry aliases only. Returns the ALIAS of any lead whose name was found, never the name itself."""
+    import re
+    from chapters import records as R
+    m = json.loads((ctx.explorer / R.ALIAS_FILE).read_text())["aliases"]
+    hits = []
+    for name, a in m.items():
+        pats = [name] + [w for w in name.split()[1:] if len(w) >= 4]
+        if any(re.search(r"\b" + re.escape(x) + r"\b", text, re.I) for x in pats):
+            hits.append(a)
+    return sorted(hits)
+
+
 def checks(ctx: C.Ctx, data: dict) -> list[dict]:
     ex, sp, oc, pc, dr = ctx.expected, data["speed"], data["outcomes"], data["pace"], data["drivers"]
     out = []
@@ -350,6 +385,42 @@ def checks(ctx: C.Ctx, data: dict) -> list[dict]:
     chk("2.3: fewer paused searches are both long-paused and past an ended contract than either alone", pz["cross"]["long_evidence"] < min(pz["over180"], pz["prior"]["evidence"]), True, hard=False)
     chk("4.4: the scenario median (every hunting search under contract tomorrow) is below the estimated median that counts unfinished searches", sc["all"]["scenario"]["median"] < sp["estimate"]["uc"]["median"], True, hard=False)
     chk("3.2: the best closing month's June-August share is most of its closings ('52 of 64')", sum(n for m, n in bcs["by_sale_month"].items() if "2026-06" <= m <= "2026-08") / bcs["n"] > 0.5, True, hard=False)
+    # 2.4 pauses by acquisition lead (added 20 Nov 2026): every count reconciles to 2.1 / 2.3, chapter 6, the Cash Forecast and the Explorer
+    ld = oc["leads"]
+    rows_, gL, gO, gA, gAll = ld["rows"], ld["groups"]["largest"], ld["groups"]["others"], ld["groups"]["assigned"], ld["groups"]["all"]
+    chk("2.4: lead rows (incl. Unassigned) add up to the signed searches and the paused total of 2.1 / 2.3",
+        (sum(r["n"] for r in rows_), sum(r["paused"] for r in rows_), gAll["n"], gAll["paused"]), (oc["waiting"]["denominator"], pa["n"], oc["waiting"]["denominator"], pa["n"]))
+    chk("2.4: every lead's status-before-pause groups and contract-history groups add up to its paused searches; path x history cells add up too",
+        sum(1 for r in rows_ + list(ld["groups"].values()) if not (sum(r["path"].values()) == sum(r["hist"].values()) == sum(r["cross"].values()) == r["paused"])), 0)
+    chk("2.4: status before the pause, all leads = 2.3 (8 Weeks, Client Start-6 Weeks, Under Contract / Passed Inspection, other, not recorded)",
+        tuple(gAll["path"][k] for k in ("long_search", "earlier", "contract", "other", "unknown")),
+        tuple(pa["from"][k] for k in ("long_search", "earlier_search", "contract", "other", "unknown")))
+    chk("2.4: contract history, all leads = 2.3 (documented, ended) = chapter 6's paused searches; evidence total = the Cash Forecast's paused fall-through count",
+        (gAll["hist"]["documented"], gAll["hist"]["ended"], gAll["hist"]["documented"] + gAll["hist"]["ended"], gAll["hist"]["documented"] + gAll["hist"]["ended"]),
+        (pa["prior"]["documented"], pa["prior"]["ended"], fo["documented"]["now"].get("paused", 0) + fo["ended"]["now"].get("paused", 0), data["cash"]["paused"]["fell_through"]["jira_fell_through"]))
+    chk("2.4: largest portfolio + other assigned leads = assigned; assigned + Unassigned = all (searches, paused, dated pauses)",
+        (gL["n"] + gO["n"], gL["paused"] + gO["paused"], gA["n"] + rows_[-1]["n"], gA["paused"] + rows_[-1]["paused"], gA["dated"] + rows_[-1]["dated"]),
+        (gA["n"], gA["paused"], gAll["n"], gAll["paused"], gAll["dated"]))
+    chk("2.4: dated pauses = paused - entered Paused after the 12 Nov extract - no start date (both dates needed)",
+        gAll["dated"], gAll["paused"] - ld["late_pause"] - ld["no_start"])
+    chk("2.4: the overall median days in pause and the 8-week hunting count agree with 2.2 / 2.3 populations",
+        (gAll["long"]["hunting"], pa["dated"] >= gAll["dated"]), (h["by_status"]["8 Weeks"]["n"], True))
+    chk("2.4: start cohorts (largest + others) add up to the two groups' searches and pauses",
+        (sum(c["largest"]["n"] for c in ld["cohorts"]), sum(c["others"]["n"] for c in ld["cohorts"]), sum(c["largest"]["paused"] for c in ld["cohorts"]), sum(c["others"]["paused"] for c in ld["cohorts"])),
+        (gL["n"], gO["n"], gL["paused"], gO["paused"]))
+    ej = explorer_lead_counts(ctx)
+    if ej is not None:
+        chk("2.4: per lead, searches / paused / paused with fall-through evidence = the published Explorer's own Jira records (same 16 Nov snapshot)",
+            {r["alias"]: [r["n"], r["paused"], r["hist"]["documented"] + r["hist"]["ended"]] for r in rows_}, ej)
+    chk("2.4: no acquisition lead's name appears anywhere in the generated data (aliases only)", leaked_names(ctx, json.dumps(data, default=str)), [])
+    own = [f for f in (C.ROOT / "docs").rglob("*") if f.is_file() and f.suffix in (".js", ".html", ".css", ".json", ".md")] + list(C.ROOT.glob("*.md"))
+    chk("2.4: no acquisition lead's name appears in the report's own files (pages, scripts, data, notes)",
+        leaked_names(ctx, "\n".join(f.read_text(encoding="utf-8", errors="ignore") for f in own)), [])
+    chk("2.4: the largest portfolio's like-for-like gap (same start half-year) stays clear of zero", ld["mh"]["by_start_half"]["lo"] > 0, True, hard=False)
+    chk("2.4 headline: the largest portfolio does not pause sooner (median start to pause at or above the other leads', all starts and 2026 starts)",
+        (gL["median"] >= gO["median"], gL["y2026"]["median"] >= gO["y2026"]["median"]), (True, True), hard=False)
+    chk("2.4 headline: more of the largest portfolio's 8-week searches are paused than still hunting, and a clearly higher share than the other leads'",
+        (gL["long"]["paused"] > gL["long"]["hunting"], gL["long"]["paused"] / (gL["long"]["paused"] + gL["long"]["hunting"]) - gO["long"]["paused"] / (gO["long"]["paused"] + gO["long"]["hunting"]) > 0.25), (True, True), hard=False)
     rc = cf["recent_closed"]
     chk("Cash forecast: closings in the last 30 days are dated inside the window and sit in no more deals than were closed",
         (rc["n"] == sum(rc["by_group"].values()), 0 < rc["n"] <= g["closed"]["n"] + g["refunded"]["n"] + g["scheduled"]["n"] + g["unverified_closing"]["n"] and rc["to"] == cf["asof"]), (True, True))

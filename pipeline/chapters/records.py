@@ -15,6 +15,8 @@ from __future__ import annotations
 
 import functools
 import hashlib
+import json
+from pathlib import Path
 
 import numpy as np
 import pandas as pd
@@ -62,7 +64,9 @@ def jira12(explorer) -> pd.DataFrame:
         "first_uc": _day(k["first_under_contract_date"]),
         "latest_uc": _day(k["latest_under_contract_date"]),
         "previous_status": k["previous_status"],
+        "previous_status_date": _day(k["previous_status_date"]),   # date the previous status was entered
         "latest_status": k["latest_status"],
+        "assignee": k["Assignee_Name"],                            # Jira assignee on 11 Nov (private: never written to the output)
         "latest_status_date": _day(k["latest_status_date"]),       # date the current status was entered (as of 11 Nov 2026)
     }, index=k.index)
 
@@ -91,3 +95,23 @@ def people(keys: pd.Series, j12: pd.DataFrame) -> pd.Series:
             if isinstance(e, str):
                 union("k" + k, "e" + e)
     return pd.Series([find("k" + k) for k in keys], index=keys.index)
+
+
+ALIAS_FILE = Path("private") / "acq_lead_aliases.json"     # inside the PRIVATE Explorer repo; never copied into this public repo
+
+
+def lead_aliases(explorer, names: pd.Series) -> dict:
+    """Jira Acq Lead -> public alias (A1, A2, ...). The mapping lives only in the private Explorer repo (ALIAS_FILE): aliases were drawn
+    in a random order, independent of any figure, and stay fixed. A lead not yet in the file gets the next free number (written back), so
+    earlier aliases never move. Unassigned issues stay "Unassigned". Nothing here writes a name into the report's output."""
+    path = Path(explorer) / ALIAS_FILE
+    doc = json.loads(path.read_text())
+    m = doc["aliases"]
+    new = sorted({str(v).strip() for v in names.dropna() if str(v).strip() and str(v).strip() != "Unassigned"} - set(m))
+    if new:
+        nxt = 1 + max(int(a[1:]) for a in m.values())
+        for i, n in enumerate(new):
+            m[n] = f"A{nxt + i}"
+        path.write_text(json.dumps(doc, indent=2) + "\n")
+        print(f"lead aliases: {len(new)} new lead(s) added to the private alias file")
+    return dict(m)

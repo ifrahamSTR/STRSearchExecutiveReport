@@ -523,6 +523,1572 @@
     "asof": "2026-11-11",
     "missing": 14
    }
+  },
+  "leads": {
+   "largest": "A1",
+   "min_row": 20,
+   "min_median": 5,
+   "rows": [
+    {
+     "alias": "A1",
+     "small": false,
+     "n": 259,
+     "paused": 61,
+     "dated": 58,
+     "median": 104.0,
+     "q1": 58.5,
+     "q3": 167.5,
+     "path": {
+      "earlier": 15,
+      "long_search": 38,
+      "contract": 3,
+      "other": 1,
+      "unknown": 4
+     },
+     "hist": {
+      "documented": 1,
+      "ended": 16,
+      "none": 44,
+      "unknown": 0
+     },
+     "cross": {
+      "earlier_ev": 2,
+      "earlier_no": 13,
+      "long_search_ev": 13,
+      "long_search_no": 25,
+      "contract_ev": 2,
+      "contract_no": 1,
+      "other_ev": 0,
+      "other_no": 1,
+      "unknown_ev": 0,
+      "unknown_no": 4
+     },
+     "long": {
+      "paused": 38,
+      "hunting": 6
+     },
+     "stages": {
+      "purchased": 129,
+      "under_contract": 29,
+      "hunting": 20,
+      "paused": 61,
+      "additional": 0,
+      "refunded": 20,
+      "other": 0
+     },
+     "y2026": {
+      "n": 190,
+      "paused": 33,
+      "dated": 31,
+      "median": 74.0,
+      "q1": 36.0,
+      "q3": 123.0
+     },
+     "dwell_median": 14.0,
+     "followup_median": 195.0,
+     "max_same_day": 3
+    },
+    {
+     "alias": "A2",
+     "small": false,
+     "n": 189,
+     "paused": 27,
+     "dated": 26,
+     "median": 142.5,
+     "q1": 63.0,
+     "q3": 215.5,
+     "path": {
+      "earlier": 6,
+      "long_search": 16,
+      "contract": 1,
+      "other": 0,
+      "unknown": 4
+     },
+     "hist": {
+      "documented": 1,
+      "ended": 8,
+      "none": 18,
+      "unknown": 0
+     },
+     "cross": {
+      "earlier_ev": 2,
+      "earlier_no": 4,
+      "long_search_ev": 6,
+      "long_search_no": 10,
+      "contract_ev": 1,
+      "contract_no": 0,
+      "other_ev": 0,
+      "other_no": 0,
+      "unknown_ev": 0,
+      "unknown_no": 4
+     },
+     "long": {
+      "paused": 16,
+      "hunting": 15
+     },
+     "stages": {
+      "purchased": 101,
+      "under_contract": 12,
+      "hunting": 24,
+      "paused": 27,
+      "additional": 1,
+      "refunded": 24,
+      "other": 0
+     },
+     "y2026": {
+      "n": 126,
+      "paused": 16,
+      "dated": 16,
+      "median": 71.0,
+      "q1": 60.75,
+      "q3": 141.25
+     },
+     "dwell_median": 9.0,
+     "followup_median": 204.0,
+     "max_same_day": 5
+    },
+    {
+     "alias": "A8",
+     "small": false,
+     "n": 171,
+     "paused": 8,
+     "dated": 8,
+     "median": 79.5,
+     "q1": 68.0,
+     "q3": 103.5,
+     "path": {
+      "earlier": 1,
+      "long_search": 2,
+      "contract": 2,
+      "other": 3,
+      "unknown": 0
+     },
+     "hist": {
+      "documented": 0,
+      "ended": 3,
+      "none": 5,
+      "unknown": 0
+     },
+     "cross": {
+      "earlier_ev": 0,
+      "earlier_no": 1,
+      "long_search_ev": 0,
+      "long_search_no": 2,
+      "contract_ev": 1,
+      "contract_no": 1,
+      "other_ev": 2,
+      "other_no": 1,
+      "unknown_ev": 0,
+      "unknown_no": 0
+     },
+     "long": {
+      "paused": 2,
+      "hunting": 2
+     },
+     "stages": {
+      "purchased": 152,
+      "under_contract": 0,
+      "hunting": 2,
+      "paused": 8,
+      "additional": 4,
+      "refunded": 5,
+      "other": 0
+     },
+     "y2026": {
+      "n": 0,
+      "paused": 0,
+      "dated": 0,
+      "median": null,
+      "q1": null,
+      "q3": null
+     },
+     "dwell_median": 3.5,
+     "followup_median": 612.0,
+     "max_same_day": 3
+    },
+    {
+     "alias": "A9",
+     "small": false,
+     "n": 99,
+     "paused": 6,
+     "dated": 6,
+     "median": 81.0,
+     "q1": 58.25,
+     "q3": 109.75,
+     "path": {
+      "earlier": 2,
+      "long_search": 4,
+      "contract": 0,
+      "other": 0,
+      "unknown": 0
+     },
+     "hist": {
+      "documented": 0,
+      "ended": 0,
+      "none": 6,
+      "unknown": 0
+     },
+     "cross": {
+      "earlier_ev": 0,
+      "earlier_no": 2,
+      "long_search_ev": 0,
+      "long_search_no": 4,
+      "contract_ev": 0,
+      "contract_no": 0,
+      "other_ev": 0,
+      "other_no": 0,
+      "unknown_ev": 0,
+      "unknown_no": 0
+     },
+     "long": {
+      "paused": 4,
+      "hunting": 12
+     },
+     "stages": {
+      "purchased": 47,
+      "under_contract": 14,
+      "hunting": 21,
+      "paused": 6,
+      "additional": 0,
+      "refunded": 11,
+      "other": 0
+     },
+     "y2026": {
+      "n": 97,
+      "paused": 6,
+      "dated": 6,
+      "median": 81.0,
+      "q1": 58.25,
+      "q3": 109.75
+     },
+     "dwell_median": 23.0,
+     "followup_median": 137.5,
+     "max_same_day": 1
+    },
+    {
+     "alias": "A6",
+     "small": false,
+     "n": 65,
+     "paused": 5,
+     "dated": 5,
+     "median": 41.0,
+     "q1": 40.0,
+     "q3": 77.0,
+     "path": {
+      "earlier": 4,
+      "long_search": 1,
+      "contract": 0,
+      "other": 0,
+      "unknown": 0
+     },
+     "hist": {
+      "documented": 0,
+      "ended": 1,
+      "none": 4,
+      "unknown": 0
+     },
+     "cross": {
+      "earlier_ev": 0,
+      "earlier_no": 4,
+      "long_search_ev": 1,
+      "long_search_no": 0,
+      "contract_ev": 0,
+      "contract_no": 0,
+      "other_ev": 0,
+      "other_no": 0,
+      "unknown_ev": 0,
+      "unknown_no": 0
+     },
+     "long": {
+      "paused": 1,
+      "hunting": 13
+     },
+     "stages": {
+      "purchased": 25,
+      "under_contract": 4,
+      "hunting": 25,
+      "paused": 5,
+      "additional": 0,
+      "refunded": 6,
+      "other": 0
+     },
+     "y2026": {
+      "n": 62,
+      "paused": 5,
+      "dated": 5,
+      "median": 41.0,
+      "q1": 40.0,
+      "q3": 77.0
+     },
+     "dwell_median": 30.0,
+     "followup_median": 89.0,
+     "max_same_day": 2
+    },
+    {
+     "alias": "A4",
+     "small": false,
+     "n": 30,
+     "paused": 0,
+     "dated": 0,
+     "median": null,
+     "q1": null,
+     "q3": null,
+     "path": {
+      "earlier": 0,
+      "long_search": 0,
+      "contract": 0,
+      "other": 0,
+      "unknown": 0
+     },
+     "hist": {
+      "documented": 0,
+      "ended": 0,
+      "none": 0,
+      "unknown": 0
+     },
+     "cross": {
+      "earlier_ev": 0,
+      "earlier_no": 0,
+      "long_search_ev": 0,
+      "long_search_no": 0,
+      "contract_ev": 0,
+      "contract_no": 0,
+      "other_ev": 0,
+      "other_no": 0,
+      "unknown_ev": 0,
+      "unknown_no": 0
+     },
+     "long": {
+      "paused": 0,
+      "hunting": 5
+     },
+     "stages": {
+      "purchased": 3,
+      "under_contract": 6,
+      "hunting": 13,
+      "paused": 0,
+      "additional": 0,
+      "refunded": 8,
+      "other": 0
+     },
+     "y2026": {
+      "n": 28,
+      "paused": 0,
+      "dated": 0,
+      "median": null,
+      "q1": null,
+      "q3": null
+     },
+     "dwell_median": null,
+     "followup_median": 47.5,
+     "max_same_day": 0
+    },
+    {
+     "alias": "A7",
+     "small": true,
+     "n": 6,
+     "paused": 0,
+     "dated": 0,
+     "median": null,
+     "q1": null,
+     "q3": null,
+     "path": {
+      "earlier": 0,
+      "long_search": 0,
+      "contract": 0,
+      "other": 0,
+      "unknown": 0
+     },
+     "hist": {
+      "documented": 0,
+      "ended": 0,
+      "none": 0,
+      "unknown": 0
+     },
+     "cross": {
+      "earlier_ev": 0,
+      "earlier_no": 0,
+      "long_search_ev": 0,
+      "long_search_no": 0,
+      "contract_ev": 0,
+      "contract_no": 0,
+      "other_ev": 0,
+      "other_no": 0,
+      "unknown_ev": 0,
+      "unknown_no": 0
+     },
+     "long": {
+      "paused": 0,
+      "hunting": 1
+     },
+     "stages": {
+      "purchased": 0,
+      "under_contract": 0,
+      "hunting": 6,
+      "paused": 0,
+      "additional": 0,
+      "refunded": 0,
+      "other": 0
+     },
+     "y2026": {
+      "n": 6,
+      "paused": 0,
+      "dated": 0,
+      "median": null,
+      "q1": null,
+      "q3": null
+     },
+     "dwell_median": null,
+     "followup_median": 52.0,
+     "max_same_day": 0
+    },
+    {
+     "alias": "A5",
+     "small": true,
+     "n": 4,
+     "paused": 0,
+     "dated": 0,
+     "median": null,
+     "q1": null,
+     "q3": null,
+     "path": {
+      "earlier": 0,
+      "long_search": 0,
+      "contract": 0,
+      "other": 0,
+      "unknown": 0
+     },
+     "hist": {
+      "documented": 0,
+      "ended": 0,
+      "none": 0,
+      "unknown": 0
+     },
+     "cross": {
+      "earlier_ev": 0,
+      "earlier_no": 0,
+      "long_search_ev": 0,
+      "long_search_no": 0,
+      "contract_ev": 0,
+      "contract_no": 0,
+      "other_ev": 0,
+      "other_no": 0,
+      "unknown_ev": 0,
+      "unknown_no": 0
+     },
+     "long": {
+      "paused": 0,
+      "hunting": 0
+     },
+     "stages": {
+      "purchased": 2,
+      "under_contract": 0,
+      "hunting": 0,
+      "paused": 0,
+      "additional": 0,
+      "refunded": 2,
+      "other": 0
+     },
+     "y2026": {
+      "n": 0,
+      "paused": 0,
+      "dated": 0,
+      "median": null,
+      "q1": null,
+      "q3": null
+     },
+     "dwell_median": null,
+     "followup_median": 421.0,
+     "max_same_day": 0
+    },
+    {
+     "alias": "A3",
+     "small": true,
+     "n": 1,
+     "paused": 0,
+     "dated": 0,
+     "median": null,
+     "q1": null,
+     "q3": null,
+     "path": {
+      "earlier": 0,
+      "long_search": 0,
+      "contract": 0,
+      "other": 0,
+      "unknown": 0
+     },
+     "hist": {
+      "documented": 0,
+      "ended": 0,
+      "none": 0,
+      "unknown": 0
+     },
+     "cross": {
+      "earlier_ev": 0,
+      "earlier_no": 0,
+      "long_search_ev": 0,
+      "long_search_no": 0,
+      "contract_ev": 0,
+      "contract_no": 0,
+      "other_ev": 0,
+      "other_no": 0,
+      "unknown_ev": 0,
+      "unknown_no": 0
+     },
+     "long": {
+      "paused": 0,
+      "hunting": 1
+     },
+     "stages": {
+      "purchased": 0,
+      "under_contract": 0,
+      "hunting": 1,
+      "paused": 0,
+      "additional": 0,
+      "refunded": 0,
+      "other": 0
+     },
+     "y2026": {
+      "n": 1,
+      "paused": 0,
+      "dated": 0,
+      "median": null,
+      "q1": null,
+      "q3": null
+     },
+     "dwell_median": null,
+     "followup_median": 220.0,
+     "max_same_day": 0
+    },
+    {
+     "alias": "Unassigned",
+     "small": false,
+     "n": 19,
+     "paused": 1,
+     "dated": 1,
+     "median": null,
+     "q1": null,
+     "q3": null,
+     "path": {
+      "earlier": 0,
+      "long_search": 1,
+      "contract": 0,
+      "other": 0,
+      "unknown": 0
+     },
+     "hist": {
+      "documented": 0,
+      "ended": 0,
+      "none": 1,
+      "unknown": 0
+     },
+     "cross": {
+      "earlier_ev": 0,
+      "earlier_no": 0,
+      "long_search_ev": 0,
+      "long_search_no": 1,
+      "contract_ev": 0,
+      "contract_no": 0,
+      "other_ev": 0,
+      "other_no": 0,
+      "unknown_ev": 0,
+      "unknown_no": 0
+     },
+     "long": {
+      "paused": 1,
+      "hunting": 6
+     },
+     "stages": {
+      "purchased": 1,
+      "under_contract": 0,
+      "hunting": 11,
+      "paused": 1,
+      "additional": 0,
+      "refunded": 6,
+      "other": 0
+     },
+     "y2026": {
+      "n": 3,
+      "paused": 0,
+      "dated": 0,
+      "median": null,
+      "q1": null,
+      "q3": null
+     },
+     "dwell_median": null,
+     "followup_median": 448.0,
+     "max_same_day": 1
+    }
+   ],
+   "groups": {
+    "largest": {
+     "n": 259,
+     "paused": 61,
+     "dated": 58,
+     "median": 104.0,
+     "q1": 58.5,
+     "q3": 167.5,
+     "path": {
+      "earlier": 15,
+      "long_search": 38,
+      "contract": 3,
+      "other": 1,
+      "unknown": 4
+     },
+     "hist": {
+      "documented": 1,
+      "ended": 16,
+      "none": 44,
+      "unknown": 0
+     },
+     "cross": {
+      "earlier_ev": 2,
+      "earlier_no": 13,
+      "long_search_ev": 13,
+      "long_search_no": 25,
+      "contract_ev": 2,
+      "contract_no": 1,
+      "other_ev": 0,
+      "other_no": 1,
+      "unknown_ev": 0,
+      "unknown_no": 4
+     },
+     "long": {
+      "paused": 38,
+      "hunting": 6
+     },
+     "stages": {
+      "purchased": 129,
+      "under_contract": 29,
+      "hunting": 20,
+      "paused": 61,
+      "additional": 0,
+      "refunded": 20,
+      "other": 0
+     },
+     "y2026": {
+      "n": 190,
+      "paused": 33,
+      "dated": 31,
+      "median": 74.0,
+      "q1": 36.0,
+      "q3": 123.0
+     },
+     "dwell_median": 14.0,
+     "followup_median": 195.0,
+     "max_same_day": 3
+    },
+    "others": {
+     "n": 565,
+     "paused": 46,
+     "dated": 45,
+     "median": 90.0,
+     "q1": 59.0,
+     "q3": 166.0,
+     "path": {
+      "earlier": 13,
+      "long_search": 23,
+      "contract": 3,
+      "other": 3,
+      "unknown": 4
+     },
+     "hist": {
+      "documented": 1,
+      "ended": 12,
+      "none": 33,
+      "unknown": 0
+     },
+     "cross": {
+      "earlier_ev": 2,
+      "earlier_no": 11,
+      "long_search_ev": 7,
+      "long_search_no": 16,
+      "contract_ev": 2,
+      "contract_no": 1,
+      "other_ev": 2,
+      "other_no": 1,
+      "unknown_ev": 0,
+      "unknown_no": 4
+     },
+     "long": {
+      "paused": 23,
+      "hunting": 49
+     },
+     "stages": {
+      "purchased": 330,
+      "under_contract": 36,
+      "hunting": 92,
+      "paused": 46,
+      "additional": 5,
+      "refunded": 56,
+      "other": 0
+     },
+     "y2026": {
+      "n": 320,
+      "paused": 27,
+      "dated": 27,
+      "median": 70.0,
+      "q1": 54.0,
+      "q3": 104.5
+     },
+     "dwell_median": 13.0,
+     "followup_median": 242.0,
+     "max_same_day": 5
+    },
+    "assigned": {
+     "n": 824,
+     "paused": 107,
+     "dated": 103,
+     "median": 91.0,
+     "q1": 58.0,
+     "q3": 168.5,
+     "path": {
+      "earlier": 28,
+      "long_search": 61,
+      "contract": 6,
+      "other": 4,
+      "unknown": 8
+     },
+     "hist": {
+      "documented": 2,
+      "ended": 28,
+      "none": 77,
+      "unknown": 0
+     },
+     "cross": {
+      "earlier_ev": 4,
+      "earlier_no": 24,
+      "long_search_ev": 20,
+      "long_search_no": 41,
+      "contract_ev": 4,
+      "contract_no": 2,
+      "other_ev": 2,
+      "other_no": 2,
+      "unknown_ev": 0,
+      "unknown_no": 8
+     },
+     "long": {
+      "paused": 61,
+      "hunting": 55
+     },
+     "stages": {
+      "purchased": 459,
+      "under_contract": 65,
+      "hunting": 112,
+      "paused": 107,
+      "additional": 5,
+      "refunded": 76,
+      "other": 0
+     },
+     "y2026": {
+      "n": 510,
+      "paused": 60,
+      "dated": 58,
+      "median": 72.5,
+      "q1": 43.75,
+      "q3": 118.0
+     },
+     "dwell_median": 14.0,
+     "followup_median": 213.0,
+     "max_same_day": 5
+    },
+    "all": {
+     "n": 843,
+     "paused": 108,
+     "dated": 104,
+     "median": 90.5,
+     "q1": 58.5,
+     "q3": 167.25,
+     "path": {
+      "earlier": 28,
+      "long_search": 62,
+      "contract": 6,
+      "other": 4,
+      "unknown": 8
+     },
+     "hist": {
+      "documented": 2,
+      "ended": 28,
+      "none": 78,
+      "unknown": 0
+     },
+     "cross": {
+      "earlier_ev": 4,
+      "earlier_no": 24,
+      "long_search_ev": 20,
+      "long_search_no": 42,
+      "contract_ev": 4,
+      "contract_no": 2,
+      "other_ev": 2,
+      "other_no": 2,
+      "unknown_ev": 0,
+      "unknown_no": 8
+     },
+     "long": {
+      "paused": 62,
+      "hunting": 61
+     },
+     "stages": {
+      "purchased": 460,
+      "under_contract": 65,
+      "hunting": 123,
+      "paused": 108,
+      "additional": 5,
+      "refunded": 82,
+      "other": 0
+     },
+     "y2026": {
+      "n": 513,
+      "paused": 60,
+      "dated": 58,
+      "median": 72.5,
+      "q1": 43.75,
+      "q3": 118.0
+     },
+     "dwell_median": 14.0,
+     "followup_median": 218.5,
+     "max_same_day": 5
+    }
+   },
+   "cohorts": [
+    {
+     "label": "Before 2025",
+     "largest": {
+      "n": 2,
+      "paused": 0,
+      "dated": 0,
+      "median": null,
+      "q1": null,
+      "q3": null,
+      "path": {
+       "earlier": 0,
+       "long_search": 0,
+       "contract": 0,
+       "other": 0,
+       "unknown": 0
+      },
+      "hist": {
+       "documented": 0,
+       "ended": 0,
+       "none": 0,
+       "unknown": 0
+      },
+      "cross": {
+       "earlier_ev": 0,
+       "earlier_no": 0,
+       "long_search_ev": 0,
+       "long_search_no": 0,
+       "contract_ev": 0,
+       "contract_no": 0,
+       "other_ev": 0,
+       "other_no": 0,
+       "unknown_ev": 0,
+       "unknown_no": 0
+      },
+      "long": {
+       "paused": 0,
+       "hunting": 0
+      },
+      "stages": {
+       "purchased": 2,
+       "under_contract": 0,
+       "hunting": 0,
+       "paused": 0,
+       "additional": 0,
+       "refunded": 0,
+       "other": 0
+      },
+      "y2026": {
+       "n": 0,
+       "paused": 0,
+       "dated": 0,
+       "median": null,
+       "q1": null,
+       "q3": null
+      },
+      "dwell_median": null,
+      "followup_median": 817.5,
+      "max_same_day": 0
+     },
+     "others": {
+      "n": 71,
+      "paused": 4,
+      "dated": 4,
+      "median": null,
+      "q1": null,
+      "q3": null,
+      "path": {
+       "earlier": 0,
+       "long_search": 2,
+       "contract": 0,
+       "other": 2,
+       "unknown": 0
+      },
+      "hist": {
+       "documented": 0,
+       "ended": 3,
+       "none": 1,
+       "unknown": 0
+      },
+      "cross": {
+       "earlier_ev": 0,
+       "earlier_no": 0,
+       "long_search_ev": 1,
+       "long_search_no": 1,
+       "contract_ev": 0,
+       "contract_no": 0,
+       "other_ev": 2,
+       "other_no": 0,
+       "unknown_ev": 0,
+       "unknown_no": 0
+      },
+      "long": {
+       "paused": 2,
+       "hunting": 1
+      },
+      "stages": {
+       "purchased": 63,
+       "under_contract": 0,
+       "hunting": 1,
+       "paused": 4,
+       "additional": 3,
+       "refunded": 0,
+       "other": 0
+      },
+      "y2026": {
+       "n": 0,
+       "paused": 0,
+       "dated": 0,
+       "median": null,
+       "q1": null,
+       "q3": null
+      },
+      "dwell_median": null,
+      "followup_median": 822.0,
+      "max_same_day": 2
+     }
+    },
+    {
+     "label": "2025 H1",
+     "largest": {
+      "n": 7,
+      "paused": 7,
+      "dated": 7,
+      "median": 305.0,
+      "q1": 280.0,
+      "q3": 327.5,
+      "path": {
+       "earlier": 0,
+       "long_search": 5,
+       "contract": 0,
+       "other": 0,
+       "unknown": 2
+      },
+      "hist": {
+       "documented": 1,
+       "ended": 0,
+       "none": 6,
+       "unknown": 0
+      },
+      "cross": {
+       "earlier_ev": 0,
+       "earlier_no": 0,
+       "long_search_ev": 1,
+       "long_search_no": 4,
+       "contract_ev": 0,
+       "contract_no": 0,
+       "other_ev": 0,
+       "other_no": 0,
+       "unknown_ev": 0,
+       "unknown_no": 2
+      },
+      "long": {
+       "paused": 5,
+       "hunting": 0
+      },
+      "stages": {
+       "purchased": 0,
+       "under_contract": 0,
+       "hunting": 0,
+       "paused": 7,
+       "additional": 0,
+       "refunded": 0,
+       "other": 0
+      },
+      "y2026": {
+       "n": 0,
+       "paused": 0,
+       "dated": 0,
+       "median": null,
+       "q1": null,
+       "q3": null
+      },
+      "dwell_median": 86.0,
+      "followup_median": 560.0,
+      "max_same_day": 1
+     },
+     "others": {
+      "n": 59,
+      "paused": 2,
+      "dated": 2,
+      "median": null,
+      "q1": null,
+      "q3": null,
+      "path": {
+       "earlier": 0,
+       "long_search": 1,
+       "contract": 0,
+       "other": 1,
+       "unknown": 0
+      },
+      "hist": {
+       "documented": 1,
+       "ended": 0,
+       "none": 1,
+       "unknown": 0
+      },
+      "cross": {
+       "earlier_ev": 0,
+       "earlier_no": 0,
+       "long_search_ev": 1,
+       "long_search_no": 0,
+       "contract_ev": 0,
+       "contract_no": 0,
+       "other_ev": 0,
+       "other_no": 1,
+       "unknown_ev": 0,
+       "unknown_no": 0
+      },
+      "long": {
+       "paused": 1,
+       "hunting": 2
+      },
+      "stages": {
+       "purchased": 49,
+       "under_contract": 0,
+       "hunting": 2,
+       "paused": 2,
+       "additional": 1,
+       "refunded": 5,
+       "other": 0
+      },
+      "y2026": {
+       "n": 0,
+       "paused": 0,
+       "dated": 0,
+       "median": null,
+       "q1": null,
+       "q3": null
+      },
+      "dwell_median": null,
+      "followup_median": 578.0,
+      "max_same_day": 1
+     }
+    },
+    {
+     "label": "2025 H2",
+     "largest": {
+      "n": 57,
+      "paused": 20,
+      "dated": 20,
+      "median": 121.5,
+      "q1": 71.75,
+      "q3": 181.25,
+      "path": {
+       "earlier": 3,
+       "long_search": 15,
+       "contract": 1,
+       "other": 0,
+       "unknown": 1
+      },
+      "hist": {
+       "documented": 0,
+       "ended": 6,
+       "none": 14,
+       "unknown": 0
+      },
+      "cross": {
+       "earlier_ev": 1,
+       "earlier_no": 2,
+       "long_search_ev": 5,
+       "long_search_no": 10,
+       "contract_ev": 0,
+       "contract_no": 1,
+       "other_ev": 0,
+       "other_no": 0,
+       "unknown_ev": 0,
+       "unknown_no": 1
+      },
+      "long": {
+       "paused": 15,
+       "hunting": 0
+      },
+      "stages": {
+       "purchased": 33,
+       "under_contract": 0,
+       "hunting": 0,
+       "paused": 20,
+       "additional": 0,
+       "refunded": 4,
+       "other": 0
+      },
+      "y2026": {
+       "n": 0,
+       "paused": 0,
+       "dated": 0,
+       "median": null,
+       "q1": null,
+       "q3": null
+      },
+      "dwell_median": 13.0,
+      "followup_median": 388.0,
+      "max_same_day": 2
+     },
+     "others": {
+      "n": 109,
+      "paused": 12,
+      "dated": 12,
+      "median": 137.5,
+      "q1": 71.0,
+      "q3": 226.0,
+      "path": {
+       "earlier": 2,
+       "long_search": 4,
+       "contract": 3,
+       "other": 0,
+       "unknown": 3
+      },
+      "hist": {
+       "documented": 0,
+       "ended": 3,
+       "none": 9,
+       "unknown": 0
+      },
+      "cross": {
+       "earlier_ev": 1,
+       "earlier_no": 1,
+       "long_search_ev": 0,
+       "long_search_no": 4,
+       "contract_ev": 2,
+       "contract_no": 1,
+       "other_ev": 0,
+       "other_no": 0,
+       "unknown_ev": 0,
+       "unknown_no": 3
+      },
+      "long": {
+       "paused": 4,
+       "hunting": 6
+      },
+      "stages": {
+       "purchased": 83,
+       "under_contract": 1,
+       "hunting": 6,
+       "paused": 12,
+       "additional": 0,
+       "refunded": 7,
+       "other": 0
+      },
+      "y2026": {
+       "n": 0,
+       "paused": 0,
+       "dated": 0,
+       "median": null,
+       "q1": null,
+       "q3": null
+      },
+      "dwell_median": 32.0,
+      "followup_median": 425.0,
+      "max_same_day": 1
+     }
+    },
+    {
+     "label": "2026 H1",
+     "largest": {
+      "n": 102,
+      "paused": 19,
+      "dated": 18,
+      "median": 109.0,
+      "q1": 49.0,
+      "q3": 143.5,
+      "path": {
+       "earlier": 5,
+       "long_search": 11,
+       "contract": 2,
+       "other": 0,
+       "unknown": 1
+      },
+      "hist": {
+       "documented": 0,
+       "ended": 6,
+       "none": 13,
+       "unknown": 0
+      },
+      "cross": {
+       "earlier_ev": 0,
+       "earlier_no": 5,
+       "long_search_ev": 4,
+       "long_search_no": 7,
+       "contract_ev": 2,
+       "contract_no": 0,
+       "other_ev": 0,
+       "other_no": 0,
+       "unknown_ev": 0,
+       "unknown_no": 1
+      },
+      "long": {
+       "paused": 11,
+       "hunting": 0
+      },
+      "stages": {
+       "purchased": 73,
+       "under_contract": 6,
+       "hunting": 0,
+       "paused": 19,
+       "additional": 0,
+       "refunded": 4,
+       "other": 0
+      },
+      "y2026": {
+       "n": 102,
+       "paused": 19,
+       "dated": 18,
+       "median": 109.0,
+       "q1": 49.0,
+       "q3": 143.5
+      },
+      "dwell_median": 15.0,
+      "followup_median": 207.0,
+      "max_same_day": 2
+     },
+     "others": {
+      "n": 105,
+      "paused": 19,
+      "dated": 19,
+      "median": 90.0,
+      "q1": 62.0,
+      "q3": 141.0,
+      "path": {
+       "earlier": 5,
+       "long_search": 13,
+       "contract": 0,
+       "other": 0,
+       "unknown": 1
+      },
+      "hist": {
+       "documented": 0,
+       "ended": 3,
+       "none": 16,
+       "unknown": 0
+      },
+      "cross": {
+       "earlier_ev": 0,
+       "earlier_no": 5,
+       "long_search_ev": 3,
+       "long_search_no": 10,
+       "contract_ev": 0,
+       "contract_no": 0,
+       "other_ev": 0,
+       "other_no": 0,
+       "unknown_ev": 0,
+       "unknown_no": 1
+      },
+      "long": {
+       "paused": 13,
+       "hunting": 10
+      },
+      "stages": {
+       "purchased": 61,
+       "under_contract": 3,
+       "hunting": 10,
+       "paused": 19,
+       "additional": 1,
+       "refunded": 11,
+       "other": 0
+      },
+      "y2026": {
+       "n": 105,
+       "paused": 19,
+       "dated": 19,
+       "median": 90.0,
+       "q1": 62.0,
+       "q3": 141.0
+      },
+      "dwell_median": 13.0,
+      "followup_median": 221.0,
+      "max_same_day": 2
+     }
+    },
+    {
+     "label": "2026 H2",
+     "largest": {
+      "n": 88,
+      "paused": 14,
+      "dated": 13,
+      "median": 57.0,
+      "q1": 36.0,
+      "q3": 74.0,
+      "path": {
+       "earlier": 6,
+       "long_search": 7,
+       "contract": 0,
+       "other": 1,
+       "unknown": 0
+      },
+      "hist": {
+       "documented": 0,
+       "ended": 4,
+       "none": 10,
+       "unknown": 0
+      },
+      "cross": {
+       "earlier_ev": 1,
+       "earlier_no": 5,
+       "long_search_ev": 3,
+       "long_search_no": 4,
+       "contract_ev": 0,
+       "contract_no": 0,
+       "other_ev": 0,
+       "other_no": 1,
+       "unknown_ev": 0,
+       "unknown_no": 0
+      },
+      "long": {
+       "paused": 7,
+       "hunting": 5
+      },
+      "stages": {
+       "purchased": 21,
+       "under_contract": 23,
+       "hunting": 19,
+       "paused": 14,
+       "additional": 0,
+       "refunded": 11,
+       "other": 0
+      },
+      "y2026": {
+       "n": 88,
+       "paused": 14,
+       "dated": 13,
+       "median": 57.0,
+       "q1": 36.0,
+       "q3": 74.0
+      },
+      "dwell_median": 9.0,
+      "followup_median": 69.0,
+      "max_same_day": 2
+     },
+     "others": {
+      "n": 215,
+      "paused": 8,
+      "dated": 8,
+      "median": 53.0,
+      "q1": 40.75,
+      "q3": 68.75,
+      "path": {
+       "earlier": 5,
+       "long_search": 3,
+       "contract": 0,
+       "other": 0,
+       "unknown": 0
+      },
+      "hist": {
+       "documented": 0,
+       "ended": 3,
+       "none": 5,
+       "unknown": 0
+      },
+      "cross": {
+       "earlier_ev": 1,
+       "earlier_no": 4,
+       "long_search_ev": 2,
+       "long_search_no": 1,
+       "contract_ev": 0,
+       "contract_no": 0,
+       "other_ev": 0,
+       "other_no": 0,
+       "unknown_ev": 0,
+       "unknown_no": 0
+      },
+      "long": {
+       "paused": 3,
+       "hunting": 27
+      },
+      "stages": {
+       "purchased": 74,
+       "under_contract": 32,
+       "hunting": 69,
+       "paused": 8,
+       "additional": 0,
+       "refunded": 32,
+       "other": 0
+      },
+      "y2026": {
+       "n": 215,
+       "paused": 8,
+       "dated": 8,
+       "median": 53.0,
+       "q1": 40.75,
+       "q3": 68.75
+      },
+      "dwell_median": 16.5,
+      "followup_median": 77.0,
+      "max_same_day": 2
+     }
+    },
+    {
+     "label": "No start date",
+     "largest": {
+      "n": 3,
+      "paused": 1,
+      "dated": 0,
+      "median": null,
+      "q1": null,
+      "q3": null,
+      "path": {
+       "earlier": 1,
+       "long_search": 0,
+       "contract": 0,
+       "other": 0,
+       "unknown": 0
+      },
+      "hist": {
+       "documented": 0,
+       "ended": 0,
+       "none": 1,
+       "unknown": 0
+      },
+      "cross": {
+       "earlier_ev": 0,
+       "earlier_no": 1,
+       "long_search_ev": 0,
+       "long_search_no": 0,
+       "contract_ev": 0,
+       "contract_no": 0,
+       "other_ev": 0,
+       "other_no": 0,
+       "unknown_ev": 0,
+       "unknown_no": 0
+      },
+      "long": {
+       "paused": 0,
+       "hunting": 1
+      },
+      "stages": {
+       "purchased": 0,
+       "under_contract": 0,
+       "hunting": 1,
+       "paused": 1,
+       "additional": 0,
+       "refunded": 1,
+       "other": 0
+      },
+      "y2026": {
+       "n": 0,
+       "paused": 0,
+       "dated": 0,
+       "median": null,
+       "q1": null,
+       "q3": null
+      },
+      "dwell_median": null,
+      "followup_median": null,
+      "max_same_day": 1
+     },
+     "others": {
+      "n": 6,
+      "paused": 1,
+      "dated": 0,
+      "median": null,
+      "q1": null,
+      "q3": null,
+      "path": {
+       "earlier": 1,
+       "long_search": 0,
+       "contract": 0,
+       "other": 0,
+       "unknown": 0
+      },
+      "hist": {
+       "documented": 0,
+       "ended": 0,
+       "none": 1,
+       "unknown": 0
+      },
+      "cross": {
+       "earlier_ev": 0,
+       "earlier_no": 1,
+       "long_search_ev": 0,
+       "long_search_no": 0,
+       "contract_ev": 0,
+       "contract_no": 0,
+       "other_ev": 0,
+       "other_no": 0,
+       "unknown_ev": 0,
+       "unknown_no": 0
+      },
+      "long": {
+       "paused": 0,
+       "hunting": 3
+      },
+      "stages": {
+       "purchased": 0,
+       "under_contract": 0,
+       "hunting": 4,
+       "paused": 1,
+       "additional": 0,
+       "refunded": 1,
+       "other": 0
+      },
+      "y2026": {
+       "n": 0,
+       "paused": 0,
+       "dated": 0,
+       "median": null,
+       "q1": null,
+       "q3": null
+      },
+      "dwell_median": null,
+      "followup_median": null,
+      "max_same_day": 1
+     }
+    }
+   ],
+   "mh": {
+    "by_start_half": {
+     "strata": 5,
+     "diff": 0.1429,
+     "lo": 0.0864,
+     "hi": 0.1994
+    },
+    "by_start_half_product": {
+     "strata": 9,
+     "diff": 0.1436,
+     "lo": 0.0872,
+     "hi": 0.2
+    }
+   },
+   "mix": {
+    "complete": {
+     "largest": 100,
+     "others": 215
+    },
+    "nce": {
+     "largest": 68,
+     "others": 157
+    },
+    "won_rule": {
+     "largest": 112,
+     "others": 246
+    }
+   },
+   "late_pause": 2,
+   "no_start": 2,
+   "reassigned": {
+    "n": 1,
+    "paused": 0
+   },
+   "reason_field": null
   }
  },
  "pace": {
@@ -17893,7 +19459,7 @@
   "snapshots": {
    "reporting_layer": "2026-11-16"
   },
-  "built_at": "2026-11-19 23:38",
+  "built_at": "2026-11-20 18:12",
   "chapters": [
    "journey",
    "outcomes",
@@ -19482,6 +21048,278 @@
    "check": "3.2: the best closing month's June-August share is most of its closings ('52 of 64')",
    "page": true,
    "explorer": true,
+   "ok": true,
+   "hard": false
+  },
+  {
+   "check": "2.4: lead rows (incl. Unassigned) add up to the signed searches and the paused total of 2.1 / 2.3",
+   "page": [
+    843,
+    108,
+    843,
+    108
+   ],
+   "explorer": [
+    843,
+    108,
+    843,
+    108
+   ],
+   "ok": true,
+   "hard": true
+  },
+  {
+   "check": "2.4: every lead's status-before-pause groups and contract-history groups add up to its paused searches; path x history cells add up too",
+   "page": 0,
+   "explorer": 0,
+   "ok": true,
+   "hard": true
+  },
+  {
+   "check": "2.4: status before the pause, all leads = 2.3 (8 Weeks, Client Start-6 Weeks, Under Contract / Passed Inspection, other, not recorded)",
+   "page": [
+    62,
+    28,
+    6,
+    4,
+    8
+   ],
+   "explorer": [
+    62,
+    28,
+    6,
+    4,
+    8
+   ],
+   "ok": true,
+   "hard": true
+  },
+  {
+   "check": "2.4: contract history, all leads = 2.3 (documented, ended) = chapter 6's paused searches; evidence total = the Cash Forecast's paused fall-through count",
+   "page": [
+    2,
+    28,
+    30,
+    30
+   ],
+   "explorer": [
+    2,
+    28,
+    30,
+    30
+   ],
+   "ok": true,
+   "hard": true
+  },
+  {
+   "check": "2.4: largest portfolio + other assigned leads = assigned; assigned + Unassigned = all (searches, paused, dated pauses)",
+   "page": [
+    824,
+    107,
+    843,
+    108,
+    104
+   ],
+   "explorer": [
+    824,
+    107,
+    843,
+    108,
+    104
+   ],
+   "ok": true,
+   "hard": true
+  },
+  {
+   "check": "2.4: dated pauses = paused - entered Paused after the 12 Nov extract - no start date (both dates needed)",
+   "page": 104,
+   "explorer": 104,
+   "ok": true,
+   "hard": true
+  },
+  {
+   "check": "2.4: the overall median days in pause and the 8-week hunting count agree with 2.2 / 2.3 populations",
+   "page": [
+    61,
+    true
+   ],
+   "explorer": [
+    61,
+    true
+   ],
+   "ok": true,
+   "hard": true
+  },
+  {
+   "check": "2.4: start cohorts (largest + others) add up to the two groups' searches and pauses",
+   "page": [
+    259,
+    565,
+    61,
+    46
+   ],
+   "explorer": [
+    259,
+    565,
+    61,
+    46
+   ],
+   "ok": true,
+   "hard": true
+  },
+  {
+   "check": "2.4: per lead, searches / paused / paused with fall-through evidence = the published Explorer's own Jira records (same 16 Nov snapshot)",
+   "page": {
+    "A1": [
+     259,
+     61,
+     17
+    ],
+    "A2": [
+     189,
+     27,
+     9
+    ],
+    "A8": [
+     171,
+     8,
+     3
+    ],
+    "A9": [
+     99,
+     6,
+     0
+    ],
+    "A6": [
+     65,
+     5,
+     1
+    ],
+    "A4": [
+     30,
+     0,
+     0
+    ],
+    "A7": [
+     6,
+     0,
+     0
+    ],
+    "A5": [
+     4,
+     0,
+     0
+    ],
+    "A3": [
+     1,
+     0,
+     0
+    ],
+    "Unassigned": [
+     19,
+     1,
+     0
+    ]
+   },
+   "explorer": {
+    "A1": [
+     259,
+     61,
+     17
+    ],
+    "A2": [
+     189,
+     27,
+     9
+    ],
+    "A3": [
+     1,
+     0,
+     0
+    ],
+    "A4": [
+     30,
+     0,
+     0
+    ],
+    "A5": [
+     4,
+     0,
+     0
+    ],
+    "A6": [
+     65,
+     5,
+     1
+    ],
+    "A7": [
+     6,
+     0,
+     0
+    ],
+    "A8": [
+     171,
+     8,
+     3
+    ],
+    "A9": [
+     99,
+     6,
+     0
+    ],
+    "Unassigned": [
+     19,
+     1,
+     0
+    ]
+   },
+   "ok": true,
+   "hard": true
+  },
+  {
+   "check": "2.4: no acquisition lead's name appears anywhere in the generated data (aliases only)",
+   "page": [],
+   "explorer": [],
+   "ok": true,
+   "hard": true
+  },
+  {
+   "check": "2.4: no acquisition lead's name appears in the report's own files (pages, scripts, data, notes)",
+   "page": [],
+   "explorer": [],
+   "ok": true,
+   "hard": true
+  },
+  {
+   "check": "2.4: the largest portfolio's like-for-like gap (same start half-year) stays clear of zero",
+   "page": true,
+   "explorer": true,
+   "ok": true,
+   "hard": false
+  },
+  {
+   "check": "2.4 headline: the largest portfolio does not pause sooner (median start to pause at or above the other leads', all starts and 2026 starts)",
+   "page": [
+    true,
+    true
+   ],
+   "explorer": [
+    true,
+    true
+   ],
+   "ok": true,
+   "hard": false
+  },
+  {
+   "check": "2.4 headline: more of the largest portfolio's 8-week searches are paused than still hunting, and a clearly higher share than the other leads'",
+   "page": [
+    true,
+    true
+   ],
+   "explorer": [
+    true,
+    true
+   ],
    "ok": true,
    "hard": false
   },

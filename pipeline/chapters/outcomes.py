@@ -5,6 +5,7 @@ post-close services. Hunting = the Active clients still searching (Client Start 
 completed milestones only: closing dates after the data date are scheduled, not closed."""
 from __future__ import annotations
 
+import numpy as np
 import pandas as pd
 
 import core as C
@@ -139,6 +140,130 @@ def status(ctx: C.Ctx) -> dict:
             "source_12nov": {"asof": "2026-11-11", "missing": int((~key.isin(j12.index)).sum())}}
 
 
+LEAD_MIN_ROW = 20         # leads with fewer signed searches share one chart row ("smaller portfolios"); the table lists each
+LEAD_MIN_MEDIAN = 5       # a median start-to-pause needs 5+ searches with both dates
+PATHS = ["earlier", "long_search", "contract", "other", "unknown"]     # status immediately before Paused (2.3's groups)
+HISTS = ["documented", "ended", "none", "unknown"]                     # prior contract history (chapter 6's evidence)
+
+
+def _half(d: pd.Series) -> pd.Series:
+    """Start cohort: half-year of the canonical start date (before 2025 together)."""
+    lab = d.dt.year.astype("Int64").astype(str) + " " + d.dt.month.le(6).map({True: "H1", False: "H2"}).astype(str)
+    return lab.where(d.dt.year >= 2025, "Before 2025").where(d.notna(), "No start date")
+
+
+def _mh(x: pd.DataFrame, flag: str, grp: str) -> dict:
+    """Mantel-Haenszel risk difference (grp True minus False) for `flag` over the strata in column `stratum` (the Explorer budget module's
+    weights and variance), so a portfolio's pause rate is compared with peers who started in the same period."""
+    num = den = var = 0.0
+    used = 0
+    for _, g in x.groupby("stratum"):
+        a, b = g[g[grp]], g[~g[grp]]
+        if not len(a) or not len(b):
+            continue
+        na, nb = len(a), len(b)
+        pa, pb = a[flag].mean(), b[flag].mean()
+        w = na * nb / (na + nb)
+        num += w * (pa - pb); den += w; var += w ** 2 * (pa * (1 - pa) / na + pb * (1 - pb) / nb)
+        used += 1
+    rd, se = num / den, var ** 0.5 / den
+    return {"strata": used, "diff": round(float(rd), 4), "lo": round(float(rd - 1.96 * se), 4), "hi": round(float(rd + 1.96 * se), 4)}
+
+
+def leads(ctx: C.Ctx) -> dict:
+    """Scene 2.4 (added 20 Nov 2026): current pauses by the Jira Acq Lead the search is assigned to today. Unit = search (a signed-up
+    Jira issue), so a repeat client counts once per search. Every count reconciles to 2.1 / 2.3, chapter 6 and the Cash Forecast.
+      pause rate        paused today / signed searches assigned to the lead (16 Nov statuses, status first as in 2.1)
+      start to pause    canonical start date (client_start_date) to the date the CURRENT pause began (12 Nov extract latest_status_date,
+                        kept only where that extract's latest status is Paused); pauses that ended leave no date, so this describes
+                        searches still paused, grouped by their current assignee
+      pathway           status immediately before Paused (2.3's groups) and prior contract history (chapter 6's evidence)
+    Leads appear only under private aliases (records.lead_aliases); no name leaves this function."""
+    asof, s = ctx.asof, ctx.signed.copy()
+    s["stage"] = R.stage(s)
+    j12 = R.jira12(ctx.explorer)
+    key = s.key.astype(str).str.upper()
+    for c in ("previous_status", "previous_status_date", "latest_status", "latest_status_date"):
+        s[c] = key.map(j12[c]).values
+    raw = s.acq_lead.astype("string").str.strip()
+    raw = raw.where(raw.notna() & raw.ne("") & raw.ne("Unassigned"))
+    alias = R.lead_aliases(ctx.explorer, raw)
+    s["lead"] = raw.map(alias).fillna("Unassigned")
+    paused = s.stage.eq("paused")
+    s["pdate"] = pd.to_datetime(s.latest_status_date).where(paused & s.latest_status.eq("Paused"))
+    s["days"] = (s.pdate - s.start).dt.days
+    prev = s.previous_status.fillna("").astype(str).str.strip().str.lower()
+    srch = [x.lower() for x in SEARCH]
+    s["ppath"] = np.select([prev.isin(srch[:4]), prev.eq("8 weeks"), prev.isin(["under contract", "passed inspection"]), prev.eq("")],
+                          ["earlier", "long_search", "contract", "unknown"], "other")
+    from chapters import fallout as FO
+    g = s.key.map(FO.classify(ctx).grp)
+    s["phist"] = np.where(g.isin(["documented", "ended"]), g, np.where(key.isin(j12.index), "none", "unknown"))
+    s["h8"] = s.stage.eq("hunting") & s.status.eq("8 Weeks")
+    s["dwell"] = (s.pdate - s.previous_status_date).dt.days        # days in the status before the pause
+    s["y26"] = s.start.dt.year.eq(2026)
+    s["coh"] = _half(s.start)
+    s["paused"] = paused
+    a12 = key.map(j12["assignee"]).astype("string").str.strip()
+    moved = key.isin(j12.index) & (a12.fillna("Unassigned").values != raw.fillna("Unassigned").values)
+
+    def med(v):
+        v = v.dropna()
+        return float(v.median()) if len(v) >= LEAD_MIN_MEDIAN else None
+
+    def qt(v, q):
+        v = v.dropna()
+        return float(v.quantile(q)) if len(v) >= LEAD_MIN_MEDIAN else None
+
+    def block(m) -> dict:
+        x = s[m]
+        p = x[x.paused]
+        d = p.days.dropna()
+        y = x[x.y26]
+        return {"n": int(len(x)), "paused": int(len(p)), "dated": int(len(d)), "median": med(d),
+                "q1": qt(d, .25), "q3": qt(d, .75),
+                "path": {k: int(p.ppath.eq(k).sum()) for k in PATHS}, "hist": {k: int(p.phist.eq(k).sum()) for k in HISTS},
+                "cross": {f"{k}_{e}": int((p.ppath.eq(k) & (p.phist.isin(["documented", "ended"]) if e == "ev" else ~p.phist.isin(["documented", "ended"]))).sum())
+                          for k in PATHS for e in ("ev", "no")},
+                "long": {"paused": int(p.ppath.eq("long_search").sum()), "hunting": int(x.h8.sum())},
+                "stages": {k: int(x.stage.eq(k).sum()) for k in R.STAGES + ["other"]},
+                "y2026": {"n": int(len(y)), "paused": int(y.paused.sum()), "dated": int(y[y.paused].days.notna().sum()), "median": med(y[y.paused].days),
+                          "q1": qt(y[y.paused].days, .25), "q3": qt(y[y.paused].days, .75)},
+                "dwell_median": med(p.dwell), "followup_median": float((asof - x.start).dt.days.median()) if x.start.notna().any() else None,
+                "max_same_day": int(p.pdate.value_counts().max()) if p.pdate.notna().any() else 0}
+
+    order = s[s.lead.ne("Unassigned")].lead.value_counts()
+    order = sorted(order.index, key=lambda a: (-order[a], int(a[1:])))
+    rows = [dict(alias=a, small=bool(order and (s.lead.eq(a).sum() < LEAD_MIN_ROW)), **block(s.lead.eq(a))) for a in order]
+    rows.append(dict(alias="Unassigned", small=False, **block(s.lead.eq("Unassigned"))))
+    big = order[0]
+    assigned = s.lead.ne("Unassigned")
+    s["is_big"] = s.lead.eq(big)
+    cmpset = s[assigned]
+    groups = {"largest": block(s.is_big), "others": block(assigned & ~s.is_big), "assigned": block(assigned), "all": block(pd.Series(True, index=s.index))}
+
+    COH = ["Before 2025", "2025 H1", "2025 H2", "2026 H1", "2026 H2", "No start date"]
+    cohorts = []
+    for c in COH:
+        m = s.coh.eq(c)
+        if m.any():
+            cohorts.append({"label": c, "largest": block(m & s.is_big), "others": block(m & assigned & ~s.is_big)})
+    mhx = cmpset[cmpset.start.notna()].assign(stratum=lambda x: x.coh, P=lambda x: x.paused.astype(float))
+    mh_coh = _mh(mhx, "P", "is_big")
+    mh_coh_prod = _mh(mhx.assign(stratum=mhx.coh + "|" + mhx.pd_product.fillna("?").astype(str)), "P", "is_big")
+    mix = {k: {"largest": int((cmpset.is_big & cmpset[c].eq(v)).sum()), "others": int((~cmpset.is_big & cmpset[c].eq(v)).sum())}
+           for k, c, v in (("complete", "pd_product", "Complete"), ("nce", "pd_experience", "New Client Experience"), ("won_rule", "start_rule", "won"))}
+    return {
+        "largest": big, "min_row": LEAD_MIN_ROW, "min_median": LEAD_MIN_MEDIAN,
+        "rows": rows, "groups": groups, "cohorts": cohorts,
+        "mh": {"by_start_half": mh_coh, "by_start_half_product": mh_coh_prod}, "mix": mix,
+        "late_pause": int((paused & s.latest_status.ne("Paused")).sum()),          # paused on 16 Nov but not yet on 11 Nov: pause date unknown
+        "no_start": int((paused & s.start.isna()).sum()),
+        "reassigned": {"n": int(moved.sum()), "paused": int((moved & paused).sum())},   # lead on 11 Nov (12 Nov extract) differs from 16 Nov
+        "reason_field": None,                                                        # Jira records no pause reason
+    }
+
+
 def build(ctx: C.Ctx) -> dict:
     ex, s = ctx.expected, ctx.signed
     act = s[s.active]
@@ -157,4 +282,5 @@ def build(ctx: C.Ctx) -> dict:
         "hunting_engagements": ex["engagements"]["hunting_official"],
         "waiting": waiting(ctx),
         "status": status(ctx),
+        "leads": leads(ctx),
     }
