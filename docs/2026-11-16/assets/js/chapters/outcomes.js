@@ -1,8 +1,8 @@
 /* Chapter 2: where are our clients today? (updated 18 Nov 2026)
    2.1 every signed-up client in one stage, status first: no current contract or completed purchase = hunting + Inactive
        (Paused + Additional Service + Refunded) -> 2.2 how long the hunting clients have waited -> 2.3 where the others stand
-       (pauses, refunds, contracts) -> 2.4 is A1 pausing more? (id outcomes-7) -> 2.5 pauses by acquisition lead (id outcomes-6) -> 2.6 up to vs above $250K today
-       (id outcomes-4) -> 2.7 milestones reached (id outcomes-5). Scene ids are stable keys; `order` sets the displayed numbers.
+       (pauses, refunds, contracts) -> 2.4 pauses by acquisition lead (id outcomes-6, added 20 Nov 2026) -> 2.5 up to vs above $250K today
+       (id outcomes-4) -> 2.6 milestones reached (id outcomes-5). Scene ids are stable keys; `order` sets the displayed numbers.
    Every count is a Jira issue (one per search) by its status on the data date, so the scenes add up to each other and to the
    Cash Forecast's groups (reconciled in the Executive Summary). */
 (function () {
@@ -247,34 +247,6 @@
     });
   }
 
-  /* 2.4 is A1 putting more searches into Paused than the other leads? (added 20 Nov 2026; id outcomes-7). The plain-language version of 2.5:
-     per 100 searches, A1 against the other assigned leads. Leads appear only as aliases. */
-  function pauseGap(main, D, ch, of) {
-    const L = D.outcomes.leads, big = L.largest, a = L.groups.largest, o = L.groups.others;
-    const ra = a.paused / a.n, ro = o.paused / o.n, ka = Math.round(ra * 100), ko = Math.round(ro * 100), times = Math.round(ra / ro);
-    const dots = (k, c) => Array.from({ length: 100 }, (_, i) => `<i class="${i < k ? 'on' : ''}" style="${i < k ? `background:${c}` : ''}"></i>`).join('');
-    const body = S.scene(main, { ch, step: 7, of, label: `Is ${big} pausing more?`,
-      title: `Yes: ${big} puts searches into Paused about ${times} times as often as the other leads, even though ${big} has more clients` });
-    body.innerHTML = `<div class="board" id="pgBoard">
-        <div class="ptools"><div class="pl"><span class="vt-l">Jira, ${S.date(D.meta.asof)} · every 100 searches</span></div><div class="pr">${S.ui.toggle()}</div></div>
-        <div class="pv-chart"><div class="pg" role="img" aria-label="Of every 100 searches, ${ka} are paused for ${big} and ${ko} for the other leads. ${big}: ${a.paused} of ${a.n}. Other leads: ${o.paused} of ${o.n}.">
-          <div class="pg-col"><p class="pg-h"><b style="color:var(--sales)">${big}</b><small>${S.int(a.n)} searches</small></p><div class="pg-grid">${dots(ka, 'var(--sales)')}</div><p class="pg-n"><span class="num" style="color:var(--sales)">${ka}</span> in every 100 are paused<small>${S.int(a.paused)} of ${S.int(a.n)} searches (${S.pct(ra, 1)})</small></p></div>
-          <div class="pg-x"><span class="num">${times}×</span><small>as often</small></div>
-          <div class="pg-col"><p class="pg-h"><b>Other leads</b><small>${S.int(o.n)} searches</small></p><div class="pg-grid">${dots(ko, 'var(--hold)')}</div><p class="pg-n"><span class="num">${ko}</span> in every 100 are paused<small>${S.int(o.paused)} of ${S.int(o.n)} searches (${S.pct(ro, 1)})</small></p></div>
-        </div>
-        <div class="legend"><span><i style="background:var(--sales)"></i>Paused, ${big}</span><span><i style="background:var(--hold)"></i>Paused, other leads</span><span><i style="background:var(--hold-2)"></i>Not paused</span></div></div>
-        <div class="pv-table tw" id="pgTable"></div>
-      </div>
-      <p class="cap">Each square is one search out of every 100, rounded; the counts underneath are exact. "Other leads" = every other assigned lead (${S.int(o.n)} searches); Unassigned searches are left out. The next section shows where ${big}'s pauses come from.</p>`;
-    S.ui.table(S.$('#pgTable', body), [
-      { k: 'label', label: 'Group', html: r => `<b>${r.label}</b>` },
-      { k: 'n', label: 'Searches', num: true, html: r => S.int(r.n) },
-      { k: 'paused', label: 'Paused', num: true, html: r => S.int(r.paused) },
-      { k: 'rate', label: 'Paused, per 100 searches', num: true, html: r => `${(r.paused / r.n * 100).toFixed(1)}` },
-    ], [{ label: big, n: a.n, paused: a.paused }, { label: 'Other leads', n: o.n, paused: o.paused }], { caption: `Paused searches: ${big} against the other leads`, sortable: false });
-    S.ui.wire(S.$('#pgBoard', body));
-  }
-
   /* 2.4 pauses by acquisition lead (added 20 Nov 2026; scene id outcomes-6, shown 4th). Unit = search. Leads appear only as aliases (A1, A2, ...)
      drawn at random, independent of any figure; the mapping stays in the private Explorer repo. Three answers in reading order: the pause rate
      per lead with the median start-to-pause in the same row order; where the largest portfolio's extra pauses come from (status before the
@@ -284,23 +256,26 @@
     const L = D.outcomes.leads, G = L.groups, big = L.largest, sec = L.second, gS = G.second, gR = G.rest, gL = G.largest, gO = G.others, gA = G.assigned, gAll = G.all, mh = L.mh.by_start_half;
     const st = { coh: 'all', mix: 'path' };
     const p1 = v => (v * 100).toFixed(1) + '%', f1 = v => (Math.round(v * 10) / 10).toFixed(1), per = (k, n) => (n ? (100 * k) / n : 0);
-    const pts = v => (v * 100).toFixed(1), rate = g => (g.n ? g.paused / g.n : 0), l8 = g => g.long.paused / (g.long.paused + g.long.hunting);
+    const pts = v => (v * 100).toFixed(1), rate = g => (g.n ? g.paused / g.n : 0);
     const hp = g => (g.stages.hunting + g.stages.paused) / g.n, ev = g => g.hist.documented + g.hist.ended, sum = (rs, f) => rs.reduce((a, r) => a + f(r), 0);
     const OTH = 'Other assigned leads', un = L.rows.find(r => r.alias === 'Unassigned'), small = L.rows.filter(r => r.small);
     const sized = L.rows.filter(r => !r.small && r.alias !== 'Unassigned');
     const smRow = small.length ? { alias: `${small.length} smaller`, sub: `${small.map(r => r.alias).join(', ')}`, n: sum(small, r => r.n), paused: sum(small, r => r.paused), dated: sum(small, r => r.dated), median: null, merged: true, stages: { hunting: sum(small, r => r.stages.hunting), paused: sum(small, r => r.stages.paused) },
       y2026: { n: sum(small, r => r.y2026.n), paused: sum(small, r => r.y2026.paused), dated: sum(small, r => r.y2026.dated), median: null } } : null;
     const rows = [...sized, ...(smRow ? [smRow] : []), un];
+    const STG = [['purchased', 'Purchased', 'closed'], ['under_contract', 'Under contract', 'uc'], ['hunting', 'Hunting', 'wait'], ['paused', 'Paused', 'paused'], ['refunded', 'Refunded', 'refund'], ['additional', 'Additional Service', 'hold-2']];
+    smRow && (smRow.stages = Object.fromEntries([...STG.map(([k]) => k), 'other'].map(k => [k, sum(small, r => r.stages[k] || 0)])));
+    const rows2 = [...rows, { alias: 'All assigned', sub: 'every lead above', n: gA.n, paused: gA.paused, stages: gA.stages }];
     const cut = r => (st.coh === 'y26' ? Object.assign({ alias: r.alias, sub: r.sub, merged: r.merged }, r.y2026) : r);
     const gapAll = rate(gL) - rate(gO), gap8 = (gL.path.long_search / gL.n) - (gO.path.long_search / gO.n);
     const histEv = gL.cross.long_search_ev + gL.cross.earlier_ev;
     const body = S.scene(main, { ch, step: 6, of, label: 'Pauses by acquisition lead',
-      title: `${big} holds ${S.pct(gL.n / gA.n)} of assigned searches but ${S.pct(gL.paused / gA.paused)} of current pauses: most of the gap is long searches moved to Paused rather than kept at 8 Weeks, not faster pausing` });
+      title: `${big} holds ${S.pct(gL.n / gA.n)} of assigned searches but ${S.pct(gL.paused / gA.paused)} of current pauses: ${Math.round(rate(gL) * 100)} in every 100 of its searches are paused, against ${Math.round(rate(gO) * 100)} for the other leads` });
     const rowAria = rows.map(r => `${r.alias}: ${r.paused} of ${r.n} paused (${p1(rate(r))})${r.median != null ? `, median ${S.med(r.median)} days from start to pause (${r.dated} searches)` : ''}`).join('; ');
-    body.innerHTML = `<div class="figs qf four">
-        <div class="fig emph"><span class="v num"><span class="from">${p1(rate(gL))}</span><span class="ar2">vs</span>${p1(rate(gO))}</span><span class="l"><i style="background:var(--paused)"></i><b>paused today</b>: ${big} ${S.int(gL.paused)} of ${S.int(gL.n)} searches; ${sec} ${S.int(gS.paused)} of ${S.int(gS.n)} (${p1(rate(gS))}); the rest ${S.int(gR.paused)} of ${S.int(gR.n)} (${p1(rate(gR))}) ${S.ui.chip('rec')}</span></div>
+    body.innerHTML = `<div class="figs qf four ld-figs">
+        <div class="fig emph"><span class="v num"><span class="from">${Math.round(rate(gL) * 100)}</span><span class="ar2">vs</span>${Math.round(rate(gO) * 100)}</span><span class="l"><i style="background:var(--sales)"></i><b>paused per 100 searches</b>: ${big} ${S.int(gL.paused)} of ${S.int(gL.n)}; the other leads ${S.int(gO.paused)} of ${S.int(gO.n)} ${S.ui.chip('rec')}</span></div>
         <div class="fig"><span class="v num"><span class="from">${S.pct(gL.n / gA.n)}</span><span class="ar2">→</span>${S.pct(gL.paused / gA.paused)}</span><span class="l"><i style="background:var(--ink-2)"></i>${big}'s share of the ${S.int(gA.n)} assigned searches, then of their ${S.int(gA.paused)} current pauses</span></div>
-        <div class="fig emph"><span class="v num"><span class="from">${S.pct(l8(gL))}</span><span class="ar2">vs</span>${S.pct(l8(gO))}</span><span class="l"><i style="background:var(--wait)"></i><b>of 8-week searches are paused</b>, not still hunting: ${S.int(gL.long.paused)} of ${S.int(gL.long.paused + gL.long.hunting)} for ${big}, ${S.int(gO.long.paused)} of ${S.int(gO.long.paused + gO.long.hunting)} for the others</span></div>
+        <div class="fig"><span class="v num"><span class="from">${Math.round(rate(gS) * 100)}</span><span class="ar2">vs</span>${Math.round(rate(gR) * 100)}</span><span class="l"><i style="background:var(--acq)"></i>${sec}, the second largest: ${S.int(gS.paused)} of ${S.int(gS.n)}; the remaining leads ${S.int(gR.paused)} of ${S.int(gR.n)}, per 100 searches</span></div>
         <div class="fig"><span class="v num">${S.med(gL.median)}<span class="ar2">vs</span>${S.med(gO.median)}<small>days</small></span><span class="l"><i style="background:var(--ink-2)"></i>median start to pause (${S.int(gL.dated)} and ${S.int(gO.dated)} still paused); 2026 starts ${S.med(gL.y2026.median)} vs ${S.med(gO.y2026.median)}: <b>not sooner</b></span></div>
       </div>
       <div class="board" id="ldBoard">
@@ -315,18 +290,12 @@
               <div class="chart h-mix" id="ldMix" role="img" aria-label="Paused per 100 searches by the status before the pause: ${big} ${['long_search', 'earlier', 'contract'].map(k => `${k.replace('_', ' ')} ${f1(per(gL.path[k], gL.n))}`).join(', ')}; other assigned leads ${['long_search', 'earlier', 'contract'].map(k => `${k.replace('_', ' ')} ${f1(per(gO.path[k], gO.n))}`).join(', ')}."></div>
               <div class="legend" id="ldMixKey"></div></div>
             <aside class="lx-note" id="ldMixNote"></aside></div>
-          <div class="lx"><div><p class="duo-h"><span class="duo-v">${S.int(gL.long.paused + gL.long.hunting + gO.long.paused + gO.long.hunting)}</span>assigned searches reached 8 Weeks and have no contract today: paused or still hunting? <small>last search status 8 Weeks · Jira, ${S.date(D.meta.asof)}</small></p>
-              <div class="l8" role="img" aria-label="Searches that reached 8 Weeks with no contract today. ${big}: ${gL.long.paused} paused, ${gL.long.hunting} still hunting (${S.pct(l8(gL))} paused). Other assigned leads: ${gO.long.paused} paused, ${gO.long.hunting} still hunting (${S.pct(l8(gO))} paused).">
-                ${[[big, gL, 'var(--sales)'], [sec, gS, 'var(--acq)'], ['Other leads', gR, 'var(--hold)']].map(([lab, g, c]) => `<div class="l8-row"><span class="l8-lab"><b style="color:${c}">${lab}</b><small>${S.int(g.long.paused + g.long.hunting)} searches</small></span><div class="l8-bar"><i class="l8-p" style="flex:${g.long.paused} 1 0;background:${c}" title="Paused after 8 Weeks: ${g.long.paused}">${g.long.paused}</i><i class="l8-h" style="flex:${g.long.hunting} 1 0" title="Still hunting at 8 Weeks: ${g.long.hunting}">${g.long.hunting}</i></div><span class="l8-v num">${S.pct(l8(g))}<small>paused</small></span></div>`).join('')}
-              </div>
-              <div class="legend"><span><i style="background:var(--sales)"></i>Paused straight from 8 Weeks (in the lead's colour)</span><span><i style="background:var(--wait-2);box-shadow:inset 0 0 0 1.5px var(--wait)"></i>Still hunting at 8 Weeks</span></div></div>
-            <aside class="lx-note"><b>Where the gap sits.</b> ${big} has moved ${S.int(gL.long.paused)} of its ${S.int(gL.long.paused + gL.long.hunting)} long searches to Paused; ${sec} ${S.int(gS.long.paused)} of ${S.int(gS.long.paused + gS.long.hunting)}; the remaining leads keep most of theirs at 8 Weeks (${S.int(gR.long.hunting)} of ${S.int(gR.long.paused + gR.long.hunting)}). Counting hunting and paused together, the gap narrows from ${pts(gapAll)} to ${pts(hp(gL) - hp(gO))} points (${p1(hp(gL))} vs ${p1(hp(gO))}). Jira records no reason for a pause, so the records cannot say whether clients stepped back or how statuses are kept.</aside></div>
+          <div class="lx"><div><p class="duo-h"><span class="duo-v">100%</span>of each lead's searches, by where they stand today <small>each bar adds to 100% of that lead's searches · segments show count · %</small></p>
+            <div class="chart h-hp" id="ldHP" role="img" aria-label="Every search by where it stands today, as a share of each lead's searches. ${rows2.map(r => `${r.alias}: ${r.n} searches, ${STG.map(([k, l]) => `${l} ${r.stages[k] || 0}`).join(', ')}`).join('; ')}."></div>
+            <div class="legend">${STG.map(([k, l, c]) => `<span><i style="background:var(--${c})"></i>${l}</span>`).join('')}</div></div>
+          <aside class="lx-note" id="ldHPNote"></aside></div>
         </div>
-        <div class="lx"><div><p class="duo-h"><span class="duo-v">${p1(hp(gA))}</span>of assigned searches are hunting or paused: the whole open backlog, lead by lead <small>hunting + paused, % of the lead's searches · segments: count · % of the lead's searches; end of bar: open of total</small></p>
-            <div class="chart h-hp" id="ldHP" role="img" aria-label="Hunting plus paused as a share of each lead's searches. ${rows.map(r => `${r.alias}: ${r.stages.hunting} hunting + ${r.stages.paused} paused of ${r.n} = ${p1((r.stages.hunting + r.stages.paused) / r.n)}`).join('; ')}."></div>
-            <div class="legend"><span><i style="background:var(--wait)"></i>Hunting</span><span><i style="background:var(--paused)"></i>Paused</span><span><i class="dash" style="color:var(--ink-2)"></i>All assigned leads</span></div></div>
-          <aside class="lx-note"><b>Paused plus hunting, together.</b> ${big} has ${S.int(gL.stages.hunting + gL.stages.paused)} of its ${S.int(gL.n)} searches open (${p1(hp(gL))}), ${sec} ${S.int(gS.stages.hunting + gS.stages.paused)} of ${S.int(gS.n)} (${p1(hp(gS))}), the remaining leads ${S.int(gR.stages.hunting + gR.stages.paused)} of ${S.int(gR.n)} (${p1(hp(gR))}). ${big}'s open searches are mostly paused (${S.int(gL.stages.paused)} of ${S.int(gL.stages.hunting + gL.stages.paused)}); ${sec}'s are split about evenly (${S.int(gS.stages.paused)} paused, ${S.int(gS.stages.hunting)} hunting); the remaining leads' are mostly still hunting (${S.int(gR.stages.hunting)} of ${S.int(gR.stages.hunting + gR.stages.paused)}). Unassigned searches are mostly hunting.</aside></div>
-        <div class="pv-table"><div class="tw" id="ldTable"></div><p class="t-h2">Start cohorts: ${big} against the other assigned leads</p><div class="tw" id="ldCoh"></div></div>
+        <div class="pv-table"><div class="tw" id="ldTable"></div><p class="t-h2">Every search by where it stands today (100% = all of the lead's searches)</p><div class="tw" id="ldStages"></div><p class="t-h2">Start cohorts: ${big} against the other assigned leads</p><div class="tw" id="ldCoh"></div></div>
       </div>
       ${S.ui.ex('How is this built?', [
         `<p class="ex-h">Unit and lead</p><p>One row per <b>search</b>: a signed-up Jira record (${S.int(gAll.n)}), so a repeat client counts once per search. Lead = the Jira Acq Lead the search is assigned to on ${S.date(D.meta.asof)} (current assignee). ${S.int(un.n)} searches have no lead (Unassigned, ${S.int(un.paused)} paused); they are in every total and outside the lead comparison, so the largest portfolio is compared with the other ${S.int(gO.n)} assigned searches. ${S.int(L.reassigned.n)} search changed lead between the 12 Nov extract and ${S.date(D.meta.asof)} (${S.int(L.reassigned.paused)} paused).</p>
@@ -432,22 +401,23 @@
     });
 
     S.chart(S.$('#ldHP', body), t => {
-      const rs = rows, tot = (gA.stages.hunting + gA.stages.paused) / gA.n;
-      const share = (r, k) => r.stages[k] / r.n, lab = r => `{a|${r.alias}}\n{n|${S.int(r.n)} searches in total}`;
+      const rs = rows2, col = { closed: t.closed, uc: t.uc, wait: t.wait, paused: t.paused, refund: t.refund, 'hold-2': t.hold2 };
+      const sh = (r, k) => (r.stages[k] || 0) / r.n, lab = r => `{a|${r.alias}}\n{n|${S.int(r.n)} searches}`;
       return Object.assign(S.base(t), {
-        tooltip: Object.assign(S.base(t).tooltip, { trigger: 'item', confine: true, formatter: p => { const r = rs[p.dataIndex], k = p.seriesIndex === 0 ? 'hunting' : 'paused';
-          return `<b>${r.alias}</b>${r.sub ? ` (${r.sub})` : ''} · ${S.int(r.n)} searches<br>${k === 'hunting' ? 'Hunting' : 'Paused'}: <b>${S.int(r.stages[k])}</b> (${p1(share(r, k))})<br>Hunting + paused: <b>${S.int(r.stages.hunting + r.stages.paused)}</b> (${p1((r.stages.hunting + r.stages.paused) / r.n)})`; } }),
-        grid: { left: 124, right: 150, top: 28, bottom: 34 },
-        xAxis: { type: 'value', min: 0, max: 0.8, interval: 0.2, axisLabel: { color: t.label, fontSize: 12, formatter: v => Math.round(v * 100) + '%' }, splitLine: { lineStyle: { color: t.grid } } },
+        tooltip: Object.assign(S.base(t).tooltip, { trigger: 'item', confine: true, formatter: p => { const r = rs[p.dataIndex], [k, l] = STG[p.seriesIndex];
+          return `<b>${r.alias}</b>${r.sub && r.alias !== 'All assigned' ? ` (${r.sub})` : ''} · ${S.int(r.n)} searches<br>${l}: <b>${S.int(r.stages[k] || 0)}</b> (${p1(sh(r, k))})`; } }),
+        grid: { left: 124, right: 16, top: 8, bottom: 30 },
+        xAxis: { type: 'value', min: 0, max: 1, interval: 0.25, axisLabel: { color: t.label, fontSize: 12, formatter: v => Math.round(v * 100) + '%' }, splitLine: { lineStyle: { color: t.grid } } },
         yAxis: { type: 'category', inverse: true, data: rs.map(r => r.alias), axisTick: { show: false }, axisLine: { lineStyle: { color: t.axis } },
           axisLabel: { formatter: (v, i) => lab(rs[i]), rich: { a: { color: t.ink, fontSize: 14, fontWeight: 700, lineHeight: 18, fontFamily: DISPLAY }, n: { color: t.muted, fontSize: 11.5, lineHeight: 15 } } } },
-        series: [['hunting', t.wait, 'Hunting'], ['paused', t.paused, 'Paused']].map(([k, c], si) => ({ name: k, type: 'bar', stack: 'hp', barWidth: '58%',
-          itemStyle: { color: c, borderColor: t.surface, borderWidth: 1.5, borderRadius: si ? [0, 4, 4, 0] : [4, 0, 0, 4] },
-          label: { show: true, color: '#fff', fontWeight: 700, fontSize: 12.5, formatter: p => (p.value >= 0.11 ? `${S.int(rs[p.dataIndex].stages[k])} · ${p1(p.value)}` : p.value >= 0.04 ? S.int(rs[p.dataIndex].stages[k]) : '') },
-          data: rs.map(r => share(r, k)),
-          ...(si ? { markLine: { symbol: 'none', silent: true, lineStyle: { color: t.ink2, type: 'dashed', width: 1.4 }, label: { show: true, position: 'start', distance: 6, formatter: `all assigned ${p1(tot)}`, color: t.ink2, fontSize: 12, fontWeight: 600 }, data: [{ xAxis: tot }] } } : {}) })).concat([{ type: 'scatter', silent: true, symbolSize: 0, data: rs.map((r, i) => [(r.stages.hunting + r.stages.paused) / r.n, i]), label: { show: true, position: 'right', distance: 8, color: t.ink, fontWeight: 700, fontSize: 12.5, formatter: p => { const r = rs[p.dataIndex], o = r.stages.hunting + r.stages.paused; return `${S.int(o)} of ${S.int(r.n)} · ${p1(p.value[0])}`; }, backgroundColor: t.surface, padding: [2, 4] }, xAxisIndex: 0, yAxisIndex: 0, z: 5 }]),
+        series: STG.map(([k, , c], si) => ({ name: k, type: 'bar', stack: 'st', barWidth: '62%',
+          itemStyle: { color: col[c], borderColor: k === 'paused' ? t.ink : t.surface, borderWidth: k === 'paused' ? 1.4 : 1.5, borderRadius: si === 0 ? [4, 0, 0, 4] : si === STG.length - 1 ? [0, 4, 4, 0] : 0 },
+          label: { show: true, color: ['hold-2'].includes(c) ? t.ink : '#fff', fontWeight: 700, fontSize: 12, formatter: p => { const v = p.value, r = rs[p.dataIndex]; return v >= 0.1 ? `${S.int(r.stages[k] || 0)} · ${Math.round(v * 100)}%` : v >= 0.045 ? `${Math.round(v * 100)}%` : ''; } },
+          data: rs.map(r => sh(r, k)) })),
       });
     });
+    const sp = (g, k) => Math.round(100 * (g.stages[k] || 0) / g.n);
+    S.$('#ldHPNote', body).innerHTML = `<b>Every search, in one row.</b> Each bar is 100% of that lead's searches, so bars of different lengths compare fairly. ${big}: ${sp(gL, 'purchased')}% purchased, ${sp(gL, 'under_contract')}% under contract, ${sp(gL, 'hunting')}% hunting, <b>${sp(gL, 'paused')}% paused</b>, ${sp(gL, 'refunded')}% refunded. The other leads: ${sp(gO, 'purchased')}% purchased, ${sp(gO, 'under_contract')}% under contract, ${sp(gO, 'hunting')}% hunting, <b>${sp(gO, 'paused')}% paused</b>, ${sp(gO, 'refunded')}% refunded. The paused slice is the big difference; ${big} also has fewer still hunting and a lower purchased share.`;
 
     /* Table view: every lead, then the start cohorts (the cohort cuts behind the switch) */
     const tRow = r => Object.assign({}, r, { rate: rate(r) });
@@ -464,10 +434,13 @@
       { k: 'hev', label: 'Ended contract or fall-through', num: true, sv: r => ev(r), html: r => `${S.int(ev(r))}${r.hist.documented ? `<small>${r.hist.documented} documented</small>` : ''}` },
       { k: 'hno', label: 'No contract on record', num: true, sv: r => r.hist.none, html: r => S.int(r.hist.none) },
       { k: 'hp', label: 'Hunting + paused', num: true, sv: r => (r.stages.hunting + r.stages.paused) / r.n, html: r => `${p1((r.stages.hunting + r.stages.paused) / r.n)}<small>${S.int(r.stages.hunting)} + ${S.int(r.stages.paused)}</small>` },
-      { k: 'l8', label: '8 Weeks: paused of all', num: true, sv: r => (r.long.paused + r.long.hunting ? l8(r) : null), html: r => (r.long.paused + r.long.hunting ? `${S.int(r.long.paused)} of ${S.int(r.long.paused + r.long.hunting)}<small>${S.pct(l8(r))}</small>` : '–') },
       { k: 'y26', label: '2026 starts: paused', num: true, sv: r => (r.y2026.n ? r.y2026.paused / r.y2026.n : null), html: r => (r.y2026.n ? `${S.int(r.y2026.paused)} of ${S.int(r.y2026.n)}<small>${p1(r.y2026.paused / r.y2026.n)}${r.y2026.median != null ? ` · ${S.med(r.y2026.median)} d` : ''}</small>` : '–') },
     ], L.rows.map(tRow), { caption: 'Pauses by acquisition lead, every lead',
       total: [Object.assign(tRow(gA), { alias: 'All assigned leads', sub: `${S.int(L.rows.length - 1)} leads`, _tot: true }), Object.assign(tRow(gAll), { alias: 'All searches', sub: 'incl. Unassigned', _tot: true, _all: true })] });
+    S.ui.table(S.$('#ldStages', body), [
+      { k: 'alias', label: 'Lead', html: r => `<b>${r.alias}</b><small>${S.int(r.n)} searches</small>` },
+      ...STG.map(([k, l]) => ({ k, label: l, num: true, sv: r => (r.stages[k] || 0) / r.n, html: r => `${p1((r.stages[k] || 0) / r.n)}<small>${S.int(r.stages[k] || 0)}</small>` })),
+    ], rows2, { caption: 'Every search by stage, per lead' });
     const cc = r => `${S.int(r.paused)} of ${S.int(r.n)}<small>${r.n ? p1(r.paused / r.n) : '–'}</small>`;
     S.ui.table(S.$('#ldCoh', body), [
       { k: 'label', label: 'Start half-year', html: r => r.label },
@@ -486,7 +459,7 @@
     });
   }
 
-  /* 2.6 up to vs above $250K: where each group stands today (scene id outcomes-4) */
+  /* 2.5 up to vs above $250K: where each group stands today (scene id outcomes-4) */
   function budgetToday(main, D, ch, of) {
     const B = D.budgets, G = Object.fromEntries(B.groups.map(g => [g.label, g])), lo = G['Up to $250K'], hi = G['Above $250K'], nr = G['Not recorded'];
     const mh = B.mh.refunded.find(x => x.w === 30), sh = (g, k) => (g.stages[k] || 0) / g.n;
@@ -538,13 +511,12 @@
 
   S.chapter('outcomes', {
     n: 2, title: 'Where are our searches today?',
-    order: ['outcomes-1', 'outcomes-2', 'outcomes-3', 'outcomes-7', 'outcomes-6', 'outcomes-4', 'outcomes-5'],   // displayed order; ids are stable keys (deep links)
+    order: ['outcomes-1', 'outcomes-2', 'outcomes-3', 'outcomes-6', 'outcomes-4', 'outcomes-5'],   // displayed order; ids are stable keys (deep links)
     render(main, D, ch) {
-      const OF = 7, at = D.outcomes.attainment;
+      const OF = 6, at = D.outcomes.attainment;
       stages(main, D, ch, OF);
       hunting(main, D, ch, OF);
       others(main, D, ch, OF);
-      pauseGap(main, D, ch, OF);
       byLead(main, D, ch, OF);
       budgetToday(main, D, ch, OF);
       const body = S.scene(main, { ch, step: 5, of: OF, label: 'Milestones reached', title: `${S.pct(at.uc_share)} of Active clients have recorded Under Contract, ${S.pct(at.closed_share)} CLOSED` });
