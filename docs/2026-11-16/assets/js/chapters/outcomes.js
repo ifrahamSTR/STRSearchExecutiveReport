@@ -260,7 +260,7 @@
     const hp = g => (g.stages.hunting + g.stages.paused) / g.n, ev = g => g.hist.documented + g.hist.ended, sum = (rs, f) => rs.reduce((a, r) => a + f(r), 0);
     const OTH = 'Other assigned leads', un = L.rows.find(r => r.alias === 'Unassigned'), small = L.rows.filter(r => r.small);
     const sized = L.rows.filter(r => !r.small && r.alias !== 'Unassigned');
-    const smRow = small.length ? { alias: `${small.length} smaller`, sub: `${small.map(r => r.alias).join(', ')}`, n: sum(small, r => r.n), paused: sum(small, r => r.paused), dated: sum(small, r => r.dated), median: null, merged: true,
+    const smRow = small.length ? { alias: `${small.length} smaller`, sub: `${small.map(r => r.alias).join(', ')}`, n: sum(small, r => r.n), paused: sum(small, r => r.paused), dated: sum(small, r => r.dated), median: null, merged: true, stages: { hunting: sum(small, r => r.stages.hunting), paused: sum(small, r => r.stages.paused) },
       y2026: { n: sum(small, r => r.y2026.n), paused: sum(small, r => r.y2026.paused), dated: sum(small, r => r.y2026.dated), median: null } } : null;
     const rows = [...sized, ...(smRow ? [smRow] : []), un];
     const cut = r => (st.coh === 'y26' ? Object.assign({ alias: r.alias, sub: r.sub, merged: r.merged }, r.y2026) : r);
@@ -294,6 +294,10 @@
               <div class="legend"><span><i style="background:var(--sales)"></i>Paused straight from 8 Weeks (in the lead's colour)</span><span><i style="background:var(--wait-2);box-shadow:inset 0 0 0 1.5px var(--wait)"></i>Still hunting at 8 Weeks</span></div></div>
             <aside class="lx-note"><b>Where the gap sits.</b> ${big} has moved ${S.int(gL.long.paused)} of its ${S.int(gL.long.paused + gL.long.hunting)} long searches to Paused; ${sec} ${S.int(gS.long.paused)} of ${S.int(gS.long.paused + gS.long.hunting)}; the remaining leads keep most of theirs at 8 Weeks (${S.int(gR.long.hunting)} of ${S.int(gR.long.paused + gR.long.hunting)}). Counting hunting and paused together, the gap narrows from ${pts(gapAll)} to ${pts(hp(gL) - hp(gO))} points (${p1(hp(gL))} vs ${p1(hp(gO))}). Jira records no reason for a pause, so the records cannot say whether clients stepped back or how statuses are kept.</aside></div>
         </div>
+        <div class="lx"><div><p class="duo-h"><span class="duo-v">${p1(hp(gA))}</span>of assigned searches are hunting or paused: the whole open backlog, lead by lead <small>hunting + paused, % of the lead's searches · count on each segment</small></p>
+            <div class="chart h-hp" id="ldHP" role="img" aria-label="Hunting plus paused as a share of each lead's searches. ${rows.map(r => `${r.alias}: ${r.stages.hunting} hunting + ${r.stages.paused} paused of ${r.n} = ${p1((r.stages.hunting + r.stages.paused) / r.n)}`).join('; ')}."></div>
+            <div class="legend"><span><i style="background:var(--wait)"></i>Hunting</span><span><i style="background:var(--paused)"></i>Paused</span><span><i class="dash" style="color:var(--ink-2)"></i>All assigned leads</span></div></div>
+          <aside class="lx-note"><b>Paused plus hunting, together.</b> ${big} has ${S.int(gL.stages.hunting + gL.stages.paused)} of its ${S.int(gL.n)} searches open (${p1(hp(gL))}), ${sec} ${S.int(gS.stages.hunting + gS.stages.paused)} of ${S.int(gS.n)} (${p1(hp(gS))}), the remaining leads ${S.int(gR.stages.hunting + gR.stages.paused)} of ${S.int(gR.n)} (${p1(hp(gR))}). ${big}'s open searches are mostly paused (${S.int(gL.stages.paused)} of ${S.int(gL.stages.hunting + gL.stages.paused)}); ${sec}'s are split about evenly (${S.int(gS.stages.paused)} paused, ${S.int(gS.stages.hunting)} hunting); the remaining leads' are mostly still hunting (${S.int(gR.stages.hunting)} of ${S.int(gR.stages.hunting + gR.stages.paused)}). Unassigned searches are mostly hunting.</aside></div>
         <div class="pv-table"><div class="tw" id="ldTable"></div><p class="t-h2">Start cohorts: ${big} against the other assigned leads</p><div class="tw" id="ldCoh"></div></div>
       </div>
       ${S.ui.ex('How is this built?', [
@@ -399,6 +403,24 @@
       });
     });
 
+    S.chart(S.$('#ldHP', body), t => {
+      const rs = rows, tot = (gA.stages.hunting + gA.stages.paused) / gA.n;
+      const share = (r, k) => r.stages[k] / r.n, lab = r => `{a|${r.alias}}\n{n|${S.int(r.n)} searches}`;
+      return Object.assign(S.base(t), {
+        tooltip: Object.assign(S.base(t).tooltip, { trigger: 'item', confine: true, formatter: p => { const r = rs[p.dataIndex], k = p.seriesIndex === 0 ? 'hunting' : 'paused';
+          return `<b>${r.alias}</b>${r.sub ? ` (${r.sub})` : ''} · ${S.int(r.n)} searches<br>${k === 'hunting' ? 'Hunting' : 'Paused'}: <b>${S.int(r.stages[k])}</b> (${p1(share(r, k))})<br>Hunting + paused: <b>${S.int(r.stages.hunting + r.stages.paused)}</b> (${p1((r.stages.hunting + r.stages.paused) / r.n)})`; } }),
+        grid: { left: 112, right: 70, top: 28, bottom: 34 },
+        xAxis: { type: 'value', min: 0, max: 0.8, interval: 0.2, axisLabel: { color: t.label, fontSize: 12, formatter: v => Math.round(v * 100) + '%' }, splitLine: { lineStyle: { color: t.grid } } },
+        yAxis: { type: 'category', inverse: true, data: rs.map(r => r.alias), axisTick: { show: false }, axisLine: { lineStyle: { color: t.axis } },
+          axisLabel: { formatter: (v, i) => lab(rs[i]), rich: { a: { color: t.ink, fontSize: 14, fontWeight: 700, lineHeight: 18, fontFamily: DISPLAY }, n: { color: t.muted, fontSize: 11.5, lineHeight: 15 } } } },
+        series: [['hunting', t.wait, 'Hunting'], ['paused', t.paused, 'Paused']].map(([k, c], si) => ({ name: k, type: 'bar', stack: 'hp', barWidth: '58%',
+          itemStyle: { color: c, borderColor: t.surface, borderWidth: 1.5, borderRadius: si ? [0, 4, 4, 0] : [4, 0, 0, 4] },
+          label: { show: true, color: '#fff', fontWeight: 700, fontSize: 12.5, formatter: p => (p.value >= 0.05 ? S.int(rs[p.dataIndex].stages[k]) : '') },
+          data: rs.map(r => share(r, k)),
+          ...(si ? { markLine: { symbol: 'none', silent: true, lineStyle: { color: t.ink2, type: 'dashed', width: 1.4 }, label: { show: true, position: 'start', distance: 6, formatter: `all assigned ${p1(tot)}`, color: t.ink2, fontSize: 12, fontWeight: 600 }, data: [{ xAxis: tot }] } } : {}) })).concat([{ type: 'scatter', silent: true, symbolSize: 0, data: rs.map((r, i) => [(r.stages.hunting + r.stages.paused) / r.n, i]), label: { show: true, position: 'right', distance: 8, color: t.ink, fontWeight: 700, fontSize: 12.5, formatter: p => p1(p.value[0]), backgroundColor: t.surface, padding: [2, 4] }, xAxisIndex: 0, yAxisIndex: 0, z: 5 }]),
+      });
+    });
+
     /* Table view: every lead, then the start cohorts (the cohort cuts behind the switch) */
     const tRow = r => Object.assign({}, r, { rate: rate(r) });
     S.ui.table(S.$('#ldTable', body), [
@@ -413,6 +435,7 @@
       { k: 'po', label: 'Other / not recorded', num: true, sv: r => r.path.other + r.path.unknown, html: r => S.int(r.path.other + r.path.unknown) },
       { k: 'hev', label: 'Ended contract or fall-through', num: true, sv: r => ev(r), html: r => `${S.int(ev(r))}${r.hist.documented ? `<small>${r.hist.documented} documented</small>` : ''}` },
       { k: 'hno', label: 'No contract on record', num: true, sv: r => r.hist.none, html: r => S.int(r.hist.none) },
+      { k: 'hp', label: 'Hunting + paused', num: true, sv: r => (r.stages.hunting + r.stages.paused) / r.n, html: r => `${p1((r.stages.hunting + r.stages.paused) / r.n)}<small>${S.int(r.stages.hunting)} + ${S.int(r.stages.paused)}</small>` },
       { k: 'l8', label: '8 Weeks: paused of all', num: true, sv: r => (r.long.paused + r.long.hunting ? l8(r) : null), html: r => (r.long.paused + r.long.hunting ? `${S.int(r.long.paused)} of ${S.int(r.long.paused + r.long.hunting)}<small>${S.pct(l8(r))}</small>` : '–') },
       { k: 'y26', label: '2026 starts: paused', num: true, sv: r => (r.y2026.n ? r.y2026.paused / r.y2026.n : null), html: r => (r.y2026.n ? `${S.int(r.y2026.paused)} of ${S.int(r.y2026.n)}<small>${p1(r.y2026.paused / r.y2026.n)}${r.y2026.median != null ? ` · ${S.med(r.y2026.median)} d` : ''}</small>` : '–') },
     ], L.rows.map(tRow), { caption: 'Pauses by acquisition lead, every lead',
