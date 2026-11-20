@@ -240,7 +240,9 @@ def leads(ctx: C.Ctx) -> dict:
     assigned = s.lead.ne("Unassigned")
     s["is_big"] = s.lead.eq(big)
     cmpset = s[assigned]
-    groups = {"largest": block(s.is_big), "others": block(assigned & ~s.is_big), "assigned": block(assigned), "all": block(pd.Series(True, index=s.index))}
+    second = order[1]
+    groups = {"largest": block(s.is_big), "second": block(s.lead.eq(second)), "rest": block(assigned & ~s.is_big & s.lead.ne(second)),
+              "others": block(assigned & ~s.is_big), "assigned": block(assigned), "all": block(pd.Series(True, index=s.index))}
 
     COH = ["Before 2025", "2025 H1", "2025 H2", "2026 H1", "2026 H2", "No start date"]
     cohorts = []
@@ -254,7 +256,7 @@ def leads(ctx: C.Ctx) -> dict:
     mix = {k: {"largest": int((cmpset.is_big & cmpset[c].eq(v)).sum()), "others": int((~cmpset.is_big & cmpset[c].eq(v)).sum())}
            for k, c, v in (("complete", "pd_product", "Complete"), ("nce", "pd_experience", "New Client Experience"), ("won_rule", "start_rule", "won"))}
     return {
-        "largest": big, "min_row": LEAD_MIN_ROW, "min_median": LEAD_MIN_MEDIAN,
+        "largest": big, "second": second, "min_row": LEAD_MIN_ROW, "min_median": LEAD_MIN_MEDIAN,
         "rows": rows, "groups": groups, "cohorts": cohorts,
         "mh": {"by_start_half": mh_coh, "by_start_half_product": mh_coh_prod}, "mix": mix,
         "late_pause": int((paused & s.latest_status.ne("Paused")).sum()),          # paused on 16 Nov but not yet on 11 Nov: pause date unknown

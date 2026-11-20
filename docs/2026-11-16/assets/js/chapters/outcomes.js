@@ -253,7 +253,7 @@
      pause, or contract history, per 100 searches); and the 8-week searches, paused vs still hunting. Cohort cuts and the full breakdown sit
      behind the 2026-starts switch and the Table view. */
   function byLead(main, D, ch, of) {
-    const L = D.outcomes.leads, G = L.groups, big = L.largest, gL = G.largest, gO = G.others, gA = G.assigned, gAll = G.all, mh = L.mh.by_start_half;
+    const L = D.outcomes.leads, G = L.groups, big = L.largest, sec = L.second, gS = G.second, gR = G.rest, gL = G.largest, gO = G.others, gA = G.assigned, gAll = G.all, mh = L.mh.by_start_half;
     const st = { coh: 'all', mix: 'path' };
     const p1 = v => (v * 100).toFixed(1) + '%', f1 = v => (Math.round(v * 10) / 10).toFixed(1), per = (k, n) => (n ? (100 * k) / n : 0);
     const pts = v => (v * 100).toFixed(1), rate = g => (g.n ? g.paused / g.n : 0), l8 = g => g.long.paused / (g.long.paused + g.long.hunting);
@@ -270,7 +270,7 @@
       title: `${big} holds ${S.pct(gL.n / gA.n)} of assigned searches but ${S.pct(gL.paused / gA.paused)} of current pauses: most of the gap is long searches moved to Paused rather than kept at 8 Weeks, not faster pausing` });
     const rowAria = rows.map(r => `${r.alias}: ${r.paused} of ${r.n} paused (${p1(rate(r))})${r.median != null ? `, median ${S.med(r.median)} days from start to pause (${r.dated} searches)` : ''}`).join('; ');
     body.innerHTML = `<div class="figs qf four">
-        <div class="fig emph"><span class="v num"><span class="from">${p1(rate(gL))}</span><span class="ar2">vs</span>${p1(rate(gO))}</span><span class="l"><i style="background:var(--paused)"></i><b>paused today</b>: ${big} ${S.int(gL.paused)} of ${S.int(gL.n)} searches; the other assigned leads ${S.int(gO.paused)} of ${S.int(gO.n)} ${S.ui.chip('rec')}</span></div>
+        <div class="fig emph"><span class="v num"><span class="from">${p1(rate(gL))}</span><span class="ar2">vs</span>${p1(rate(gO))}</span><span class="l"><i style="background:var(--paused)"></i><b>paused today</b>: ${big} ${S.int(gL.paused)} of ${S.int(gL.n)} searches; ${sec} ${S.int(gS.paused)} of ${S.int(gS.n)} (${p1(rate(gS))}); the rest ${S.int(gR.paused)} of ${S.int(gR.n)} (${p1(rate(gR))}) ${S.ui.chip('rec')}</span></div>
         <div class="fig"><span class="v num"><span class="from">${S.pct(gL.n / gA.n)}</span><span class="ar2">→</span>${S.pct(gL.paused / gA.paused)}</span><span class="l"><i style="background:var(--ink-2)"></i>${big}'s share of the ${S.int(gA.n)} assigned searches, then of their ${S.int(gA.paused)} current pauses</span></div>
         <div class="fig emph"><span class="v num"><span class="from">${S.pct(l8(gL))}</span><span class="ar2">vs</span>${S.pct(l8(gO))}</span><span class="l"><i style="background:var(--wait)"></i><b>of 8-week searches are paused</b>, not still hunting: ${S.int(gL.long.paused)} of ${S.int(gL.long.paused + gL.long.hunting)} for ${big}, ${S.int(gO.long.paused)} of ${S.int(gO.long.paused + gO.long.hunting)} for the others</span></div>
         <div class="fig"><span class="v num">${S.med(gL.median)}<span class="ar2">vs</span>${S.med(gO.median)}<small>days</small></span><span class="l"><i style="background:var(--ink-2)"></i>median start to pause (${S.int(gL.dated)} and ${S.int(gO.dated)} still paused); 2026 starts ${S.med(gL.y2026.median)} vs ${S.med(gO.y2026.median)}: <b>not sooner</b></span></div>
@@ -280,7 +280,7 @@
         <div class="pv-chart">
           <div class="lx"><div><p class="duo-h"><span class="duo-v" id="ldV">${p1(rate(gAll))}</span><span id="ldHead">of all ${S.int(gAll.n)} searches are paused today. Each lead:</span> <small>leads by number of searches · bar = paused share · dot = median days from start to pause, line = middle half</small></p>
               <div class="chart h-lead" id="ldChart" role="img" aria-label="Pause rate and median days from start to pause by acquisition lead. ${rowAria}."></div>
-              <div class="legend"><span><i style="background:var(--paused)"></i>${big}: paused, % of its searches</span><span><i style="background:var(--hold-2);box-shadow:inset 0 0 0 1px var(--hold)"></i>Other leads</span><span><i class="dot" style="background:var(--ink)"></i>Median days from start to the current pause</span><span><i class="dash" style="color:var(--ink-2)"></i>All searches</span></div></div>
+              <div class="legend"><span><i style="background:var(--sales)"></i>${big}</span><span><i style="background:var(--acq)"></i>${sec}</span><span><i style="background:var(--hold-2);box-shadow:inset 0 0 0 1px var(--hold)"></i>Other leads</span><span><i class="dot" style="background:var(--ink)"></i>Median days from start to the current pause</span><span><i class="dash" style="color:var(--ink-2)"></i>All searches</span></div></div>
             <aside class="lx-note" id="ldNote"></aside></div>
           <div class="lx"><div><p class="duo-h"><span class="duo-v">${f1(100 * gapAll)}</span>more paused per 100 searches for ${big} than the other leads. What those pauses were: <small>paused searches per 100 searches · status first, as in 2.3</small></p>
               <div class="mixbar">${S.ui.seg('mix', 'Pause pathway', [['path', 'Status before the pause'], ['hist', 'Contract history']], 'path')}</div>
@@ -289,10 +289,10 @@
             <aside class="lx-note" id="ldMixNote"></aside></div>
           <div class="lx"><div><p class="duo-h"><span class="duo-v">${S.int(gL.long.paused + gL.long.hunting + gO.long.paused + gO.long.hunting)}</span>assigned searches reached 8 Weeks and have no contract today: paused or still hunting? <small>last search status 8 Weeks · Jira, ${S.date(D.meta.asof)}</small></p>
               <div class="l8" role="img" aria-label="Searches that reached 8 Weeks with no contract today. ${big}: ${gL.long.paused} paused, ${gL.long.hunting} still hunting (${S.pct(l8(gL))} paused). Other assigned leads: ${gO.long.paused} paused, ${gO.long.hunting} still hunting (${S.pct(l8(gO))} paused).">
-                ${[[big, gL], [OTH, gO]].map(([lab, g]) => `<div class="l8-row"><span class="l8-lab"><b>${lab}</b><small>${S.int(g.long.paused + g.long.hunting)} searches</small></span><div class="l8-bar"><i class="l8-p" style="flex:${g.long.paused} 1 0" title="Paused after 8 Weeks: ${g.long.paused}">${g.long.paused}</i><i class="l8-h" style="flex:${g.long.hunting} 1 0" title="Still hunting at 8 Weeks: ${g.long.hunting}">${g.long.hunting}</i></div><span class="l8-v num">${S.pct(l8(g))}<small>paused</small></span></div>`).join('')}
+                ${[[big, gL, 'var(--sales)'], [sec, gS, 'var(--acq)'], ['Other leads', gR, 'var(--hold)']].map(([lab, g, c]) => `<div class="l8-row"><span class="l8-lab"><b style="color:${c}">${lab}</b><small>${S.int(g.long.paused + g.long.hunting)} searches</small></span><div class="l8-bar"><i class="l8-p" style="flex:${g.long.paused} 1 0;background:${c}" title="Paused after 8 Weeks: ${g.long.paused}">${g.long.paused}</i><i class="l8-h" style="flex:${g.long.hunting} 1 0" title="Still hunting at 8 Weeks: ${g.long.hunting}">${g.long.hunting}</i></div><span class="l8-v num">${S.pct(l8(g))}<small>paused</small></span></div>`).join('')}
               </div>
-              <div class="legend"><span><i style="background:var(--paused)"></i>Paused, straight from 8 Weeks</span><span><i style="background:var(--wait-2);box-shadow:inset 0 0 0 1.5px var(--wait)"></i>Still hunting at 8 Weeks</span></div></div>
-            <aside class="lx-note"><b>Where the gap sits.</b> ${big} has moved ${S.int(gL.long.paused)} of its ${S.int(gL.long.paused + gL.long.hunting)} long searches to Paused; the other leads keep most of theirs at 8 Weeks (${S.int(gO.long.hunting)} of ${S.int(gO.long.paused + gO.long.hunting)}). Counting hunting and paused together, the gap narrows from ${pts(gapAll)} to ${pts(hp(gL) - hp(gO))} points (${p1(hp(gL))} vs ${p1(hp(gO))}). Jira records no reason for a pause, so the records cannot say whether clients stepped back or how statuses are kept.</aside></div>
+              <div class="legend"><span><i style="background:var(--sales)"></i>Paused straight from 8 Weeks (in the lead's colour)</span><span><i style="background:var(--wait-2);box-shadow:inset 0 0 0 1.5px var(--wait)"></i>Still hunting at 8 Weeks</span></div></div>
+            <aside class="lx-note"><b>Where the gap sits.</b> ${big} has moved ${S.int(gL.long.paused)} of its ${S.int(gL.long.paused + gL.long.hunting)} long searches to Paused; ${sec} ${S.int(gS.long.paused)} of ${S.int(gS.long.paused + gS.long.hunting)}; the remaining leads keep most of theirs at 8 Weeks (${S.int(gR.long.hunting)} of ${S.int(gR.long.paused + gR.long.hunting)}). Counting hunting and paused together, the gap narrows from ${pts(gapAll)} to ${pts(hp(gL) - hp(gO))} points (${p1(hp(gL))} vs ${p1(hp(gO))}). Jira records no reason for a pause, so the records cannot say whether clients stepped back or how statuses are kept.</aside></div>
         </div>
         <div class="pv-table"><div class="tw" id="ldTable"></div><p class="t-h2">Start cohorts: ${big} against the other assigned leads</p><div class="tw" id="ldCoh"></div></div>
       </div>
@@ -305,6 +305,7 @@
       ])}
       <p class="cap">Jira, status on ${S.date(D.meta.asof)} · ${S.int(gAll.n)} searches = ${S.int(gA.n)} assigned + ${S.int(un.n)} Unassigned; ${S.int(gAll.paused)} paused = ${S.int(gA.paused)} + ${S.int(un.paused)}, the same as 2.1 and 2.3 · a pattern in the records, not a cause.</p>`;
 
+    const LC = (a, t) => (a === big ? t.sales : a === sec ? t.acq : t.hold2);
     const chartNode = S.$('#ldChart', body), mixNode = S.$('#ldMix', body);
     const COLS = { path: [['long_search', '8 Weeks', 'wait'], ['earlier', 'Client Start to 6 Weeks', 'wait2'], ['contract', 'Under Contract / Passed Inspection', 'uc'], ['otherx', 'Other or not recorded', 'hold2']],
       hist: [['documented', 'Documented fall-through', 'uc'], ['ended', 'Contract ended, no purchase', 'uc2'], ['none', 'No contract on record', 'hold2']].concat(gAll.hist.unknown ? [['unknown', 'History not covered', 'hold']] : []) };
@@ -321,7 +322,7 @@
     const mixNote = () => {
       const k8 = per(gL.path.long_search, gL.n), o8 = per(gO.path.long_search, gO.n);
       S.$('#ldMixNote', body).innerHTML = st.mix === 'path'
-        ? `<b>Mostly long searches.</b> ${f1(k8)} of every 100 ${big} searches are paused straight from 8 Weeks, against ${f1(o8)} for the other leads: ${f1(100 * gap8)} of the ${f1(100 * gapAll)}-point gap. Earlier hunting stages add ${f1(per(gL.path.earlier, gL.n) - per(gO.path.earlier, gO.n))}; pauses from a contract are few for everyone (${gL.path.contract} and ${gO.path.contract}).`
+        ? `<b>Mostly long searches.</b> ${f1(k8)} of every 100 ${big} searches are paused straight from 8 Weeks, against ${f1(o8)} for the other leads: ${f1(100 * gap8)} of the ${f1(100 * gapAll)}-point gap. ${sec} sits between: ${f1(per(gS.path.long_search, gS.n))} per 100 from 8 Weeks, the remaining leads ${f1(per(gR.path.long_search, gR.n))}. Earlier hunting stages add ${f1(per(gL.path.earlier, gL.n) - per(gO.path.earlier, gO.n))}; pauses from a contract are few for everyone (${gL.path.contract} and ${gO.path.contract}).`
         : `<b>Contract trouble is proportionate.</b> ${S.int(ev(gL))} of ${big}'s ${S.int(gL.paused)} pauses (${S.pct(ev(gL) / gL.paused)}) follow an ended contract or documented fall-through, against ${S.int(ev(gO))} of ${S.int(gO.paused)} (${S.pct(ev(gO) / gO.paused)}) for the others. Per 100 searches: ${f1(per(ev(gL), gL.n))} vs ${f1(per(ev(gO), gO.n))} with that history, ${f1(per(gL.hist.none, gL.n))} vs ${f1(per(gO.hist.none, gO.n))} without.`;
       S.$('#ldMixKey', body).innerHTML = COLS[st.mix].map(([, l, c]) => `<span><i style="background:var(--${c === 'wait2' ? 'wait-2' : c === 'uc2' ? 'uc-2' : c === 'hold2' ? 'hold-2' : c})${c === 'uc2' ? ';box-shadow:inset 0 0 0 1.5px var(--uc)' : ''}"></i>${l}</span>`).join('');
     };
@@ -356,7 +357,7 @@
         ],
         series: [
           { type: 'bar', xAxisIndex: 0, yAxisIndex: 0, barWidth: '56%',
-            data: rs.map(r => ({ value: rate(r), itemStyle: { color: r.alias === big ? t.paused : t.hold2, opacity: r.alias === 'Unassigned' || r.merged ? 0.6 : 1, borderColor: r.alias === big ? t.paused : t.hold, borderWidth: r.alias === big ? 0 : 1, borderRadius: [0, 4, 4, 0] } })),
+            data: rs.map(r => ({ value: rate(r), itemStyle: { color: LC(r.alias, t), opacity: r.alias === 'Unassigned' || r.merged ? 0.6 : 1, borderColor: r.alias === big || r.alias === sec ? LC(r.alias, t) : t.hold, borderWidth: r.alias === big || r.alias === sec ? 0 : 1, borderRadius: [0, 4, 4, 0] } })),
             label: { show: true, position: 'right', distance: 6, color: t.ink, fontSize: 12.5, fontWeight: 650, backgroundColor: t.surface, padding: [2, 4], borderRadius: 3, formatter: p => { const r = rs[p.dataIndex]; return r.n ? `${S.int(r.paused)} of ${S.int(r.n)} · ${p1(rate(r))}` : st.coh === 'y26' ? 'no 2026 starts' : 'none'; } },
             markLine: { symbol: 'none', silent: true, lineStyle: { color: t.ink2, type: 'dashed', width: 1.4 },
               label: { show: true, position: 'start', distance: 6, formatter: `all searches ${p1(rate(all))}`, color: t.ink2, fontSize: 12, fontWeight: 600 }, data: [{ xAxis: rate(all) }] } },
@@ -365,8 +366,8 @@
               const i = params.dataIndex, r = rs[i], y = api.coord([0, i])[1];
               if (r.median == null) return { type: 'text', z2: 5, style: { x: api.coord([0, i])[0] + 6, y, text: timing(r), textVerticalAlign: 'middle', fill: t.muted, font: `500 12px Figtree, sans-serif`, backgroundColor: t.surface, padding: [2, 4] } };
               const xm = api.coord([r.median, i])[0], kids = [];
-              if (r.q1 != null) kids.push({ type: 'line', shape: { x1: api.coord([r.q1, i])[0], y1: y, x2: api.coord([r.q3, i])[0], y2: y }, style: { stroke: r.alias === big ? t.ink2 : t.hold, lineWidth: 3, lineCap: 'round', opacity: 0.55 } });
-              kids.push({ type: 'circle', shape: { cx: xm, cy: y, r: r.alias === big ? 8 : 6.5 }, style: { fill: r.alias === big ? t.ink : t.ink2, stroke: t.surface, lineWidth: 2 } });
+              if (r.q1 != null) kids.push({ type: 'line', shape: { x1: api.coord([r.q1, i])[0], y1: y, x2: api.coord([r.q3, i])[0], y2: y }, style: { stroke: r.alias === big || r.alias === sec ? LC(r.alias, t) : t.hold, lineWidth: 3, lineCap: 'round', opacity: 0.5 } });
+              kids.push({ type: 'circle', shape: { cx: xm, cy: y, r: r.alias === big ? 8 : 6.5 }, style: { fill: r.alias === big || r.alias === sec ? LC(r.alias, t) : t.ink2, stroke: t.surface, lineWidth: 2 } });
               kids.push({ type: 'text', z2: 5, style: { x: (r.q3 != null ? api.coord([r.q3, i])[0] : xm) + 8, y, text: `${S.med(r.median)} d · ${r.dated}`, textVerticalAlign: 'middle', fill: t.ink, font: `650 12.5px Figtree, sans-serif`, backgroundColor: t.surface, padding: [2, 4] } });
               return { type: 'group', children: kids };
             },
@@ -377,7 +378,7 @@
     });
 
     const recM = S.chart(mixNode, t => {
-      const grp = [[big, gL], [OTH, gO]], cols = COLS[st.mix];
+      const grp = [[big, gL], [sec, gS], ['Other leads', gR]], cols = COLS[st.mix];
       const col = { wait: t.wait, wait2: t.wait2, uc: t.uc, uc2: t.uc2, hold2: t.hold2, hold: t.hold };
       const maxV = Math.ceil(per(gL.paused, gL.n) / 5) * 5 + 3;
       return Object.assign(S.base(t), {
@@ -389,8 +390,8 @@
         xAxis: { type: 'value', min: 0, max: maxV, interval: 5, axisLabel: { color: t.label, fontSize: 12 }, splitLine: { lineStyle: { color: t.grid } },
           name: 'paused per 100 searches', nameLocation: 'middle', nameGap: 22, nameTextStyle: { color: t.muted, fontSize: 12 } },
         yAxis: { type: 'category', inverse: true, data: grp.map(([n]) => n), axisTick: { show: false }, axisLine: { show: false },
-          axisLabel: { formatter: (v, i) => `{a|${v}}\n{n|${f1(per(grp[i][1].paused, grp[i][1].n))} per 100 · ${S.int(grp[i][1].paused)} paused}`,
-            rich: { a: { color: t.ink, fontSize: 14, fontWeight: 700, lineHeight: 18, fontFamily: DISPLAY }, n: { color: t.muted, fontSize: 11.5, lineHeight: 15 } } } },
+          axisLabel: { formatter: (v, i) => `{a${i}|${v}}\n{n|${f1(per(grp[i][1].paused, grp[i][1].n))} per 100 · ${S.int(grp[i][1].paused)} paused}`,
+            rich: { a0: { color: t.sales, fontSize: 14, fontWeight: 700, lineHeight: 18, fontFamily: DISPLAY }, a1: { color: t.acq, fontSize: 14, fontWeight: 700, lineHeight: 18, fontFamily: DISPLAY }, a2: { color: t.ink2, fontSize: 14, fontWeight: 700, lineHeight: 18, fontFamily: DISPLAY }, a: { color: t.ink, fontSize: 14, fontWeight: 700, lineHeight: 18, fontFamily: DISPLAY }, n: { color: t.muted, fontSize: 11.5, lineHeight: 15 } } } },
         series: cols.map(([k, l, c], si) => ({ name: l, type: 'bar', stack: 'm', barWidth: 34,
           itemStyle: { color: col[c], borderColor: c === 'uc2' ? t.uc : t.surface, borderWidth: c === 'uc2' ? 1.2 : 1.5 },
           label: { show: true, color: ['uc', 'wait'].includes(c) ? '#fff' : t.ink, fontWeight: 700, fontSize: 12.5, formatter: p => (p.value >= 1.6 ? f1(p.value) : '') },

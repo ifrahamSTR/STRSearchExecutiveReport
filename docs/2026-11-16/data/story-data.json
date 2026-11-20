@@ -526,6 +526,7 @@
   },
   "leads": {
    "largest": "A1",
+   "second": "A2",
    "min_row": 20,
    "min_median": 5,
    "rows": [
@@ -1176,6 +1177,120 @@
      },
      "dwell_median": 14.0,
      "followup_median": 195.0,
+     "max_same_day": 3
+    },
+    "second": {
+     "n": 189,
+     "paused": 27,
+     "dated": 26,
+     "median": 142.5,
+     "q1": 63.0,
+     "q3": 215.5,
+     "path": {
+      "earlier": 6,
+      "long_search": 16,
+      "contract": 1,
+      "other": 0,
+      "unknown": 4
+     },
+     "hist": {
+      "documented": 1,
+      "ended": 8,
+      "none": 18,
+      "unknown": 0
+     },
+     "cross": {
+      "earlier_ev": 2,
+      "earlier_no": 4,
+      "long_search_ev": 6,
+      "long_search_no": 10,
+      "contract_ev": 1,
+      "contract_no": 0,
+      "other_ev": 0,
+      "other_no": 0,
+      "unknown_ev": 0,
+      "unknown_no": 4
+     },
+     "long": {
+      "paused": 16,
+      "hunting": 15
+     },
+     "stages": {
+      "purchased": 101,
+      "under_contract": 12,
+      "hunting": 24,
+      "paused": 27,
+      "additional": 1,
+      "refunded": 24,
+      "other": 0
+     },
+     "y2026": {
+      "n": 126,
+      "paused": 16,
+      "dated": 16,
+      "median": 71.0,
+      "q1": 60.75,
+      "q3": 141.25
+     },
+     "dwell_median": 9.0,
+     "followup_median": 204.0,
+     "max_same_day": 5
+    },
+    "rest": {
+     "n": 376,
+     "paused": 19,
+     "dated": 19,
+     "median": 75.0,
+     "q1": 54.0,
+     "q3": 94.5,
+     "path": {
+      "earlier": 7,
+      "long_search": 7,
+      "contract": 2,
+      "other": 3,
+      "unknown": 0
+     },
+     "hist": {
+      "documented": 0,
+      "ended": 4,
+      "none": 15,
+      "unknown": 0
+     },
+     "cross": {
+      "earlier_ev": 0,
+      "earlier_no": 7,
+      "long_search_ev": 1,
+      "long_search_no": 6,
+      "contract_ev": 1,
+      "contract_no": 1,
+      "other_ev": 2,
+      "other_no": 1,
+      "unknown_ev": 0,
+      "unknown_no": 0
+     },
+     "long": {
+      "paused": 7,
+      "hunting": 34
+     },
+     "stages": {
+      "purchased": 229,
+      "under_contract": 24,
+      "hunting": 68,
+      "paused": 19,
+      "additional": 4,
+      "refunded": 32,
+      "other": 0
+     },
+     "y2026": {
+      "n": 194,
+      "paused": 11,
+      "dated": 11,
+      "median": 68.0,
+      "q1": 47.0,
+      "q3": 92.0
+     },
+     "dwell_median": 24.0,
+     "followup_median": 264.0,
      "max_same_day": 3
     },
     "others": {
@@ -19459,7 +19574,7 @@
   "snapshots": {
    "reporting_layer": "2026-11-16"
   },
-  "built_at": "2026-11-20 18:12",
+  "built_at": "2026-11-20 18:19",
   "chapters": [
    "journey",
    "outcomes",
@@ -21146,6 +21261,23 @@
    "explorer": [
     61,
     true
+   ],
+   "ok": true,
+   "hard": true
+  },
+  {
+   "check": "2.4: largest + second-largest + remaining assigned leads = assigned (searches, paused, 8-week paused and hunting)",
+   "page": [
+    824,
+    107,
+    61,
+    55
+   ],
+   "explorer": [
+    824,
+    107,
+    61,
+    55
    ],
    "ok": true,
    "hard": true

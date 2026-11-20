@@ -405,6 +405,9 @@ def checks(ctx: C.Ctx, data: dict) -> list[dict]:
         gAll["dated"], gAll["paused"] - ld["late_pause"] - ld["no_start"])
     chk("2.4: the overall median days in pause and the 8-week hunting count agree with 2.2 / 2.3 populations",
         (gAll["long"]["hunting"], pa["dated"] >= gAll["dated"]), (h["by_status"]["8 Weeks"]["n"], True))
+    chk("2.4: largest + second-largest + remaining assigned leads = assigned (searches, paused, 8-week paused and hunting)",
+        tuple(sum(g[k] for g in (ld["groups"]["largest"], ld["groups"]["second"], ld["groups"]["rest"])) for k in ("n", "paused")) + tuple(sum(g["long"][k] for g in (ld["groups"]["largest"], ld["groups"]["second"], ld["groups"]["rest"])) for k in ("paused", "hunting")),
+        (gA["n"], gA["paused"], gA["long"]["paused"], gA["long"]["hunting"]))
     chk("2.4: start cohorts (largest + others) add up to the two groups' searches and pauses",
         (sum(c["largest"]["n"] for c in ld["cohorts"]), sum(c["others"]["n"] for c in ld["cohorts"]), sum(c["largest"]["paused"] for c in ld["cohorts"]), sum(c["others"]["paused"] for c in ld["cohorts"])),
         (gL["n"], gO["n"], gL["paused"], gO["paused"]))
